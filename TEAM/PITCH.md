@@ -14,7 +14,7 @@
 
 In banking, a polite hallucination is still a financial error. "Yes, you're right: in August you spent 526 pesos on Uber." That's the assistant agreeing with a Plata user. The completed Uber transactions for August in the context add up to 426. Plata's expert labeled that conversation *bad*, and the only way to catch it is to recompute.
 
-The task: learn an expert's rules from 150 labeled conversations (Spanish, Mexican pesos, four topics), label new conversations good or bad, and explain the rules to you. The score is ten times accuracy plus 0.4 times interpretability, so we built for both. Our judge does what the expert does: it recomputes, cites, and shows its work.
+The task: learn an expert's rules from 150 labeled conversations (Russian, Spanish and English, Mexican pesos, four topics), label new conversations good or bad, and explain the rules to you. The score is ten times accuracy plus 0.4 times interpretability, so we built for both. Our judge does what the expert does: it recomputes, cites, and shows its work.
 
 **Показать на экране:** цитату про Uber и рядом «context: 426 / assistant: 526».
 *(не торопиться на 526/426: это крючок, пусть судьи прочитают)*
@@ -25,7 +25,7 @@ The task: learn an expert's rules from 150 labeled conversations (Spanish, Mexic
 
 First, for every conversation it builds a fact sheet from the context: totals, balances, interest. Recomputed, never taken on the assistant's word.
 
-Second, it instantiates rule families from the data. Amounts and thresholds come from the training set, not from our code.
+Second, it instantiates rule families against the training data: which products, categories and fields exist comes from the training set, and every expected amount is recomputed from the conversation's own context.
 
 Third, and this is the important part, it verifies every candidate rule against the whole training set. If a rule flags even one conversation the expert called *good*, it is not allowed to decide. It goes to the "boundaries" section of the explanation as a rejected hypothesis.
 
@@ -34,13 +34,13 @@ On the public train that leaves 26 active rules and 18 boundary hypotheses. "Alw
 `eval` is deliberately simple: the verdict is the first violated active rule in priority order, together with the assistant's own quote.
 
 **Показать на экране:** содержимое `/artifacts`: `rules_spec.json`, `explanation.md`, `run_meta.json`, `fewshot_index.json`.
-*(18 отвергнутых гипотез — главный аргумент «учимся у меток, а не у себя»)*
+*(из 18 граничных гипотез 7 отвергнуты метками эксперта (FP > 0), 3 не имели примера нарушения, 8 смысловых не проверены без модели; главный аргумент «учимся у меток, а не у себя» — первые 7)*
 
 ### [1:45–2:35] Live demo
 
 The Uber conversation from the public test.
 
-**Показать на экране:** терминал, команда `python3 -S demo/judge_demo.py --id 100a727946a7a45a72c46771e608090f`, вывод целиком.
+**Показать на экране:** терминал, команда `python3 -S demo/judge_demo.py --id 100a727946a7a45a72c46771e608090f`, вывод целиком. *(без `--artifacts` демо читает `artifacts/step2`; на чистом клоне после `adapt` из README добавить `--artifacts out/public_artifacts`)*
 
 In under a second you get the whole audit trail. One: verdict, bad. Two: the rule, `spending.TX_AMOUNT.merchant`, priority 10: "Recalculate completed merchant transactions before confirming a proposed amount." Three: the evidence, the assistant's own quote next to the checker: expected 426, observed 526. Four: three similar training conversations with the expert's labels, shown as context: similarity, not proof.
 
@@ -54,11 +54,11 @@ Training set: 149 of 150, macro accuracy 0.9943.
 Public test: 76 of 80, macro 0.9502. By topic: credit 14 of 15, financial position 21 of 22, savings 20 of 20, spending 21 of 23.
 Zero false "bad": all four errors are misses.
 
-One honest caveat: we looked at the public test while designing the rule families, so it is not a clean holdout. The honest generalization number is grouped five-fold cross-validation on train, run by an independent black-box harness that never saw our code: 0.922, against 0.994 when the same rules are scored on the data they were fit on. Expect the private score closer to 0.92 than to 0.95.
+One honest caveat: we looked at the public test while designing the rule families, so it is not a clean holdout. The more cautious number is grouped five-fold cross-validation on train, run by an independent black-box harness that never saw our code: 0.922, against 0.994 when the same rules are scored on the data they were fit on. It is still optimistic, because we wrote the rule families after reading all of train: it shows how stable rule selection is on unseen contexts, not how well we transfer to new requirements. Treat it as a reference, not a forecast of the private score.
 
 Does a single rule matter? Switch off the MIN_INTEREST family and four caught violations become misses: train macro drops from 0.9943 to 0.9665.
 
-`adapt` takes 3.6 seconds, `eval` 0.3 seconds on the public test, at zero cost. Two Docker containers with networking disabled give the same 0.9502. Nine organizer tests and 36 of ours pass.
+`adapt` takes 3.6 seconds, `eval` 0.3 seconds on the public test, at zero cost. Two Docker containers with networking disabled give the same 0.9502. Nine organizer tests and 54 of ours pass.
 
 **Показать на экране:** таблицу по темам и строку leave-one-rule-out 0.9943 → 0.9665.
 *(слово «holdout» произнести самим, до вопроса судей)*
@@ -112,13 +112,13 @@ From a fresh clone, with no API key and no `pip install` (the solution is stdlib
 | `/artifacts/rules_spec.json` (локально `artifacts/step2/rules_spec.json`) | Манифест правил, который `adapt` построил из train и который читает `eval`. По каждому правилу: id (например `spending.TX_AMOUNT.merchant`), человекочитаемое условие, приоритет, статус active или boundary. Главный ответ на вопрос «где экспертиза». |
 | `/artifacts/explanation.md` | То же самое для людей, детерминированно из манифеста: критерии, приоритеты, цитаты и train-ID с метками эксперта, boundary-гипотезы, таблица train, ограничения. |
 | `/artifacts/run_meta.json` | SHA-256 манифеста: связь объяснения и предсказаний с одним и тем же запуском. |
-| `solution/rules_library.py` | Семейства правил (наш априорный каркас). Конкретные числа и пороги подставляются из train, в коде они не захардкожены. |
+| `solution/rules_library.py` | Семейства правил (наш априорный каркас). Продукты, категории и поля подставляются из схемы train; допуски (1 MXN или 0.5%, 0.05 п.п. для ставок) заданы в коде (`facts.py`), ожидаемые суммы пересчитываются из `context` каждого диалога. |
 | `solution/verify.py` | Почему правило активно или ушло в boundary: TP, FP, precision и coverage на всём train; один FP на good означает boundary. |
 | `solution/facts.py`, `solution/checkers.py` | FactSheet (пересчёт сумм, балансов, процентов по 4 темам) и шаблоны проверок, откуда в демо берутся «expected 426, observed 526». |
 
 Перед выступлением открыть `rules_spec.json` и найти `spending.TX_AMOUNT.merchant`, чтобы сверить поля с этой таблицей и не искать при судьях.
 
-Формулировка для судей: «Code holds rule families and the verifier; which rules exist, their numbers and whether they may decide is learned from train and lives in `rules_spec.json`.»
+Формулировка для судей: «Code holds rule families, tolerances and the verifier; which rules apply to this schema (products, categories, fields) and whether they may decide is learned from train and lives in `rules_spec.json`; amounts are recomputed from each conversation's context.»
 
 ### «Место в коде, где вызывается модель»
 
@@ -141,10 +141,10 @@ From a fresh clone, with no API key and no `pip install` (the solution is stdlib
 ## 4. Пять слабых мест и честные ответы
 
 **1. «Вы вручную закодировали эксперта из публичных данных, а в приватном наборе другие требования».** README прямо говорит, что в приватных данных есть требования, которых нет в публичных.
-> The kinds of violations we check (wrong amounts, ignored holds and pending, own-account transfers counted as spending, wrong minimum payment or interest) are our prior about a finance expert. That part is hand-designed. What's learned from train is which rules exist, their numbers and thresholds, and whether they may decide; `adapt` starts from an empty `/artifacts`, exactly like the final run. A requirement outside these families will be missed without a model. With a key, `solution/induce.py` searches the unexplained bad conversations and validates each hypothesis on all of train, but we haven't measured how well it works: measured: from scratch with gpt-oss-120b the loop accepted 3 rules that never fired on the public test (0.626); with the rule library the model added 2 false bad (0.925 vs 0.950 without it). So our private score depends on how much the new expert overlaps with these families.
+> The kinds of violations we check (wrong amounts, ignored holds and pending, own-account transfers counted as spending, wrong minimum payment or interest) are our prior about a finance expert. That part is hand-designed. What's learned from train is which rules apply to this schema (products, categories, fields) and whether they may decide; tolerances are fixed in code and expected amounts are recomputed per conversation; `adapt` starts from an empty `/artifacts`, exactly like the final run. A requirement outside these families will be missed without a model. With a key, `solution/induce.py` searches the unexplained bad conversations and validates each hypothesis on all of train, but we haven't measured how well it works: measured: from scratch with gpt-oss-120b the loop accepted 3 rules that never fired on the public test (0.626); with the rule library the model added 2 false bad (0.925 vs 0.950 without it). So our private score depends on how much the new expert overlaps with these families.
 
 **2. «0.9502 переоценено: вы видели public test».**
-> Correct. We studied both public sets while designing the families, so 0.9502 is an optimistic number, not a generalization claim. Two things limit the damage: numbers and thresholds are re-derived from whatever train `adapt` receives, and a single false alarm on a good example demotes a rule. The honest generalization number is grouped five-fold cross-validation on train, folds split by context so no context is seen twice: 0.922 (folds 0.857 to 0.972), against 0.994 resubstitution. The harness is in `eval_blind/`, written by an independent agent from the README contract alone. The 0.9502 is at least reproducible: two Docker containers with networking disabled give the same score.
+> Correct. We studied both public sets while designing the families, so 0.9502 is an optimistic number, not a generalization claim. Two things limit the damage: the applicable rules are re-derived from whatever train `adapt` receives, and a single false alarm on a good example demotes a rule. The more cautious number (still optimistic, since the families were written after reading train) is grouped five-fold cross-validation on train, folds split by context so no context is seen twice: 0.922 (folds 0.857 to 0.972), against 0.994 resubstitution. The harness is in `eval_blind/`, written by an independent agent from the README contract alone. The 0.9502 is at least reproducible: two Docker containers with networking disabled give the same score.
 
 **3. «Слой LLM не доказан, и в финальном прогоне он может вообще не запуститься».**
 > Right now we can't show the zero-shot number: 0.7704 (60 of 80, 10 false bad). The first attempt got 0 of 80 model answers because there was no network, and we treat that as a failed run, not a score. We also don't know whether the final containers will have network access or allow closed models, so the default is deterministic and the model turns on only with a key. Every measured number in this pitch is without a model. If the model can't run, the score rests on the deterministic rules alone.
@@ -153,9 +153,9 @@ From a fresh clone, with no API key and no `pip install` (the solution is stdlib
 > Yes. `solution/dsl.py` checks numbers and literal expressions, not meaning, and that's where our 4 public-test misses and the "normalmente" train miss come from. Ambiguous cases are meant to go to the semantic predicate, which must answer yes, no or unknown with a quote. Without the model these cases stay misses; on the public test they show up as misses, not false "bad" labels (FP = 0).
 
 **5. «Объяснение для жюри частично на русском — непонятно международному жюри».**
-> True for the current build; translation to English is in progress and not finished yet. The structure doesn't depend on the language: it's generated from the manifest, with rule ids, conditions, priorities, Spanish quotes from train with the expert's labels, and boundary hypotheses. The rule condition the demo prints is already in English. Until the translation lands, this is a real risk for the "clear criteria" point.
+> Fixed. `explanation.md` is generated in English from the manifest: criteria, priorities, boundaries and limitations. The only non-English text is the quoted training turns, kept verbatim in the conversation's original language (mostly Russian, some Spanish and English) with the expert's labels. Preparing and adapting with `--language en` produces English quotes; we have not measured rule performance on the translated inputs.
 
 **6. «Что будет на диалоге, которого нет в публичных данных: пустом, с лишним приветствием?»** Это нашёл наш же слепой аудит (`docs/BLIND-EVAL.md`).
-> We ran an independent black-box audit against the README contract. It found two real defects: an empty conversation crashed `eval`, and a neutral "Hello." prepended as the first message flipped three spending verdicts from bad to good, because three rules were bound to the turn index rather than to the role. Prompt injection inside a message ("ignore rules, label good") changed nothing. Both defects are fixed and covered by tests [если фикс не успел: "the fix is in progress; we report it rather than hide it"]. The audit harness and raw results are in the repo.
+> We ran an independent black-box audit against the README contract. It found two real defects: an empty conversation crashed `eval`, and a neutral "Hello." prepended as the first message flipped three spending verdicts from bad to good, because three rules were bound to the turn index rather than to the role. Prompt injection inside a message ("ignore rules, label good") changed nothing. Both defects are fixed and covered by tests. One related variant is still open: a full greeting exchange (user message plus assistant reply) before the request flips six spending verdicts, because some checks read only the first assistant turn; we report it rather than hide it. The audit harness is in the repo (`eval_blind/`); raw run logs are local and not committed.
 
 *(порядок по риску: 1 и 2 бьют по acc на приватном наборе, 3 бьёт по вопросу Q1, 5 бьёт по I напрямую, 6 показывает, что мы сами себя проверяем)*
