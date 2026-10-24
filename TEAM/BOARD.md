@@ -8,5 +8,5 @@
 - done | Демо для судей: demo/judge_demo.py --id <id> (вердикт, правило, цитата, похожие train) | Codex (Sol) | demo/ tests/test_demo.py | 13:45
 - done | Слепая проверка: CV 0.922 vs 0.994, падение на пустом диалоге, 3 вердикта зависят от индекса хода | Codex (Blind) | eval_blind/ docs/BLIND-EVAL.md | 13:41
 - todo | Фикс по BLIND-EVAL: пустой диалог, привязка правил к роли, тесты; explanation на английском | Astra после шага 3 | solution/ tests/ | 13:41
-- doing | Ответы на 3 вопроса судей, питч 3–5 мин: два черновика (Opus, Gemini Argon), слияние планировщиком | Claude-планировщик | TEAM/TASK-C-PITCH.md TEAM/PITCH-opus.md TEAM/PITCH-argon.md → TEAM/PITCH.md | 14:05
+- done | Питч 3–5 мин + 3 вопроса судей + показ кода + 6 слабых мест; осталось подставить zero-shot и rediscovery из шага 3 | Claude-планировщик | TEAM/PITCH.md | 13:50
 - todo | Чеклист FAQ перед сдачей, push, SHA организаторам, форма OrganizerHQ | Аркадий | — | —
