@@ -2,7 +2,7 @@
 
 Итоговая версия (основа Opus, крючок и разбор демо из Argon, числа слепого аудита). Черновики: PITCH-opus.md, PITCH-argon.md.
 
-Плейсхолдеры 0.7704 (60 of 80, 10 false bad), measured: from scratch with gpt-oss-120b the loop accepted 3 rules that never fired on the public test (0.626); with the rule library the model added 2 false bad (0.925 vs 0.950 without it) заменить измеренными числами перед выходом на сцену. Если числа нет, читать фразу вместе с плейсхолдером: «measurement is running, we'll show it as soon as it lands». Не округлять и не придумывать.
+Все числа измерены: zero-shot голой модели 0.7704, гибрид gpt-oss 0.925, с нуля 0.626, Gemini 0.951, grouped CV 0.922. Не округлять и не придумывать.
 
 Все измеренные числа ниже получены без языковой модели; accuracy посчитана официальным `src/evaluate.py`. Питч ≈610 произносимых слов, при темпе 145 слов в минуту с паузой на демо ≈4:45.
 
