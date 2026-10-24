@@ -85,20 +85,21 @@ def explain(manifest):
     for topic, g in sorted(manifest["training_summary"]["by_topic"].items()):
         lines.append(f"| {topic} | {g['correct']} / {g['n']} | {g['accuracy']:.6f} | {g['TP']} | {g['FP']} | {g['FN']} | {g['TN']} |")
     induction = manifest.get("induction", {})
-    lines += ["", "## Как найдены правила", "",
-              "Шаблоны инстанцируются из полей входного train и заново проверяются на всём train. "
-              "Индукция использует ошибки текущего манифеста и bad без объяснения: ближайший good той же темы по TF-IDF context, "
-              "1–2 атомарные гипотезы без списка известных семейств, затем до 8 канонических правил на тему. "
-              "Каждый кандидат проверяется на всём train; при FP выполняется один раунд сужения. "
-              "Все гипотезы и отказы сохраняются в induction_log.json.", "",
-              f"Фактический статус индукции: `{induction.get('status', 'not_run')}`. "
-              f"Принятые ID: {', '.join(induction.get('accepted_rule_ids', [])) or 'нет'}.", "",
-              "## Ограничения", "",
-              f"Модельные шаги: `{manifest.get('model_status', 'not_checked')}`. "
-              "При отсутствии ключа новые правила, семантические критерии, zero-shot baseline и rediscovery "
-              "не подтверждены живой моделью. Кэш может дать ранее проверенный ответ; API-ошибки и unknown логируются. "
-              "Поддержка считается по точным различным context; near-duplicate grouping и cross-validation не реализованы. "
-              "Совпадение train не доказывает качество на приватном наборе.", "",
+    lines += ["", "## How the rules were found", "",
+              "Templates are instantiated from the fields of the supplied train set and re-verified on the whole train set. "
+              "Induction starts from rows the current manifest gets wrong and from unexplained bad rows: each is paired with the "
+              "nearest good row of the same topic (TF-IDF over context), the model proposes 1–2 atomic hypotheses without a list "
+              "of known rule families, and hypotheses are merged into at most 8 canonical rules per topic. "
+              "Every candidate is verified on the whole train set; a candidate with FP gets one narrowing round. "
+              "All hypotheses and rejections are stored in induction_log.json.", "",
+              f"Actual induction status: `{induction.get('status', 'not_run')}`. "
+              f"Accepted IDs: {', '.join(induction.get('accepted_rule_ids', [])) or 'none'}.", "",
+              "## Limitations", "",
+              f"Model steps: `{manifest.get('model_status', 'not_checked')}`. "
+              "Without an API key, new rules, semantic criteria, the zero-shot baseline and rediscovery are not confirmed "
+              "by a live model. The cache may replay a previously verified answer; API errors and unknown verdicts are logged. "
+              "Support counts exact distinct contexts; near-duplicate grouping and cross-validation are not implemented. "
+              "Agreement on train does not prove quality on the private set.", "",
               "### Quoted training evidence", ""]
     for iid, w in sorted(witnesses.items()):
         lines += [f'<a id="example-{iid}"></a>', f"**{iid} — expert label `{w['label']}`**", ""]

@@ -9,7 +9,7 @@ import sys
 from .checkers import run_check
 from .facts import FactSheet
 from .io import load_rows, write_json
-from .llm import ChatClient
+from .llm import ChatClient, pmap
 from .semantic import SemanticRuntime
 
 
@@ -47,11 +47,13 @@ def evaluate(input_path="/input/test.jsonl", artifacts="/artifacts", output="/ou
     runtime = SemanticRuntime(client, index)
     if not client.available:
         print("[eval] model calls skipped: no enabled API key; cached responses may be reused", file=sys.stderr)
-    predictions, decisions = [], []
-    for row in rows:
+    def judge(row):
         checks = []
-        label = predict(row, manifest["rules"], runtime, manifest.get("default_label", "good"),
-                        manifest.get("topic_majority"), checks)
+        return predict(row, manifest["rules"], runtime, manifest.get("default_label", "good"),
+                       manifest.get("topic_majority"), checks), checks
+
+    predictions, decisions = [], []
+    for row, (label, checks) in zip(rows, pmap(judge, rows) if client.available else map(judge, rows)):
         predictions.append(dict(item_id=row["item_id"], label=label))
         decisions.append(dict(item_id=row["item_id"], label=label, checks=checks,
                               fallback=any(c["violated"] is None for c in checks) and not any(c["violated"] is True for c in checks)))

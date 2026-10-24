@@ -32,6 +32,17 @@ def values(facts):
     return [v for t in facts.assistant_turns for v in t["money"]]
 
 
+def opening_request(facts):
+    """All user text before the first assistant reply, so a greeting turn does not hide the request."""
+    parts = []
+    for m in facts.conversation:
+        if m["role"] == "assistant":
+            break
+        if m["role"] == "user":
+            parts.append(norm(m["content"]))
+    return "\n".join(parts) or next((norm(m["content"]) for m in facts.conversation if m["role"] == "user"), "")
+
+
 def known(facts, field):
     return any(fnmatch.fnmatchcase(key, field) and value is not None
                for key, value in facts.known_fields.items())
@@ -126,7 +137,7 @@ def wrong_period(f, p):
             if not month_in(answer, int(previous[-2:])) and previous not in answer:
                 return evidence(f, "Last-month answer omits the preceding calendar month", expected_month=previous, reply=answer)
     elif p["kind"] == "default_three_months":
-        user = next((norm(m["content"]) for m in f.conversation if m["role"] == "user"), "")
+        user = opening_request(f)
         if not re.search(p["request_pattern"], user) or len(f.last3) != 3:
             return None
         first = f.assistant_turns[0]["normalized"]
@@ -191,7 +202,7 @@ def amount_mismatch(f, p):
     if not f.assistant_turns:
         return None
     kind = p["kind"]
-    user = next((norm(m["content"]) for m in f.conversation if m["role"] == "user"), "")
+    user = opening_request(f)
     first = f.assistant_turns[0]
     if kind == "remaining_debt":
         cs = f.expected["credit_statement"]

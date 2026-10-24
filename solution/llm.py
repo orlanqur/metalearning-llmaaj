@@ -1,12 +1,14 @@
 """Small, fail-soft OpenAI-compatible chat client; standard library only."""
 
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import math
 import os
 from pathlib import Path
 import sys
+import threading
 import time
 from http.client import HTTPException
 from urllib.error import HTTPError, URLError
@@ -14,6 +16,16 @@ from urllib.request import Request, urlopen
 
 DEFAULT_MODEL = "openai/gpt-oss-120b"
 GEMINI_OPENAI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai"
+
+
+def pmap(function, items):
+    """Ordered map over a thread pool; model calls are I/O-bound. LLM_WORKERS=1 restores sequential runs."""
+    # ponytail: fixed pool, no rate-limit backoff beyond the client retries; lower LLM_WORKERS on HTTP 429
+    workers = max(1, int(os.getenv("LLM_WORKERS", "8")))
+    if workers == 1:
+        return [function(item) for item in items]
+    with ThreadPoolExecutor(workers) as pool:
+        return list(pool.map(function, items))
 DEFAULT_GEMINI_MODEL = "gemini-4-argon"
 
 
@@ -189,7 +201,7 @@ class ChatClient:
                 try:
                     self.cache_dir.mkdir(parents=True, exist_ok=True)
                     target = self.cache_dir / (key + ".json")
-                    temp = target.with_suffix(f".{os.getpid()}.tmp")
+                    temp = target.with_suffix(f".{os.getpid()}.{threading.get_ident()}.tmp")
                     temp.write_text(canonical(dict(key=key, model=model, response=result)), encoding="utf-8")
                     temp.replace(target)
                 except OSError:

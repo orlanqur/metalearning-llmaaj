@@ -21,11 +21,13 @@ def load_rows(path, training=False):
             seen.add(iid)
             if row["topic"] not in TOPICS or not isinstance(row["context"], dict):
                 raise ValueError(f"Line {line_no}: invalid topic or context")
-            if not isinstance(row["conversation"], list) or not row["conversation"]:
-                raise ValueError(f"Line {line_no}: conversation must be a nonempty list")
-            for message in row["conversation"]:
-                if not isinstance(message, dict) or set(message) != {"role", "content"} or message["role"] not in {"assistant", "user", "system", "tool"} or not isinstance(message["content"], str):
-                    raise ValueError(f"Line {line_no}: invalid message")
+            if not isinstance(row["conversation"], list):
+                raise ValueError(f"Line {line_no}: conversation must be a list")
+            # One malformed message must not abort the whole run (no predictions.csv = zero score):
+            # keep valid role/content pairs, drop the rest; an empty conversation is judged as is.
+            row["conversation"] = [{"role": m["role"], "content": m["content"]} for m in row["conversation"]
+                                   if isinstance(m, dict) and m.get("role") in {"assistant", "user", "system", "tool"}
+                                   and isinstance(m.get("content"), str)]
             if training and row.get("label") not in {"good", "bad"}:
                 raise ValueError(f"Line {line_no}: training requires good/bad label")
             # Eval cannot use an accidentally supplied label or translated copy.

@@ -8,7 +8,7 @@ from .checkers import run_check
 from .dsl import GRAMMAR, validate
 from .facts import FactSheet
 from .io import write_json
-from .llm import canonical
+from .llm import canonical, pmap
 from .semantic import TfidfIndex, compact_facts
 from .verify import training_summary, verify
 
@@ -96,7 +96,7 @@ def induce(rows, rules, runtime, output):
         write_json(output / "induction_log.json", log)
         return rules, log
     retrieval = TfidfIndex([canonical(r["context"]) for r in rows])
-    by_topic = {}
+    by_topic, jobs = {}, []
     for row in residuals:
         eligible = [i for i, r in enumerate(rows) if r["label"] == "good" and r["topic"] == row["topic"] and r["item_id"] != row["item_id"]]
         nearest = retrieval.nearest(canonical(row["context"]), eligible, 1)
@@ -106,8 +106,11 @@ def induce(rows, rules, runtime, output):
         twin = rows[nearest[0]]
         pair = dict(residual_id=row["item_id"], good_id=twin["item_id"], topic=row["topic"])
         log["pairs"].append(pair)
-        response = client.request(DISCOVERY_SYSTEM, canonical(dict(pair=[evidence_row(row), evidence_row(twin)])),
-                                  rules_schema(2), model=client.induction_model)
+        jobs.append((row, twin, pair))
+    # Discovery calls are independent per pair: run them concurrently, keep log order.
+    responses = pmap(lambda job: client.request(DISCOVERY_SYSTEM, canonical(dict(pair=[evidence_row(job[0]), evidence_row(job[1])])),
+                                                rules_schema(2), model=client.induction_model), jobs)
+    for (row, twin, pair), response in zip(jobs, responses):
         if response is None:
             log["hypotheses"].append(dict(pair=pair, status="model_unavailable"))
             continue
