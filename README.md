@@ -196,10 +196,12 @@ removed and the model had to re-discover it from the residual `bad` conversation
 (`solution/validate.py leave-one-rule-out`). Claude Sonnet 5.5 re-discovered it
 (4 of 4 witnesses, 0 false alarms, 304 calls, about $4.07); Gemma 4 31B proposed
 the rule almost verbatim but verification rejected it (11 true, 3 false); gpt-oss-120b
-from scratch did not. Qwen3.8-27B on this test: not measured; the run tripped the client's
-circuit breaker on slow responses before induction started. Practical reading: open-weight Qwen is enough to apply known
-rule families at 0 false `bad`; discovering genuinely new expert rules needs a
-stronger model, which the organizers' containers may or may not allow.
+from scratch did not. **Qwen3.8-27B also re-discovered it** (4 of 4, 0 false alarms, three induced `credit`
+rules each covering all four witnesses; 111 new calls plus 265 cached, 8 min, about $0.21)
+once the per-request deadline was raised: `LLM_DEADLINE=600`, `LLM_BREAKER_AFTER=10`;
+with the default 135 s deadline its first run tripped the breaker before induction
+started. Practical reading: both the closed default (Sonnet) and the open-weight path
+(Qwen, about 10x cheaper per token) discover new expert rules on this test.
 
 **Model layer, measured honestly.** With `openai/gpt-oss-120b` the hybrid run
 activated three semantic rules that produced 2 false `bad` labels on public test
@@ -316,10 +318,9 @@ excluded from Docker builds. Full policy and limits: [SECURITY.md](docs/SECURITY
   yes/no/unknown predicate with a quote, measured per rule before activation.
 - **Grouped cross-validation inside `adapt`.** Report an honest expected accuracy
   next to the artifacts instead of a resubstitution score.
-- **Open-weight path.** Qwen3.8-27B needs work before it can replace Sonnet for
-  discovery: longer per-request deadlines (its hidden-rule run tripped the breaker),
-  a completed hidden-rule test, and a measured induction run; until then it is the
-  fallback for applying known rule families.
+- **Open-weight path.** Qwen3.8-27B passed the hidden-rule test with a longer
+  per-request deadline (`LLM_DEADLINE=600`); next is making that deadline the Qwen
+  default and running the full public hybrid with induction on Qwen.
 
 ## Repository map
 
