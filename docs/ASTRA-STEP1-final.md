@@ -7,5 +7,5 @@
 
 Сеть и модели не использовались. `src/`, `data/` не изменены; коммитов нет.
 
-Подробности и известные пропуски: [ASTRA-STEP1.md](/Users/arkadijmisurov/code_projects/ai-automatizations/hackathon-bcn-2026/metalearning-llmaaj/docs/ASTRA-STEP1.md).
+Подробности и известные пропуски: [ASTRA-STEP1.md](docs/ASTRA-STEP1.md).
 
