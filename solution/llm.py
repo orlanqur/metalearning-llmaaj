@@ -14,7 +14,7 @@ from http.client import HTTPException
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-DEFAULT_MODEL = "qwen/qwen3.8-27b"
+DEFAULT_MODEL = "anthropic/claude-sonnet-5.5"
 GEMINI_OPENAI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai"
 
 

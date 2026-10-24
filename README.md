@@ -17,9 +17,16 @@ The original task contract is preserved in [ORGANIZER-README.md](docs/ORGANIZER-
 
 ## Model and license
 
-- Default open-weight model: **`qwen/qwen3.8-27b`** (Qwen3.8-27B, **Apache 2.0**) via OpenRouter. In the
-  team's benchmark it is the only open-weight model whose hybrid run kept 0 false `bad`
-  (76/80, 0.9502); `openai/gpt-oss-120b` scored 0.9252 and `google/gemma-4-31b-it` 0.9377.
+- Default model for rule discovery: **`anthropic/claude-sonnet-5.5`** via OpenRouter.
+  The organizers confirmed that their containers have network access, that a closed
+  model is acceptable for this track and that API cost does not affect the score.
+  Sonnet is the only model in our benchmark that re-discovered a hidden rule
+  (4 of 4, 0 false alarms), and its hybrid run on the public test keeps 0 false `bad`
+  (76/80, 0.9502; 35 active rules: 26 from the library, 7 semantic, 2 induced; 345 calls, 4 min).
+- Open-weight fallback: **`qwen/qwen3.8-27b`** (Qwen3.8-27B, Apache 2.0), the only
+  open-weight model whose hybrid run also kept 0 false `bad` (76/80, 0.9502); set
+  `INDUCTION_MODEL=qwen/qwen3.8-27b`. `openai/gpt-oss-120b` scored 0.9252 and
+  `google/gemma-4-31b-it` 0.9377.
 - Alternative provider: **Gemini**. The documented team-member run used
   **`gemini-4-argon`**, a closed model; it is separate from the open-weight default.
 - Without an API key, the solution runs in deterministic mode. Use `--no-model`
@@ -154,6 +161,8 @@ reports, not a new benchmark run for this README.
 | Public test | No model | **0.9502** | 76/80 |
 | Train, grouped five-fold CV | No model | **0.922** | Fold mean |
 | Public test, team-member run | Gemini `gemini-4-argon` | **0.9507** | 76/80 |
+| Public test, hybrid (rules + model) | `anthropic/claude-sonnet-5.5` | **0.9502** | 76/80, 0 false bad |
+| Public test, hybrid (rules + model) | `qwen/qwen3.8-27b` | 0.9502 | 76/80, 0 false bad |
 | Public test, hybrid (rules + model) | `openai/gpt-oss-120b` | 0.9252 | 74/80 |
 | Public test, from scratch (model-only induction, no rule library) | `openai/gpt-oss-120b` | 0.6259 | 50/80 |
 | Same bare model, zero-shot (no rules, no few-shot) | `openai/gpt-oss-120b` | **0.7704** | 60/80 |
@@ -192,8 +201,8 @@ on train, but none of them fired on the public test: every conversation was
 predicted `good` (50/80), macro 0.6259. That run made at least 78 calls for about
 $0.04 and was stopped by its 55-minute limit, so this is the saved checkpoint, not a
 finished induction. The model alone does
-not recover the expert's rules within this budget. The submitted default is therefore the deterministic
-mode; the model layer is opt-in via an API key. The from-scratch mode
+not recover the expert's rules within this budget. The model layer runs whenever an API key is present (the organizers run with
+network access); without a key the deterministic mode is used. The from-scratch mode
 (`adapt --from-scratch` or `ADAPT_MODE=from_scratch`), the multi-round induction
 loop (`solution/induce.py`) and the measurement script
 (`solution/measure_induction.py`) are in this repository; report:
@@ -299,7 +308,10 @@ excluded from Docker builds. Full policy and limits: [SECURITY.md](docs/SECURITY
   yes/no/unknown predicate with a quote, measured per rule before activation.
 - **Grouped cross-validation inside `adapt`.** Report an honest expected accuracy
   next to the artifacts instead of a resubstitution score.
-- **Hidden-rule test on Qwen3.8-27B** with a longer per-request deadline.
+- **Open-weight path.** Qwen3.8-27B needs work before it can replace Sonnet for
+  discovery: longer per-request deadlines (its hidden-rule run tripped the breaker),
+  a completed hidden-rule test, and a measured induction run; until then it is the
+  fallback for applying known rule families.
 
 ## Repository map
 

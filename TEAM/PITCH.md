@@ -73,7 +73,7 @@ Does a single rule matter? Switch off the MIN_INTEREST family and four caught vi
 
 Where do we fail? On meaning, not numbers. The four public-test misses and the one train miss, a Spanish "normalmente", are semantic. The private set will also bring expert requirements the public data doesn't show.
 
-That's what the optional model layer is for: a yes/no/unknown predicate that has to quote the dialog, and rule induction on unexplained cases, with every new rule verified on all of train like the others. The default model is Qwen3.8-27B, Apache 2.0; a strong closed model such as Sonnet 5.5 re-discovered a hidden rule in our test, open-weight ones did not. Without a key everything stays deterministic. How much better than the bare model? 0.7704 (60 of 80, 10 false bad). We'll show you a number, not an adjective.
+That's what the optional model layer is for: a yes/no/unknown predicate that has to quote the dialog, and rule induction on unexplained cases, with every new rule verified on all of train like the others. The default discovery model is Claude Sonnet 5.5: the only one that re-discovered a hidden rule in our test, and its hybrid run keeps 0 false bad on the public test. Open-weight fallback: Qwen3.8-27B. Without a key everything stays deterministic. How much better than the bare model? 0.7704 (60 of 80, 10 false bad). We'll show you a number, not an adjective.
 
 A judge that recomputes, cites, and admits what it doesn't know. Thank you.
 
