@@ -147,7 +147,7 @@ reports, not a new benchmark run for this README.
 | Public test, team-member run | Gemini `gemini-4-argon` | **0.9507** | 76/80 |
 | Public test, hybrid (rules + model) | `openai/gpt-oss-120b` | 0.9252 | 74/80 |
 | Public test, from scratch (model-only induction, no rule library) | `openai/gpt-oss-120b` | 0.6259 | — |
-| Same bare model, zero-shot | Model baseline | measured in progress | — |
+| Same bare model, zero-shot (no rules, no few-shot) | `openai/gpt-oss-120b` | **0.7704** | 60/80 |
 
 Public-test breakdown; accuracies are calculated from the reported counts:
 
@@ -157,6 +157,13 @@ Public-test breakdown; accuracies are calculated from the reported counts:
 | `financial_position` | 21/22 | 0.9545 | 22/22 |
 | `savings` | 20/20 | 1.0000 | 20/20 |
 | `spending` | 21/23 | 0.9130 | 20/23 |
+
+**Bare model vs. our layer.** Zero-shot `openai/gpt-oss-120b` on the same 80
+public-test conversations, given the full context and dialog but no learned rules
+and no few-shot examples, scores macro 0.7704 (60/80; credit 15/15, financial
+position 17/22, savings 14/20, spending 14/23; 10 false `bad`). Our deterministic
+rules score 0.9502 with 0 false `bad`. Measured with `solution/validate.py zero-shot`;
+evidence in `out/zero_shot.score.json` (generated, not committed).
 
 **Model layer, measured honestly.** With `openai/gpt-oss-120b` the hybrid run
 activated three semantic rules that produced 2 false `bad` labels on public test

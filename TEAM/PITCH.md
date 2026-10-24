@@ -2,7 +2,7 @@
 
 Итоговая версия (основа Opus, крючок и разбор демо из Argon, числа слепого аудита). Черновики: PITCH-opus.md, PITCH-argon.md.
 
-Плейсхолдеры `[ZERO-SHOT: TBD]`, `[REDISCOVERY: TBD]` заменить измеренными числами перед выходом на сцену. Если числа нет, читать фразу вместе с плейсхолдером: «measurement is running, we'll show it as soon as it lands». Не округлять и не придумывать.
+Плейсхолдеры 0.7704 (60 of 80, 10 false bad), `[REDISCOVERY: TBD]` заменить измеренными числами перед выходом на сцену. Если числа нет, читать фразу вместе с плейсхолдером: «measurement is running, we'll show it as soon as it lands». Не округлять и не придумывать.
 
 Все измеренные числа ниже получены без языковой модели; accuracy посчитана официальным `src/evaluate.py`. Питч ≈610 произносимых слов, при темпе 145 слов в минуту с паузой на демо ≈4:45.
 
@@ -73,7 +73,7 @@ Does a single rule matter? Switch off the MIN_INTEREST family and four caught vi
 
 Where do we fail? On meaning, not numbers. The four public-test misses and the one train miss, a Spanish "normalmente", are semantic. The private set will also bring expert requirements the public data doesn't show.
 
-That's what the optional model layer is for: a yes/no/unknown predicate that has to quote the dialog, and rule induction on unexplained cases, with every new rule verified on all of train like the others. The default model is gpt-oss-120b, Apache 2.0. Without a key everything stays deterministic. How much better than the bare model? `[ZERO-SHOT: TBD]`. We'll show you a number, not an adjective.
+That's what the optional model layer is for: a yes/no/unknown predicate that has to quote the dialog, and rule induction on unexplained cases, with every new rule verified on all of train like the others. The default model is gpt-oss-120b, Apache 2.0. Without a key everything stays deterministic. How much better than the bare model? 0.7704 (60 of 80, 10 false bad). We'll show you a number, not an adjective.
 
 A judge that recomputes, cites, and admits what it doesn't know. Thank you.
 
@@ -85,9 +85,9 @@ A judge that recomputes, cites, and admits what it doesn't know. Thank you.
 
 ### Q1. "How is your product better than the same model without your layer, and how did you check?"
 
-Our default judge makes zero model calls and scores macro 0.9502 on the public test (76 of 80, zero false "bad"), measured with the organizers' `src/evaluate.py`; caveat: that set is not a clean holdout for us, and grouped cross-validation on train gives 0.922. The same model zero-shot on the same 80 conversations scores `[ZERO-SHOT: TBD]`, computed by `solution/validate.py` (an earlier run got 0 of 80 model answers for lack of network, so it is not a baseline). We also measure single pieces: removing the MIN_INTEREST family turns 4 caught violations into misses and drops train macro from 0.9943 to 0.9665. What the layer adds is inspectable in `/artifacts/rules_spec.json`: recomputed facts plus 26 active rules, each verified against the full training set.
+Our default judge makes zero model calls and scores macro 0.9502 on the public test (76 of 80, zero false "bad"), measured with the organizers' `src/evaluate.py`; caveat: that set is not a clean holdout for us, and grouped cross-validation on train gives 0.922. The same model zero-shot on the same 80 conversations scores 0.7704 (60 of 80, 10 false bad), computed by `solution/validate.py` (an earlier run got 0 of 80 model answers for lack of network, so it is not a baseline). We also measure single pieces: removing the MIN_INTEREST family turns 4 caught violations into misses and drops train macro from 0.9943 to 0.9665. What the layer adds is inspectable in `/artifacts/rules_spec.json`: recomputed facts plus 26 active rules, each verified against the full training set.
 
-> *Шпаргалка:* без модели 0.9502 на public test, голая модель — `[ZERO-SHOT: TBD]` (`solution/validate.py`); минус MIN_INTEREST → 0.9665 на train. «0/80» — сбой сети, не результат модели.
+> *Шпаргалка:* без модели 0.9502 на public test, голая модель — 0.7704 (60 of 80, 10 false bad) (`solution/validate.py`); минус MIN_INTEREST → 0.9665 на train. «0/80» — сбой сети, не результат модели.
 
 ### Q2. "Where doesn't your product work?"
 
@@ -147,7 +147,7 @@ From a fresh clone, with no API key and no `pip install` (the solution is stdlib
 > Correct. We studied both public sets while designing the families, so 0.9502 is an optimistic number, not a generalization claim. Two things limit the damage: numbers and thresholds are re-derived from whatever train `adapt` receives, and a single false alarm on a good example demotes a rule. The honest generalization number is grouped five-fold cross-validation on train, folds split by context so no context is seen twice: 0.922 (folds 0.857 to 0.972), against 0.994 resubstitution. The harness is in `eval_blind/`, written by an independent agent from the README contract alone. The 0.9502 is at least reproducible: two Docker containers with networking disabled give the same score.
 
 **3. «Слой LLM не доказан, и в финальном прогоне он может вообще не запуститься».**
-> Right now we can't show the zero-shot number: `[ZERO-SHOT: TBD]`. The first attempt got 0 of 80 model answers because there was no network, and we treat that as a failed run, not a score. We also don't know whether the final containers will have network access or allow closed models, so the default is deterministic and the model turns on only with a key. Every measured number in this pitch is without a model. If the model can't run, the score rests on the deterministic rules alone.
+> Right now we can't show the zero-shot number: 0.7704 (60 of 80, 10 false bad). The first attempt got 0 of 80 model answers because there was no network, and we treat that as a failed run, not a score. We also don't know whether the final containers will have network access or allow closed models, so the default is deterministic and the model turns on only with a key. Every measured number in this pitch is without a model. If the model can't run, the score rests on the deterministic rules alone.
 
 **4. «Вы проверяете числа, а не смысл».**
 > Yes. `solution/dsl.py` checks numbers and literal expressions, not meaning, and that's where our 4 public-test misses and the "normalmente" train miss come from. Ambiguous cases are meant to go to the semantic predicate, which must answer yes, no or unknown with a quote. Without the model these cases stay misses; on the public test they show up as misses, not false "bad" labels (FP = 0).
