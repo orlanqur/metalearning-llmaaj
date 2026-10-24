@@ -57,6 +57,23 @@ figcaption{margin-top:8px;font-size:1.05rem;color:var(--ink)}
 
 #model figure svg{max-height:50vh}
 #model .badge{font-size:.95rem;margin-bottom:8px}
+.nexth{margin:14px 0 8px;font-size:1.45rem}
+.cards.next{margin-bottom:0}
+.cards.next .cardh{border-top-color:var(--good)}
+.cards.next .cardh h3{font-size:1.2rem}
+.cards.next .cardh p{font-size:1.05rem}
+.nn{display:inline-block;width:1.5em;height:1.5em;line-height:1.5em;text-align:center;margin-right:.4em;border-radius:50%;background:var(--good);color:#fff;font-size:.8em}
+#limits .cardh{padding:12px 18px}
+#limits .cardh h3{font-size:1.25rem}
+#limits .cardh p{font-size:1.1rem}
+#limits .audit{padding:12px 18px}
+#limits .audit h3{font-size:1.25rem;margin-bottom:8px}
+#limits .audit li{font-size:1.1rem;padding:8px 12px}
+#limits .badge{font-size:.95rem;margin-bottom:10px}
+#limits .nexth{margin:10px 0 6px;font-size:1.25rem}
+#limits .cards.next .cardh h3{font-size:1.1rem}
+#limits .cards.next .cardh p{font-size:1rem}
+#limits h2{margin-bottom:10px}
 /* svg text and shapes */
 svg text{font-family:var(--sans);fill:var(--ink)}
 .cap{font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;fill:var(--muted)}
@@ -390,7 +407,7 @@ footer.src{margin-top:10px;font-size:1rem;color:var(--muted)}
 <section class="slide" id="model" aria-labelledby="h-model"><div class="wrap">
 <h2 id="h-model"><span class="n">6</span><span lang="en">Optional model layer</span><span lang="ru">Необязательный слой с моделью</span></h2>
 <p class="lead"><span lang="en">A model answers yes, no or unknown, and must quote the assistant. It can also propose rules for bad cases nothing explains. Every proposal is verified on all of train first.</span><span lang="ru">Модель отвечает «да», «нет» или «не знаю» и обязана привести цитату ассистента. Ещё она может предложить правила для плохих диалогов, которые ни одно правило не объяснило. Каждое предложение сначала проверяется на всех обучающих диалогах.</span></p>
-<p><span class="badge"><span lang="en">No API key: everything stays deterministic. Default model: Qwen3.8-27B (open-weight, Apache 2.0).</span><span lang="ru">Без ключа API модель не нужна: всё считают правила, результат всегда одинаковый. Модель по умолчанию — Qwen3.8-27B (открытая, Apache 2.0).</span></span> <span class="badge"><span lang="en">Hidden-rule test: we removed the MIN_INTEREST family and let the model re-discover it. Claude Sonnet 5.5 did (4 of 4 cases, 0 false alarms, $4.07); Gemma and, from scratch, gpt-oss-120b did not.</span><span lang="ru">Проверка: мы спрятали одно правило (MIN_INTEREST) и попросили модель найти его заново. Sonnet 5.5 нашёл (4 из 4, без ложных тревог, $4.07); Gemma и gpt-oss (с нуля) — нет.</span></span></p>
+<p><span class="badge"><span lang="en">No API key: everything stays deterministic. Default model: Qwen3.8-27B (open-weight, Apache 2.0).</span><span lang="ru">Без ключа API модель не нужна: всё считают правила, результат всегда одинаковый. Модель по умолчанию — Qwen3.8-27B (открытая, Apache 2.0).</span></span> <span class="badge"><span lang="en">Hidden-rule test: we removed the MIN_INTEREST family and let the model re-discover it. Claude Sonnet 5.5 did (4 of 4 cases, 0 false alarms, $4.07); Gemma and, from scratch, gpt-oss-120b did not. Qwen3.8-27B on this test: not measured (the client's circuit breaker tripped on slow responses).</span><span lang="ru">Проверка: мы спрятали одно правило (MIN_INTEREST) и попросили модель найти его заново. Sonnet 5.5 нашёл (4 из 4, без ложных тревог, $4.07); Gemma и gpt-oss (с нуля) — нет. Qwen3.8-27B в этом тесте не измерен: клиент прервал прогон из-за медленных ответов.</span></span></p>
 <figure>
 <svg viewBox="0 0 1100 515" role="img" aria-label="Semantic predicate and induction loop. Left: a model gets a dialog and a question and answers yes with an exact quote, no, or unknown. Right: a bad conversation no rule explains is paired with the nearest good one, the model proposes a hypothesis, it is verified on all train, and is accepted, narrowed or sent to boundary, then the loop continues." data-en="Semantic predicate and induction loop. Left: a model gets a dialog and a question and answers yes with an exact quote, no, or unknown. Right: a bad conversation no rule explains is paired with the nearest good one, the model proposes a hypothesis, it is verified on all train, and is accepted, narrowed or sent to boundary, then the loop continues." data-ru="Слева: проверка-вопрос к модели. Модель получает диалог и один вопрос и отвечает «да» с точной цитатой, «нет» или «не знаю». Справа: поиск новых правил. Плохой диалог, который ни одно правило не объяснило, сравнивают с ближайшим хорошим. Модель предлагает гипотезу, её проверяют на всех обучающих диалогах: принять, сузить или отправить в границу. Потом берут следующий необъяснённый диалог.">
 <rect class="card" x="0" y="0" width="410" height="505" rx="18"/>
@@ -479,6 +496,12 @@ footer.src{margin-top:10px;font-size:1rem;color:var(--muted)}
 <li><span lang="en"><b>Leading “Hello.”:</b> flipped 3 verdicts. Rules now follow roles.</span><span lang="ru"><b>«Hello.» в начале:</b> менялись 3 вердикта. Теперь правила смотрят на роль, а не на номер реплики.</span></li>
 <li class="wait"><span lang="en">Post-fix re-audit: <span class="measuring">measuring</span></span><span lang="ru">Повторная проверка после исправлений: <span class="measuring">измеряем</span></span></li>
 </ul>
+</div>
+<h3 class="nexth"><span lang="en">Next steps</span><span lang="ru">Что дальше</span></h3>
+<div class="cards next">
+<div class="cardh"><h3><span class="nn">a</span><span lang="en">Model council</span><span lang="ru">Совет моделей</span></h3><p><span lang="en">Two or three open-weight models (Qwen, Gemma, gpt-oss) propose hypotheses on the same bad/good pairs. Proposals are merged; the same verifier checks them. Gemma already phrased the hidden rule almost word for word, but the verifier rejected it as too noisy.</span><span lang="ru">Две-три открытые модели предлагают правила по одним и тем же парам диалогов, предложения объединяются, проверка та же. Gemma уже сформулировала спрятанное правило почти дословно, но проверка его отклонила: слишком много ложных тревог.</span></p></div>
+<div class="cardh"><h3><span class="nn">b</span><span lang="en">Meaning checks</span><span lang="ru">Проверки смысла</span></h3><p><span lang="en">Semantic checks for violations that have no numbers, like the 4 public-test misses.</span><span lang="ru">Проверки смысла для ошибок без чисел — например, для 4 пропусков на публичном тесте.</span></p></div>
+<div class="cardh"><h3><span class="nn">c</span><span lang="en">Honest accuracy estimate</span><span lang="ru">Честная оценка точности</span></h3><p><span lang="en">Grouped cross-validation inside adapt, so the artifacts report an honest expected accuracy.</span><span lang="ru">Перекрёстная проверка прямо внутри обучения: вместе с результатом выдаётся честная оценка точности.</span></p></div>
 </div>
 </div></section>
 
