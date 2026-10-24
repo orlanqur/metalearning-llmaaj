@@ -42,6 +42,14 @@ See [the Gemini run notes](docs/MISHA-GEMINI.md) for provider selection details.
 
 ## Quick start
 
+**API key for the organizers' run.** Pass your OpenRouter key into both containers
+as an environment variable: `docker run -e OPENROUTER_API_KEY=... ...` for `adapt`
+and for `eval`. With the key, `adapt` runs rule discovery with
+`anthropic/claude-sonnet-5.5` and `eval` applies the learned semantic rules; without
+it, both stages run the deterministic rules only (the 0.9502 public baseline).
+No other configuration is required; `.env.example` lists the optional overrides.
+
+
 Run from the repository root. Local execution requires Python 3.10+;
 the Docker image uses Python 3.12 and downloads no Python packages.
 
