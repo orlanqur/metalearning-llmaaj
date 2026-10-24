@@ -145,6 +145,8 @@ reports, not a new benchmark run for this README.
 | Public test | No model | **0.9502** | 76/80 |
 | Train, grouped five-fold CV | No model | **0.922** | Fold mean |
 | Public test, team-member run | Gemini `gemini-4-argon` | **0.9507** | 76/80 |
+| Public test, hybrid (rules + model) | `openai/gpt-oss-120b` | 0.9252 | 74/80 |
+| Public test, from scratch (model-only induction, no rule library) | `openai/gpt-oss-120b` | 0.6259 | — |
 | Same bare model, zero-shot | Model baseline | measured in progress | — |
 
 Public-test breakdown; accuracies are calculated from the reported counts:
@@ -155,6 +157,16 @@ Public-test breakdown; accuracies are calculated from the reported counts:
 | `financial_position` | 21/22 | 0.9545 | 22/22 |
 | `savings` | 20/20 | 1.0000 | 20/20 |
 | `spending` | 21/23 | 0.9130 | 20/23 |
+
+**Model layer, measured honestly.** With `openai/gpt-oss-120b` the hybrid run
+activated three semantic rules that produced 2 false `bad` labels on public test
+(0.9252 vs 0.9502 without the model; 299 calls, 33 min, about $0.07). Multi-round
+induction from scratch, with the rule library disabled, accepted 3 induced rules
+and scored 0.6259 (77 calls, 35 min): the model alone does not recover the expert's
+rules within this budget. The submitted default is therefore the deterministic
+mode; the model layer is opt-in via an API key. The from-scratch mode, the
+multi-round induction loop and the measurement script live in branch
+`orlanqur/induce` (report: `docs/ASTRA-INDUCE.md` there).
 
 **The public test is not a clean holdout:** both public sets informed the rule
 families. Grouped CV splits train by identical context; fold scores range from
