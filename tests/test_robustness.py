@@ -117,3 +117,44 @@ class DeadlineTests(unittest.TestCase):
         finally:
             os.environ.pop("LLM_DEADLINE")
             server.shutdown()
+
+
+class BreakerAndRoutingTests(unittest.TestCase):
+    def _client(self, base_url):
+        from solution.llm import ChatClient
+        return ChatClient(tempfile.mkdtemp(), api_key="test", base_url=base_url, attempts=1, pause=0, dotenv="/nonexistent")
+
+    def test_provider_sort_only_for_openrouter(self):
+        import io
+        from unittest.mock import patch
+        from urllib.error import URLError
+        bodies = []
+
+        def capture(req, timeout):
+            bodies.append(json.loads(req.data))
+            raise URLError("offline")
+        with patch("solution.llm.urlopen", side_effect=capture):
+            self._client("https://openrouter.ai/api/v1").request("s", "u", {"type": "object"}, model="m")
+            self._client("https://generativelanguage.googleapis.com/v1beta/openai").request("s", "u", {"type": "object"}, model="m")
+        self.assertEqual(bodies[0]["provider"], {"sort": "throughput"})
+        self.assertNotIn("provider", bodies[1])
+
+    def test_success_resets_consecutive_failures(self):
+        import io
+        from unittest.mock import patch
+        from urllib.error import URLError
+
+        class Ok(io.BytesIO):
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+        ok = lambda: Ok(json.dumps({"choices": [{"message": {"content": "{}"}}]}).encode())
+        client = self._client("https://openrouter.ai/api/v1")
+        outcomes = [URLError("x"), URLError("x"), ok(), URLError("x"), URLError("x")]
+        with patch("solution.llm.urlopen", side_effect=outcomes):
+            for i in range(5):
+                client.request("s", f"u{i}", {"type": "object"}, model="m")
+        self.assertEqual(client.failures_in_row, 2)
+        self.assertFalse(client.circuit_open)

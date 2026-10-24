@@ -141,8 +141,13 @@ class ClientTests(unittest.TestCase):
             with patch("solution.llm.urlopen", side_effect=URLError("secret must never be logged")) as request:
                 self.assertIsNone(c2.request("different", "u", VERDICT_SCHEMA))
                 self.assertEqual(request.call_count, 3)
+                self.assertFalse(c2.circuit_open)  # one failed request does not switch the model off
+                self.assertIsNone(c2.request("second", "u", VERDICT_SCHEMA))
+                self.assertIsNone(c2.request("third", "u", VERDICT_SCHEMA))
+                self.assertEqual(request.call_count, 9)
+                self.assertTrue(c2.circuit_open)  # three failed requests in a row
                 self.assertIsNone(c2.request("next", "u", VERDICT_SCHEMA))
-                self.assertEqual(request.call_count, 3)  # circuit breaker
+                self.assertEqual(request.call_count, 9)  # circuit breaker
             self.assertNotIn("secret must never", json.dumps(c2.events))
 
     @patch.dict("os.environ", {}, clear=True)
@@ -282,7 +287,7 @@ class NoKeyPipelineTests(unittest.TestCase):
                  patch("solution.llm.time.sleep"):
                 result = evaluate(train, base/"artifacts", base/"out/pred.csv")
             self.assertEqual(result["predictions"], 2)
-            self.assertEqual(result["network_calls"], 3)
+            self.assertEqual(result["network_calls"], 6)  # 2 rows x 3 attempts; breaker needs 3 failed requests
             log = json.loads((base/"out/pred.log.json").read_text())
             self.assertTrue(all(d["fallback"] for d in log["decisions"]))
             self.assertNotIn("fixture-secret", json.dumps(log))

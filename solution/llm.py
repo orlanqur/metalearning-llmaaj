@@ -157,6 +157,10 @@ class ChatClient:
         self.deadline = float(os.getenv("LLM_DEADLINE", str(timeout * 3)))
         self.events, self._memo = [], {}
         self.circuit_open = False
+        # One slow or failed request must not switch the model off for the whole run:
+        # the breaker opens only after LLM_BREAKER_AFTER failed requests in a row.
+        self.breaker_after = max(1, int(os.getenv("LLM_BREAKER_AFTER", "3")))
+        self.failures_in_row = 0
         # Count HTTP attempts, including retries; cache reads never spend budget.
         self.max_calls = max_calls
         self.network_calls = 0
@@ -211,6 +215,8 @@ class ChatClient:
                 dict(role="user", content=user)])
             if self.max_tokens is not None:
                 payload["max_tokens"] = self.max_tokens
+            if "openrouter.ai" in self.base_url:
+                payload["provider"] = dict(sort="throughput")  # route to the fastest provider for this model
             if structured:
                 payload["response_format"] = dict(type="json_schema", json_schema=dict(name="result", strict=True, schema=schema))
             try:
@@ -237,6 +243,7 @@ class ChatClient:
                             elapsed_seconds=time.monotonic()-start, structured=structured,
                             usage=usage)
                 self._memo[key] = result
+                self.failures_in_row = 0
                 try:
                     self.cache_dir.mkdir(parents=True, exist_ok=True)
                     target = self.cache_dir / (key + ".json")
@@ -257,9 +264,13 @@ class ChatClient:
                     structured = False
                 if attempt < self.attempts:
                     time.sleep(self.pause * attempt)
-        self.circuit_open = True
+        with self._budget_lock:
+            self.failures_in_row += 1
+            if self.failures_in_row >= self.breaker_after:
+                self.circuit_open = True
         self._memo[key] = None
-        print("[llm] API unavailable after retries; using deterministic/topic fallback", file=sys.stderr)
+        print("[llm] API unavailable after retries; using deterministic/topic fallback" if self.circuit_open
+              else "[llm] request failed after retries; this item uses the deterministic/topic fallback", file=sys.stderr)
         return None
 
     def stats(self):
