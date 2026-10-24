@@ -185,6 +185,21 @@ Public-test breakdown; accuracies are calculated from the reported counts:
 | `savings` | 20/20 | 1.0000 | 20/20 |
 | `spending` | 21/23 | 0.9130 | 20/23 |
 
+**Which model to plug in (all runs on the same public data).**
+
+| Model | Hybrid, public test | False `bad` | Hidden-rule test | Cost of that test |
+|---|---:|---:|---|---:|
+| Rules only, no model | 0.950 | 0 | n/a | $0 |
+| Qwen3.8-27B (open-weight, Apache 2.0) | 0.950 | 0 | found 4/4 (`LLM_DEADLINE=600`) | $0.21 |
+| Claude Sonnet 5.5 (default) | 0.950 | 0 | found 4/4 | $4.07 |
+| GPT-6.1 Sol | 0.938 | 1 | found 4/4 | $1.47 |
+| Gemini 4 (team member's run) | 0.951 | 1 | not tested | — |
+| gpt-oss-120b | 0.925 | 2 | not found (from scratch) | $0.07 |
+| Gemma 4 31B | 0.938 | 1 | phrased it, rejected by the verifier | $0.28 |
+
+Takeaway: open-weight Qwen matches the closed default on accuracy and on rule
+discovery at roughly 1/20 of the cost; it needs the longer per-request deadline.
+
 **Bare model vs. our layer.** Zero-shot `openai/gpt-oss-120b` on the same 80
 public-test conversations, given the full context and dialog but no learned rules
 and no few-shot examples, scores macro 0.7704 (60/80; credit 15/15, financial
