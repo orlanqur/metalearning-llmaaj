@@ -37,3 +37,7 @@ Across all adapt runs (full, 5 folds, topic omitted, shuffled): structurally 5/5
 1. Empty/short conversation: do not crash; return a verdict (good by default) and a row in predictions.csv.
 2. Spending rules that depend on turn number: find the first assistant/user turn by role, not by index.
 3. Cover both cases with a test in `tests/` and rerun `eval_blind/run.py --run-name audit-04`.
+
+## Post-fix re-check (2026-10-24 16:00, HEAD after 4a42e6d)
+
+Re-probed against the current rules by an independent verifier: empty dialogue → exit 0, predictions written; a single prepended user message → 0 flips, 76/80. Open case: prepending a greeting exchange (user "Hola" + assistant reply) still flips 6 `bad` → `good` (macro 0.9502 → 0.8850), because three checkers read the first assistant turn by position. Raw audit outputs under `eval_blind/out/` are not committed.

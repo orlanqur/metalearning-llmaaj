@@ -17,7 +17,9 @@ The original task contract is preserved in [ORGANIZER-README.md](docs/ORGANIZER-
 
 ## Model and license
 
-- Default open-weight model: **`openai/gpt-oss-120b`**, **Apache 2.0**, via OpenRouter.
+- Default open-weight model: **`qwen/qwen3.8-27b`** (Qwen3.8-27B, **Apache 2.0**) via OpenRouter. In the
+  team's benchmark it is the only open-weight model whose hybrid run kept 0 false `bad`
+  (76/80, 0.9502); `openai/gpt-oss-120b` scored 0.9252 and `google/gemma-4-31b-it` 0.9377.
 - Alternative provider: **Gemini**. The documented team-member run used
   **`gemini-4-argon`**, a closed model; it is separate from the open-weight default.
 - Without an API key, the solution runs in deterministic mode. Use `--no-model`
@@ -171,6 +173,16 @@ and no few-shot examples, scores macro 0.7704 (60/80; credit 15/15, financial
 position 17/22, savings 14/20, spending 14/23; 10 false `bad`). Our deterministic
 rules score 0.9502 with 0 false `bad`. Measured with `solution/validate.py zero-shot`;
 evidence in `out/zero_shot.score.json` (generated, not committed).
+
+**Which model can learn a new rule.** Hidden-rule test: the MIN_INTEREST family was
+removed and the model had to re-discover it from the residual `bad` conversations
+(`solution/validate.py leave-one-rule-out`). Claude Sonnet 5.5 re-discovered it
+(4 of 4 witnesses, 0 false alarms, 304 calls, about $4.07); Gemma 4 31B proposed
+the rule almost verbatim but verification rejected it (11 true, 3 false); gpt-oss-120b
+from scratch did not. Qwen3.8-27B on this test: see `out/loo_qwen` if present,
+otherwise not measured. Practical reading: open-weight Qwen is enough to apply known
+rule families at 0 false `bad`; discovering genuinely new expert rules needs a
+stronger model, which the organizers' containers may or may not allow.
 
 **Model layer, measured honestly.** With `openai/gpt-oss-120b` the hybrid run
 activated three semantic rules that produced 2 false `bad` labels on public test
