@@ -14,7 +14,9 @@
 - done | README.md форка по чеклисту FAQ, контракт организаторов в docs/ORGANIZER-README.md (d657261) | Codex (README) | README.md | 15:10
 - done | docs/APPROACH.html — 9 экранов со схемами, офлайн, 41 КБ; zero-shot и rediscovery помечены «measuring» | Opus → планировщик | docs/APPROACH.html | 15:16
 - done | Режим adapt --from-scratch + многораундовая индукция: измерено, from-scratch 0.626, гибрид gpt-oss 0.925 (< 0.950 без модели); слияние отложено из-за конфликтов с fix, ветка orlanqur/induce запушена как эксперимент, цифры в README | Astra-2 (Codex) | orlanqur/induce, docs/ASTRA-INDUCE.md | 15:40
-- doing | Zero-shot baseline gpt-oss на public test (80 вызовов, 8 воркеров), стартовал 15:40 | Claude-планировщик | out/zero_shot.* | 15:45
+- done | Zero-shot baseline gpt-oss: 0.7704 (60/80, 10 FP) vs 0.9502 с правилами; в README, питчах, HTML | Claude-планировщик | out/zero_shot.score.json | 15:55
 - done | Merge induce в рабочую ветку: 25400ea, тесты 53+9, предсказания без модели побайтно прежние, 0.9502 | Claude-планировщик + Codex | solution/ tests/ docs/MERGE-INDUCE.md | 15:45
 - done | docs/APPROACH.html двуязычный EN/RU с цифрами индукции, 72 КБ | Opus → планировщик | docs/APPROACH.html | 15:45
-- todo | Финальная приёмка HEAD 25400ea: submit/accept.sh на копии, Docker rebuild + smoke --network none, приватность | Claude-приёмщик | — | 15:45
+- done | Финальная приёмка 25400ea: accept.sh 53+9 OK, 0.9502, Docker --network none побайтно, приватность чисто | Claude-приёмщик | DIALOG 15:51 | 15:55
+- done | Дедлайн на HTTP-запрос (e02bb37) черри-пик → 240e612, тесты OK, предсказания без модели прежние | Claude-планировщик | solution/llm.py | 15:55
+- doing | Независимый критик (Gemini Argon) по пакету сдачи → сверка Opus → правки до 16:35 | Claude-планировщик | scratchpad | 15:55
