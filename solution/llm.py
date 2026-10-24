@@ -18,6 +18,16 @@ DEFAULT_MODEL = "openai/gpt-oss-120b"
 GEMINI_OPENAI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai"
 
 
+def read_with_deadline(response, deadline):
+    """Read the whole body, but fail once the wall-clock deadline passes (keep-alive whitespace resets socket timeouts)."""
+    chunks = []
+    while chunk := response.read1(65536):
+        chunks.append(chunk)
+        if time.monotonic() > deadline:
+            raise TimeoutError("model response exceeded the total deadline")
+    return b"".join(chunks)
+
+
 def pmap(function, items):
     """Ordered map over a thread pool; model calls are I/O-bound. LLM_WORKERS=1 restores sequential runs."""
     # ponytail: fixed pool, no rate-limit backoff beyond the client retries; lower LLM_WORKERS on HTTP 429
@@ -143,6 +153,8 @@ class ChatClient:
         self.cache_dir = Path(cache_dir)
         self.read_cache_dirs = [self.cache_dir] + [Path(p) for p in read_cache_dirs]
         self.timeout, self.attempts, self.pause = timeout, max(1, attempts), pause
+        # Socket timeouts are per read; a provider can keep a request alive with whitespace forever.
+        self.deadline = float(os.getenv("LLM_DEADLINE", str(timeout * 3)))
         self.events, self._memo = [], {}
         self.circuit_open = False
         # Count HTTP attempts, including retries; cache reads never spend budget.
@@ -212,7 +224,7 @@ class ChatClient:
                         return None
                     self.network_calls += 1
                 with urlopen(req, timeout=self.timeout) as response:
-                    body = json.load(response)
+                    body = json.loads(read_with_deadline(response, start + self.deadline))
                 raw_usage = body.get("usage") if isinstance(body, dict) else None
                 if isinstance(raw_usage, dict):
                     usage = {k: v for k, v in raw_usage.items() if k in

@@ -63,3 +63,41 @@ class RobustnessTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class DeadlineTests(unittest.TestCase):
+    def test_keepalive_whitespace_cannot_hang_a_request(self):
+        import http.server
+        import threading
+        import time
+        from solution.llm import ChatClient
+
+        class Trickle(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                self.rfile.read(int(self.headers["Content-Length"]))
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                try:
+                    for _ in range(100):  # 10 s of keep-alive whitespace, never a body
+                        self.wfile.write(b" ")
+                        self.wfile.flush()
+                        time.sleep(0.1)
+                except OSError:
+                    pass
+
+            def log_message(self, *args):
+                pass
+
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Trickle)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        os.environ["LLM_DEADLINE"] = "0.5"
+        try:
+            client = ChatClient(tempfile.mkdtemp(), api_key="test", base_url=f"http://127.0.0.1:{server.server_port}",
+                                timeout=5, attempts=1, pause=0, dotenv="/nonexistent")
+            start = time.monotonic()
+            self.assertIsNone(client.request("s", "u", {"type": "object"}, model="m"))
+            self.assertLess(time.monotonic() - start, 3)
+        finally:
+            os.environ.pop("LLM_DEADLINE")
+            server.shutdown()
