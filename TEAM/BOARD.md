@@ -13,3 +13,5 @@
 - todo | Чеклист FAQ перед сдачей, push, SHA организаторам, форма OrganizerHQ | Аркадий | — | —
 - done | README.md форка по чеклисту FAQ, контракт организаторов в docs/ORGANIZER-README.md (d657261) | Codex (README) | README.md | 15:10
 - done | docs/APPROACH.html — 9 экранов со схемами, офлайн, 41 КБ; zero-shot и rediscovery помечены «measuring» | Opus → планировщик | docs/APPROACH.html | 15:16
+- done | Режим adapt --from-scratch + многораундовая индукция: измерено, from-scratch 0.626, гибрид gpt-oss 0.925 (< 0.950 без модели); слияние отложено из-за конфликтов с fix, ветка orlanqur/induce запушена как эксперимент, цифры в README | Astra-2 (Codex) | orlanqur/induce, docs/ASTRA-INDUCE.md | 15:40
+- doing | Zero-shot baseline gpt-oss на public test (80 вызовов, 8 воркеров) | Claude-планировщик | out/zero_shot.* | 15:40
