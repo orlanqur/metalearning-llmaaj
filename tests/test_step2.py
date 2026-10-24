@@ -107,7 +107,7 @@ class ClientTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             client = ChatClient(temp, dotenv=Path(temp) / "absent")
             self.assertEqual(client.base_url, "https://openrouter.ai/api/v1")
-            self.assertEqual(client.induction_model, "openai/gpt-oss-120b")
+            self.assertEqual(client.induction_model, "qwen/qwen3.8-27b")
 
     @patch.dict("os.environ", {}, clear=True)
     def test_cache_survives_separate_client_without_key(self):
