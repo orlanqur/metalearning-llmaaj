@@ -1,0 +1,1265 @@
+{
+  "model_status": "skipped_no_key_or_disabled",
+  "manifest_sha256": "9e19072205c5019493b005d52e79ddf245430634f9cb86d515af4701165ca973",
+  "input_sha256": "d158c9a2dcea130e2cfa6e61d854113bf5391bc57273015dd6140b0ab8df0236",
+  "predictions_sha256": "574be230233cb356980dbfed75fbc8022e0ab67a34fb256e84d464e34e3304ea",
+  "stats": {
+    "key_present": false,
+    "enabled": false,
+    "induction_model": "openai/gpt-oss-120b",
+    "eval_model": "openai/gpt-oss-120b",
+    "network_calls": 0,
+    "model_calls": 0,
+    "elapsed_seconds": 0,
+    "reported_cost": 0,
+    "cost_complete": true,
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "event_statuses": {}
+  },
+  "model_events": [],
+  "semantic_events": [],
+  "decisions": [
+    {
+      "item_id": "33b3d072865a9ae4dc780e3048c823f6",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_EXPLICIT.last_month",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.average",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "spending.REFUND.clothing",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.month",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "spending.TX_AMOUNT.merchant",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "ac473fdf3f91f239ac360ff5411e7e00",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_EXPLICIT.last_month",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.average",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "spending.REFUND.clothing",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.month",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "spending.TX_AMOUNT.merchant",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "5884d3994d7da115fb18918b9604941b",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "financial_position.CREDIT_AS_MONEY.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.HOLD.available_amount",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "financial_position.NET.net_amount",
+          "violated": true,
+          "evidence": {
+            "reason": "Required context-derived amount is absent",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "Всего у вас **31 080 MXN**: 12 480 MXN на Cuenta Veluna и 18 600 MXN на Ahorro Flexible. Ещё два счёта пустые."
+              },
+              {
+                "turn": 3,
+                "text": "На Ahorro Flexible у вас ставка **9% годовых**, проценты начисляются каждый день."
+              },
+              {
+                "turn": 5,
+                "text": "На Cuenta Veluna у вас **12 480 MXN**."
+              }
+            ],
+            "kind": "net_after_debt",
+            "expected_any": [
+              26980.0,
+              26980.0,
+              26980.0
+            ]
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "812f2849600616685a3d45ba7e95b5f0",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "savings.ACTION.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.AMOUNT.balance_cuenta_veluna",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.FIXED_LOCK.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.ahorro_flexible",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.selected_tariff",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "25043fb0721c9de79e5cc72adba5139b",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "savings.ACTION.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.AMOUNT.balance_cuenta_veluna",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.FIXED_LOCK.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.ahorro_flexible",
+          "violated": true,
+          "evidence": {
+            "reason": "Percentage is outside context rates for the selected subscription",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "По ставке 14% годовых за 12 месяцев вы получите около **7 000 MXN** процентов, то есть на вклад вернётся примерно **57 000 MXN**. Учтите, что досрочно снять деньги из Fijo нельзя, они будут недоступны до конца срока."
+              },
+              {
+                "turn": 3,
+                "text": "При той же ставке за два года выйдет около **14 000 MXN** процентов. Ставка при продлении может измениться, поэтому итог за второй год ориентировочный."
+              }
+            ],
+            "expected": [
+              9.0,
+              10.0,
+              11.0,
+              12.0
+            ],
+            "observed": [
+              14.0
+            ]
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "bf24cfe2686e9eb8ec1e64955b88820f",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "credit.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.deny_date",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.MIN_INTEREST.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.PAID_STATUS.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "1b7fd6f0ac20bcf5566d6f54e6bd2b76",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "credit.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.deny_date",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.MIN_INTEREST.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.PAID_STATUS.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "cb91dc19511003e463eeb29c49b0a8c2",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "financial_position.CREDIT_AS_MONEY.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.HOLD.available_amount",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "financial_position.NET.net_amount",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "fe2dd24903b200cc85e8cfa2a123c60a",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_EXPLICIT.last_month",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.average",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.clothing",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.month",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.TX_AMOUNT.merchant",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "16d369527ab15f75a2a8b8c24fb2069e",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "savings.ACTION.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.AMOUNT.balance_cuenta_veluna",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.FIXED_LOCK.lexical",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "savings.RATE.ahorro_flexible",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.selected_tariff",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "3f080b9b556f3a5a76e73f19dd28f5b1",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "credit.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.deny_date",
+          "violated": true,
+          "evidence": {
+            "reason": "Denies access to a populated context field",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "Точной даты следующей выписки у меня нет, она зависит от настроек вашей карты."
+              },
+              {
+                "turn": 3,
+                "text": "Не могу назвать даже примерную дату. Лучше уточнить в приложении, в разделе с выпиской."
+              }
+            ],
+            "field": "credit_statement.due_date",
+            "match": "точной даты следующей выписки у меня нет"
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "a468d7240d5670e67d96d43341ed34f7",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "financial_position.CREDIT_AS_MONEY.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.HOLD.available_amount",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "financial_position.NET.net_amount",
+          "violated": true,
+          "evidence": {
+            "reason": "Required context-derived amount is absent",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "У вас **30 900 MXN** собственных средств: **21 400 MXN** на Cuenta Veluna и **9 500 MXN** в Ahorro Flexible. Долг по Crédito Veluna сейчас **5 400 MXN**, а доступный лимит в **24 600 MXN** вашими деньгами не считается."
+              }
+            ],
+            "kind": "net_after_debt",
+            "expected_any": [
+              25500.0,
+              25500.0,
+              25500.0
+            ]
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "582893e4ef8ff7fbb4a3a034c8968bbf",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "credit.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.deny_date",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.MIN_INTEREST.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.PAID_STATUS.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "f1661a09794ce7b90c6138bd2bd31e9e",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "savings.ACTION.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.AMOUNT.balance_cuenta_veluna",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.FIXED_LOCK.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.ahorro_flexible",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.selected_tariff",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "ac330af02a68bc82bc3b998720802ea3",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "financial_position.CREDIT_AS_MONEY.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.HOLD.available_amount",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.NET.net_amount",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "financial_position.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "f420d36efc590e44e35c6a9fadbb9a9d",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_EXPLICIT.last_month",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.average",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "spending.REFUND.clothing",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.month",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "spending.TX_AMOUNT.merchant",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "247303d9f7e7030f41fa4e2c316b8b65",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "credit.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.deny_date",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.MIN_INTEREST.lexical",
+          "violated": true,
+          "evidence": {
+            "reason": "Inherited lexical predicate matched",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "Grace — платёж без процентов: 11,940.00 MXN; минимальный платёж: 1,380.00 MXN; общий долг: 16,205.00 MXN. Выписка от 2026-09-08, срок оплаты — 2026-09-28 (просрочка 4 дня на 2026-10-02).\n\nЕсли внесёте минимальный платёж 1,380.00 MXN прямо сейчас, проценты не начислятся и вы избежите последующих штрафов; можно оплатить через страницу оплаты карты: [оплатить карту](lnk_payments)."
+              }
+            ],
+            "match": "если внесете минимальный платеж 1,380.00 mxn прямо сейчас, проценты не начислятся",
+            "predicate": "minimum payment falsely waives interest"
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "36bfc6ef2aa0ef6e1ed57b1d53c88139",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "financial_position.CREDIT_AS_MONEY.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.HOLD.available_amount",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "financial_position.NET.net_amount",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "8c7a8db84b6272dfb7bade9f1a8555c6",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "credit.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.deny_date",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.MIN_INTEREST.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.PAID_STATUS.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "90d66b1a8763964292f6c932d8e561d9",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "savings.ACTION.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.AMOUNT.balance_cuenta_veluna",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.FIXED_LOCK.lexical",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "savings.RATE.ahorro_flexible",
+          "violated": true,
+          "evidence": {
+            "reason": "Percentage is outside context rates for the selected subscription",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "En un año ganarías 3,000 MXN a una tasa del 12% anual."
+              }
+            ],
+            "expected": [
+              9.0
+            ],
+            "observed": [
+              12.0
+            ]
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "8e1cd915c77b096daf096415afc0e7e9",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": true,
+          "evidence": {
+            "reason": "Context-derived poison amount appears in the scoped answer",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "В среднем вы тратили 21,933 MXN в месяц за июнь–август 2026. За эти три месяца: покупки 48,100 MXN; переводы другим людям 5,200 MXN; переводы между своими счетами 12,500 MXN. Всего трат: 65,800 MXN за три месяца."
+              }
+            ],
+            "kind": "own_transfers",
+            "expected_poison": [
+              21933.333333333336
+            ],
+            "observed": [
+              21933.0
+            ]
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "fd2577d515ceff8e5b3b59993d9390dd",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "savings.ACTION.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.AMOUNT.balance_cuenta_veluna",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.FIXED_LOCK.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.ahorro_flexible",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.selected_tariff",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "175f4407ed6ab276fc244d33014af34f",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_EXPLICIT.last_month",
+          "violated": true,
+          "evidence": {
+            "reason": "Last-month answer omits the preceding calendar month",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "Marisol: en octubre (mes en curso) gastaste 6,250 MXN en compras. Detalle rápido de las transacciones de octubre:\n- 2026-10-03 — Chedraui — 2,100 MXN (completada).\n- 2026-10-07 — Pemex — 1,050 MXN (completada).\nAdemás hubo una transferencia a otra persona el 2026-10-09 por 1,000 MXN (completada), que se muestra por separado como salida. Si quieres, verifico también el total combinado con septiembre."
+              }
+            ],
+            "expected_month": "2026-09",
+            "reply": "Marisol: en octubre (mes en curso) gastaste 6,250 MXN en compras. Detalle rápido de las transacciones de octubre:\n- 2026-10-03 — Chedraui — 2,100 MXN (completada).\n- 2026-10-07 — Pemex — 1,050 MXN (completada).\nAdemás hubo una transferencia a otra persona el 2026-10-09 por 1,000 MXN (completada), que se muestra por separado como salida. "
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "5567a50c06033ebddcf2fdcd2d4e5e6a",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_EXPLICIT.last_month",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.average",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.clothing",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.month",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.TX_AMOUNT.merchant",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "4a5f9eb6fe89c8b2cf08454245e61da4",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "financial_position.CREDIT_AS_MONEY.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.HOLD.available_amount",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "financial_position.NET.net_amount",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "83dcef3b5e6618e98654641aa779dc25",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "credit.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.KNOWN_DATA.deny_date",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "credit.MIN_INTEREST.lexical",
+          "violated": true,
+          "evidence": {
+            "reason": "Inherited lexical predicate matched",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "Платёж без процентов: 11,980.10 MXN; минимальный платёж: 1,030.00 MXN; общий долг: 14,520.00 MXN. Дата выписки: 2026-10-05, крайний срок оплаты: 2026-10-25. Если внесёте минимальный платёж — проценты не начислятся."
+              }
+            ],
+            "match": "если внесете минимальный платеж — проценты не начислятся",
+            "predicate": "minimum payment falsely waives interest"
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "fba73a2e5e1c772b96da348c66b7efed",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_EXPLICIT.last_month",
+          "violated": true,
+          "evidence": {
+            "reason": "Last-month answer omits the preceding calendar month",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "October 2026 (partial): purchases 5,280.40 MXN; transfers to others 1,200.00 MXN — total spending 6,480.40 MXN.\n\nTransactions this month:\n- 2026-10-03 Soriana — 1,320.40 MXN (completed; groceries).\n- 2026-10-06 Vips — 780.00 MXN (completed; restaurants).\n- 2026-10-08 Liverpool — 3,180.00 MXN (completed; department store). Known: amount, date, status and merchant. Unknown: whether this purchase is split into interest-free installments or will be refunded later.\n- 2026-10-09 Transfer to Carlos Mendoza — 1,200.00 MXN (completed; transfer to another person — counted as spending).\n\nI excluded transfers between your own accounts when computing totals. [экран накоплений](lnk_savings)"
+              }
+            ],
+            "expected_month": "2026-09",
+            "reply": "October 2026 (partial): purchases 5,280.40 MXN; transfers to others 1,200.00 MXN — total spending 6,480.40 MXN.\n\nTransactions this month:\n- 2026-10-03 Soriana — 1,320.40 MXN (completed; groceries).\n- 2026-10-06 Vips — 780.00 MXN (completed; restaurants).\n- 2026-10-08 Liverpool — 3,180.00 MXN (completed; department store). Known: amount, date, status and merchant. Unknown: whether this purchase is split into interest-free installments or will be refunded later.\n- 2026-10-09 Transfer to Carlos Mendoza — 1,200.00 MXN (completed; transfer to another person — counted as spending).\n\nI excluded transfers between your own accounts when computing totals. [экран накоплений](lnk_savings)"
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "1bedba8378bf0d211f19975329848356",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "financial_position.CREDIT_AS_MONEY.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "financial_position.HOLD.available_amount",
+          "violated": false,
+          "evidence": {
+            "applicable": false
+          }
+        },
+        {
+          "rule_id": "financial_position.NET.net_amount",
+          "violated": true,
+          "evidence": {
+            "reason": "Required context-derived amount is absent",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "Собственных средств у вас **32 500 MXN**: 18 200 MXN на Cuenta Veluna, 4 300 MXN в Ahorro Flexible и 10 000 MXN в Ahorro Fijo. Долг по Crédito Veluna — 2 600 MXN. Доступный лимит (22 400 MXN) вашими деньгами не считается."
+              },
+              {
+                "turn": 3,
+                "text": "Нет, Ahorro Fijo — срочный вклад, 10 000 MXN недоступны до 10 июня 2027 года. Погасить долг можно со счёта Cuenta Veluna или из Ahorro Flexible."
+              }
+            ],
+            "kind": "net_after_debt",
+            "expected_any": [
+              29900.0,
+              29900.0,
+              19900.0
+            ]
+          }
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "6d9a0ddbc48b013cddbe7d6b0ffb4674",
+      "label": "good",
+      "checks": [
+        {
+          "rule_id": "savings.ACTION.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.AMOUNT.balance_cuenta_veluna",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.DATE.context",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.FIXED_LOCK.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.ahorro_flexible",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.RATE.selected_tariff",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "savings.KNOWN_DATA.ask_populated_field",
+          "violated": false,
+          "evidence": {}
+        }
+      ],
+      "fallback": false
+    },
+    {
+      "item_id": "f9ce52d8dde22208126ab59812fd2b84",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_EXPLICIT.last_month",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.REFUND.average",
+          "violated": true,
+          "evidence": {
+            "reason": "Context-derived poison amount appears in the scoped answer",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "Meses considerados: julio, agosto y septiembre de 2026.\n\n2026-07 — Compras: 19,800 MXN; Transferencias a terceros: 2,000 MXN; Reembolsos: 0 MXN.\n2026-08 — Compras: 21,300 MXN; Transferencias a terceros: 2,500 MXN; Reembolsos: 1,850 MXN (Liverpool).\n2026-09 — Compras: 18,600 MXN; Transferencias a terceros: 1,800 MXN; Reembolsos: 700 MXN (Amazon Mexico).\n\nTotal mostrado para esos tres meses (no resté los reembolsos): Compras 59,700 MXN; Transferencias a terceros 6,300 MXN; Gasto combinado mostrado: 66,000 MXN."
+              }
+            ],
+            "kind": "gross_refunds",
+            "expected_poison": [
+              66000.0
+            ],
+            "observed": [
+              19800.0,
+              2000.0,
+              0.0,
+              21300.0,
+              2500.0,
+              1850.0,
+              18600.0,
+              1800.0,
+              700.0,
+              59700.0,
+              6300.0,
+              66000.0
+            ]
+          }
+        }
+      ],
+      "fallback": false
+    }
+  ]
+}

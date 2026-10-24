@@ -1,0 +1,79 @@
+{
+  "cv_1_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "cv_2_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "cv_3_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "cv_4_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "cv_5_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "full_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "shuffle_train_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "without_credit_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "without_financial_position_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "without_savings_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  },
+  "without_spending_adapt": {
+    "clear_criteria": true,
+    "clear_priorities": true,
+    "links_to_training_examples": true,
+    "clear_boundaries": true,
+    "consistency_with_implementation": true
+  }
+}

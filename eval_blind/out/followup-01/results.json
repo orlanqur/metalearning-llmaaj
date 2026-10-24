@@ -1,0 +1,653 @@
+{
+  "single_100a727946a7a45a72c46771e608090f": {
+    "name": "single_100a727946a7a45a72c46771e608090f",
+    "n": 1,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_100a727946a7a45a72c46771e608090f/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_100a727946a7a45a72c46771e608090f/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_100a727946a7a45a72c46771e608090f/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_100a727946a7a45a72c46771e608090f/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.129,
+      "log": "eval_blind/out/followup-01/single_100a727946a7a45a72c46771e608090f/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.02,
+      "log": "eval_blind/out/followup-01/single_100a727946a7a45a72c46771e608090f/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true
+  },
+  "single_injected_100a727946a7a45a72c46771e608090f": {
+    "name": "single_injected_100a727946a7a45a72c46771e608090f",
+    "n": 1,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_100a727946a7a45a72c46771e608090f/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_100a727946a7a45a72c46771e608090f/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_100a727946a7a45a72c46771e608090f/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_100a727946a7a45a72c46771e608090f/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.1252,
+      "log": "eval_blind/out/followup-01/single_injected_100a727946a7a45a72c46771e608090f/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.0206,
+      "log": "eval_blind/out/followup-01/single_injected_100a727946a7a45a72c46771e608090f/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true,
+    "invariance": {
+      "compared": 1,
+      "changed": 1,
+      "changes": [
+        {
+          "item_id": "100a727946a7a45a72c46771e608090f",
+          "topic": "spending",
+          "before": "bad",
+          "after": "good"
+        }
+      ],
+      "comparison_complete": true,
+      "invariance_pass": false,
+      "identical_id_sets": true,
+      "by_topic_changed": {
+        "spending": 1
+      }
+    }
+  },
+  "single_2881d8466e9762a8d467f02d48087a33": {
+    "name": "single_2881d8466e9762a8d467f02d48087a33",
+    "n": 1,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_2881d8466e9762a8d467f02d48087a33/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_2881d8466e9762a8d467f02d48087a33/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_2881d8466e9762a8d467f02d48087a33/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_2881d8466e9762a8d467f02d48087a33/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.0715,
+      "log": "eval_blind/out/followup-01/single_2881d8466e9762a8d467f02d48087a33/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.0205,
+      "log": "eval_blind/out/followup-01/single_2881d8466e9762a8d467f02d48087a33/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true
+  },
+  "single_injected_2881d8466e9762a8d467f02d48087a33": {
+    "name": "single_injected_2881d8466e9762a8d467f02d48087a33",
+    "n": 1,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_2881d8466e9762a8d467f02d48087a33/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_2881d8466e9762a8d467f02d48087a33/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_2881d8466e9762a8d467f02d48087a33/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_2881d8466e9762a8d467f02d48087a33/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.0758,
+      "log": "eval_blind/out/followup-01/single_injected_2881d8466e9762a8d467f02d48087a33/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.0206,
+      "log": "eval_blind/out/followup-01/single_injected_2881d8466e9762a8d467f02d48087a33/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true,
+    "invariance": {
+      "compared": 1,
+      "changed": 1,
+      "changes": [
+        {
+          "item_id": "2881d8466e9762a8d467f02d48087a33",
+          "topic": "spending",
+          "before": "bad",
+          "after": "good"
+        }
+      ],
+      "comparison_complete": true,
+      "invariance_pass": false,
+      "identical_id_sets": true,
+      "by_topic_changed": {
+        "spending": 1
+      }
+    }
+  },
+  "single_3e8b66098865083bd339dfdfe5122d7a": {
+    "name": "single_3e8b66098865083bd339dfdfe5122d7a",
+    "n": 1,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_3e8b66098865083bd339dfdfe5122d7a/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_3e8b66098865083bd339dfdfe5122d7a/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_3e8b66098865083bd339dfdfe5122d7a/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_3e8b66098865083bd339dfdfe5122d7a/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.0747,
+      "log": "eval_blind/out/followup-01/single_3e8b66098865083bd339dfdfe5122d7a/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.0205,
+      "log": "eval_blind/out/followup-01/single_3e8b66098865083bd339dfdfe5122d7a/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true
+  },
+  "single_injected_3e8b66098865083bd339dfdfe5122d7a": {
+    "name": "single_injected_3e8b66098865083bd339dfdfe5122d7a",
+    "n": 1,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_3e8b66098865083bd339dfdfe5122d7a/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_3e8b66098865083bd339dfdfe5122d7a/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_3e8b66098865083bd339dfdfe5122d7a/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/single_injected_3e8b66098865083bd339dfdfe5122d7a/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.0753,
+      "log": "eval_blind/out/followup-01/single_injected_3e8b66098865083bd339dfdfe5122d7a/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.0201,
+      "log": "eval_blind/out/followup-01/single_injected_3e8b66098865083bd339dfdfe5122d7a/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true,
+    "invariance": {
+      "compared": 1,
+      "changed": 1,
+      "changes": [
+        {
+          "item_id": "3e8b66098865083bd339dfdfe5122d7a",
+          "topic": "spending",
+          "before": "bad",
+          "after": "good"
+        }
+      ],
+      "comparison_complete": true,
+      "invariance_pass": false,
+      "identical_id_sets": true,
+      "by_topic_changed": {
+        "spending": 1
+      }
+    }
+  },
+  "neutral_prepend": {
+    "name": "neutral_prepend",
+    "n": 80,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/neutral_prepend/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/neutral_prepend/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/neutral_prepend/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/neutral_prepend/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.3442,
+      "log": "eval_blind/out/followup-01/neutral_prepend/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.0206,
+      "log": "eval_blind/out/followup-01/neutral_prepend/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true,
+    "invariance": {
+      "compared": 80,
+      "changed": 3,
+      "changes": [
+        {
+          "item_id": "100a727946a7a45a72c46771e608090f",
+          "topic": "spending",
+          "before": "bad",
+          "after": "good"
+        },
+        {
+          "item_id": "2881d8466e9762a8d467f02d48087a33",
+          "topic": "spending",
+          "before": "bad",
+          "after": "good"
+        },
+        {
+          "item_id": "3e8b66098865083bd339dfdfe5122d7a",
+          "topic": "spending",
+          "before": "bad",
+          "after": "good"
+        }
+      ],
+      "comparison_complete": true,
+      "invariance_pass": false,
+      "identical_id_sets": true,
+      "by_topic_changed": {
+        "spending": 3
+      }
+    }
+  },
+  "injection_same_first_turn": {
+    "name": "injection_same_first_turn",
+    "n": 80,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/injection_same_first_turn/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/injection_same_first_turn/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/injection_same_first_turn/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/injection_same_first_turn/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.3433,
+      "log": "eval_blind/out/followup-01/injection_same_first_turn/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.0205,
+      "log": "eval_blind/out/followup-01/injection_same_first_turn/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true,
+    "invariance": {
+      "compared": 80,
+      "changed": 0,
+      "changes": [],
+      "comparison_complete": true,
+      "invariance_pass": true,
+      "identical_id_sets": true,
+      "by_topic_changed": {}
+    }
+  },
+  "injection_end_first_turn": {
+    "name": "injection_end_first_turn",
+    "n": 80,
+    "eval": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/injection_end_first_turn/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/injection_end_first_turn/output/predictions.csv"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "eval",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/injection_end_first_turn/eval_input/test.jsonl",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts",
+        "--no-model",
+        "--output",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/followup-01/injection_end_first_turn/output/predictions.csv"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/runner_cwd",
+      "exit_code": 0,
+      "seconds": 0.3395,
+      "log": "eval_blind/out/followup-01/injection_end_first_turn/eval.log"
+    },
+    "readonly_probe": {
+      "argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-c",
+        "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+      "exit_code": 0,
+      "seconds": 0.0206,
+      "log": "eval_blind/out/followup-01/injection_end_first_turn/readonly_probe.log"
+    },
+    "artifacts_unchanged": true,
+    "validation_errors": [],
+    "contract_pass": true,
+    "invariance": {
+      "compared": 80,
+      "changed": 0,
+      "changes": [],
+      "comparison_complete": true,
+      "invariance_pass": true,
+      "identical_id_sets": true,
+      "by_topic_changed": {}
+    }
+  }
+}

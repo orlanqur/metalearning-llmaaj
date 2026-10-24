@@ -1,0 +1,38 @@
+{
+  "full_adapt": {
+    "name": "full_adapt",
+    "train_n": 150,
+    "fresh_empty_artifacts": true,
+    "adapt": {
+      "argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "adapt",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/adapt_input",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/artifacts",
+        "--no-model"
+      ],
+      "effective_argv": [
+        "python3",
+        "-S",
+        "-m",
+        "solution",
+        "adapt",
+        "--input",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/adapt_input",
+        "--artifacts",
+        "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/artifacts",
+        "--no-model"
+      ],
+      "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/runner_cwd",
+      "exit_code": 2,
+      "seconds": 0.0777,
+      "log": "eval_blind/out/audit-02/full_adapt/adapt.log"
+    },
+    "artifacts": "eval_blind/out/audit-02/full_adapt/artifacts"
+  }
+}

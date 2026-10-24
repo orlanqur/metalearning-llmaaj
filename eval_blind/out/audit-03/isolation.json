@@ -1,0 +1,9 @@
+{
+  "mode": "inherited_sandbox_source_only_cwd",
+  "nested_sandbox_unavailable": true,
+  "local_socket_bind_denied": true,
+  "source_inspection": false,
+  "package_copy_after_test_freeze": true,
+  "absolute_repository_read_access": "not_blocked_by_harness",
+  "limits": "Not Docker; no proof of read isolation or all possible network mechanisms."
+}

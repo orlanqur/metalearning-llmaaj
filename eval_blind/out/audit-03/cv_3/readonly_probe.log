@@ -1,0 +1,2 @@
+COMMAND ["python3", "-S", "-c", "from pathlib import Path\nimport sys\np=Path(sys.argv[1])\ntargets=[p/'.blind_write_probe']+[x for x in p.rglob('*') if x.is_file()]\nfor x in targets:\n try:\n  f=x.open('a');f.close()\n except PermissionError:\n  continue\n print('WRITE_ALLOWED',x);raise SystemExit(1)\nprint('all artifact writes denied')", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_3_adapt/artifacts"]
+all artifact writes denied

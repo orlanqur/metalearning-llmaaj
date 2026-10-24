@@ -1,0 +1,15 @@
+{
+  "flags": {
+    "adapt": {
+      "input": "--input",
+      "artifacts": "--artifacts",
+      "output": null
+    },
+    "eval": {
+      "input": "--input",
+      "artifacts": "--artifacts",
+      "output": "--output"
+    }
+  },
+  "source": "CLI --help only; README/docs show mount paths, not local path flags"
+}

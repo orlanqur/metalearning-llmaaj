@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/run.py", line 368, in main
+    runner.run()
+    ~~~~~~~~~~^^
+  File "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/run.py", line 294, in run
+    self.initialize()
+    ~~~~~~~~~~~~~~~^^
+  File "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/run.py", line 191, in initialize
+    raise RuntimeError("Cannot establish independently verified offline sandbox; solution not launched")
+RuntimeError: Cannot establish independently verified offline sandbox; solution not launched

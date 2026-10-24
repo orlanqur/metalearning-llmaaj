@@ -1,0 +1,20 @@
+{
+  "all_match": true,
+  "content_inspected": false,
+  "hashes_checked": {
+    "solution/facts.py": true,
+    "solution/dsl.py": true,
+    "solution/semantic.py": true,
+    "solution/checkers.py": true,
+    "solution/io.py": true,
+    "solution/__init__.py": true,
+    "solution/llm.py": true,
+    "solution/induce.py": true,
+    "solution/validate.py": true,
+    "solution/rules_library.py": true,
+    "solution/adapt.py": true,
+    "solution/eval.py": true,
+    "solution/verify.py": true,
+    "solution/__main__.py": true
+  }
+}

@@ -1,0 +1,62 @@
+COMMAND ["python3", "-S", "-m", "solution", "adapt", "--input", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_1_adapt/adapt_input/train.jsonl", "--artifacts", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_1_adapt/artifacts", "--no-model"]
+[induce] model steps skipped: no enabled API key
+{
+  "train_rows": 120,
+  "candidates": 44,
+  "statuses": {
+    "boundary": 22,
+    "active": 22
+  },
+  "training_summary": {
+    "kind": "train_resubstitution",
+    "grouped_split": "not_run",
+    "by_topic": {
+      "financial_position": {
+        "n": 29,
+        "correct": 29,
+        "TP": 12,
+        "FP": 0,
+        "FN": 0,
+        "TN": 17,
+        "accuracy": 1.0
+      },
+      "savings": {
+        "n": 27,
+        "correct": 27,
+        "TP": 9,
+        "FP": 0,
+        "FN": 0,
+        "TN": 18,
+        "accuracy": 1.0
+      },
+      "credit": {
+        "n": 29,
+        "correct": 29,
+        "TP": 10,
+        "FP": 0,
+        "FN": 0,
+        "TN": 19,
+        "accuracy": 1.0
+      },
+      "spending": {
+        "n": 35,
+        "correct": 34,
+        "TP": 16,
+        "FP": 0,
+        "FN": 1,
+        "TN": 18,
+        "accuracy": 0.9714285714285714
+      }
+    },
+    "macro_topic_accuracy": 0.9928571428571429,
+    "errors": [
+      {
+        "item_id": "5f9ae3d8d52eaf3dade5beee0fce7f0e",
+        "topic": "spending",
+        "expected": "bad",
+        "predicted": "good"
+      }
+    ]
+  },
+  "artifacts": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_1_adapt/artifacts"
+}

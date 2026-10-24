@@ -1,0 +1,597 @@
+{
+  "explanation": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_2_adapt/artifacts/explanation.md",
+  "train": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_2_adapt/adapt_input/train.jsonl",
+  "rules_spec": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_2_adapt/artifacts/rules_spec.json",
+  "kind": "structural_lint_not_jury_score",
+  "criteria": {
+    "clear_criteria": {
+      "structural_pass": true,
+      "condition_language": true,
+      "verdict_language": true,
+      "rule_ids": [
+        "all.CONVENTION.anchor",
+        "all.CONVENTION.links",
+        "all.CONVENTION.typo",
+        "credit.AMOUNT.remaining_debt",
+        "credit.CONVENTION.residual_interest",
+        "credit.DATE.context",
+        "credit.KNOWN_DATA.ask_populated_field",
+        "credit.KNOWN_DATA.deny_date",
+        "credit.MIN_INTEREST.lexical",
+        "credit.MIN_INTEREST.semantic",
+        "credit.NONANSWER.semantic",
+        "credit.PAID_STATUS.lexical",
+        "financial_position.CONVENTION.own_after_hold",
+        "financial_position.CREDIT_AS_MONEY.poison",
+        "financial_position.HOLD.available_amount",
+        "financial_position.KNOWN_DATA.ask_populated_field",
+        "financial_position.NET.net_amount",
+        "financial_position.NONANSWER.semantic",
+        "savings.ACTION.lexical",
+        "savings.ACTION.semantic",
+        "savings.AMOUNT.balance_cuenta_veluna",
+        "savings.CONVENTION.interest",
+        "savings.DATE.context",
+        "savings.FIXED_LOCK.lexical",
+        "savings.FIXED_LOCK.semantic",
+        "savings.KNOWN_DATA.ask_populated_field",
+        "savings.NONANSWER.semantic",
+        "savings.RATE.ahorro_flexible",
+        "savings.RATE.selected_tariff",
+        "spending.AMOUNT.confirmed_purchases",
+        "spending.CONVENTION.other_in_total",
+        "spending.DENIAL.lexical",
+        "spending.DENIAL.semantic",
+        "spending.KNOWN_DATA.ask_populated_field",
+        "spending.NONANSWER.semantic",
+        "spending.OTHER_TRANSFER.omitted",
+        "spending.OWN_TRANSFER.lexical",
+        "spending.OWN_TRANSFER.poison",
+        "spending.PERIOD_DEFAULT.three_months",
+        "spending.PERIOD_EXPLICIT.last_month",
+        "spending.REFUND.average",
+        "spending.REFUND.clothing",
+        "spending.REFUND.month",
+        "spending.TX_AMOUNT.merchant"
+      ]
+    },
+    "clear_priorities": {
+      "structural_pass": true,
+      "priority_language": true
+    },
+    "links_to_training_examples": {
+      "structural_pass": true,
+      "references": [
+        {
+          "item_id": "04b71730fc4e3c4fdf19e0888108a8a5",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 4
+        },
+        {
+          "item_id": "0ae6aa45d6788645be6959d076800798",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "0b056b6072e50369a8477e95a5d53e77",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "0eea79a6cac297b8b6e8dd9141342211",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "12806993ba0f0423f6ccc31c6f991d26",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "13120e9df1d7546bfb9747489ec52f54",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "16d369527ab15f75a2a8b8c24fb2069e",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": false,
+          "references": 2
+        },
+        {
+          "item_id": "175f4407ed6ab276fc244d33014af34f",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "1947acadc729f44cef4c17f20ec81669",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "1b23b4284824f79908ea3bad1def21da",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "1cc197350645f6c731ff191fc0a597e5",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "22c3c8a00320a4740b3f8a20536583a8",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "247303d9f7e7030f41fa4e2c316b8b65",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "25043fb0721c9de79e5cc72adba5139b",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "284db98e9fbb9c6869b0c143058552a3",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "2c970a10f2f03e74e3e27474eb8cba7c",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "33b3d072865a9ae4dc780e3048c823f6",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "33c2df30a8869c2403fa65135b4904a3",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "3dbf49307247e5a33fbdc9e3a2ed052c",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "46c829c7efe83c74cc11d2e53c3689cc",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": false,
+          "references": 2
+        },
+        {
+          "item_id": "4c518af851ed865828d593948d0e5fe1",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "4d84d3f17c5aa5ba3b622695423cf003",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": false,
+          "references": 2
+        },
+        {
+          "item_id": "4f6de85c6f13f76ea29f8d13edfea60d",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "527d7be830db2e5f2c9d37af04e4a036",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 10
+        },
+        {
+          "item_id": "5884d3994d7da115fb18918b9604941b",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "695c52a9339c867ac1d28fdf88bd7195",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "6ae91a59442c77d08d8c5e46dbcc3a6f",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 10
+        },
+        {
+          "item_id": "72d4d9a9e2ef9fa0da8eb3d028d986b7",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "788b8ddedccb1543d09913a7eb1eea12",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "78df9193de2e3e73d6504c42e43d1f52",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "7d540a50953a86a90664740e3f96a789",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": false,
+          "references": 2
+        },
+        {
+          "item_id": "80079c6727853d113b1ecb6b72c7dc96",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "893405915e7831b00ec10f9f145c9c72",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "8b99e4d6dd481e022802f71bac669664",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "8e6f153305a8666a7949517fb46f0233",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "90d66b1a8763964292f6c932d8e561d9",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "a1a651b2ad3fc21371964782fca2306c",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "a468d7240d5670e67d96d43341ed34f7",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "a9d7e4b9f770e90eb43f6e6f21050f0c",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": false,
+          "references": 2
+        },
+        {
+          "item_id": "b219e69d00518f14abcf95fb5d17b17f",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "ccb20080b7e5ddcc85ac0251d3b92b4d",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": false,
+          "references": 2
+        },
+        {
+          "item_id": "d1ebe99111d0eb078432ee98df48dbab",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "d5849713b69833bfdc39a5fde4c143cc",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 10
+        },
+        {
+          "item_id": "de8d5f46e3fe82fbca94f3bfe92f9f5e",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "dead27bbef55a5965651dfc492c4c3d8",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "e22bd691330b291386089c23f423ea5c",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": false,
+          "references": 2
+        },
+        {
+          "item_id": "e6d9da2a6a719d92435ff16825bb8895",
+          "gold_label": "good",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": false,
+          "references": 2
+        },
+        {
+          "item_id": "f3304c411ca2a345b13ae01d92be9043",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        },
+        {
+          "item_id": "f922db12640a7720effc405b2062f70c",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 3
+        },
+        {
+          "item_id": "f9ce52d8dde22208126ab59812fd2b84",
+          "gold_label": "bad",
+          "label_matches": true,
+          "source_excerpt_found": true,
+          "criterion_link_found": true,
+          "references": 2
+        }
+      ],
+      "unknown_ids": []
+    },
+    "clear_boundaries": {
+      "structural_pass": true,
+      "specific_condition": true,
+      "train_ids": [
+        "04b71730fc4e3c4fdf19e0888108a8a5",
+        "0b056b6072e50369a8477e95a5d53e77",
+        "16d369527ab15f75a2a8b8c24fb2069e",
+        "46c829c7efe83c74cc11d2e53c3689cc",
+        "4d84d3f17c5aa5ba3b622695423cf003",
+        "527d7be830db2e5f2c9d37af04e4a036",
+        "6ae91a59442c77d08d8c5e46dbcc3a6f",
+        "78df9193de2e3e73d6504c42e43d1f52",
+        "7d540a50953a86a90664740e3f96a789",
+        "8b99e4d6dd481e022802f71bac669664",
+        "8e6f153305a8666a7949517fb46f0233",
+        "a9d7e4b9f770e90eb43f6e6f21050f0c",
+        "b219e69d00518f14abcf95fb5d17b17f",
+        "ccb20080b7e5ddcc85ac0251d3b92b4d",
+        "d5849713b69833bfdc39a5fde4c143cc",
+        "e22bd691330b291386089c23f423ea5c",
+        "e6d9da2a6a719d92435ff16825bb8895",
+        "f922db12640a7720effc405b2062f70c"
+      ]
+    },
+    "consistency_with_implementation": {
+      "structural_pass": true,
+      "spec_exists": true,
+      "spec_rule_ids": [
+        "all.CONVENTION.anchor",
+        "all.CONVENTION.links",
+        "all.CONVENTION.typo",
+        "credit.AMOUNT.remaining_debt",
+        "credit.CONVENTION.residual_interest",
+        "credit.DATE.context",
+        "credit.KNOWN_DATA.ask_populated_field",
+        "credit.KNOWN_DATA.deny_date",
+        "credit.MIN_INTEREST.lexical",
+        "credit.MIN_INTEREST.semantic",
+        "credit.NONANSWER.semantic",
+        "credit.PAID_STATUS.lexical",
+        "financial_position.CONVENTION.own_after_hold",
+        "financial_position.CREDIT_AS_MONEY.poison",
+        "financial_position.HOLD.available_amount",
+        "financial_position.KNOWN_DATA.ask_populated_field",
+        "financial_position.NET.net_amount",
+        "financial_position.NONANSWER.semantic",
+        "savings.ACTION.lexical",
+        "savings.ACTION.semantic",
+        "savings.AMOUNT.balance_cuenta_veluna",
+        "savings.CONVENTION.interest",
+        "savings.DATE.context",
+        "savings.FIXED_LOCK.lexical",
+        "savings.FIXED_LOCK.semantic",
+        "savings.KNOWN_DATA.ask_populated_field",
+        "savings.NONANSWER.semantic",
+        "savings.RATE.ahorro_flexible",
+        "savings.RATE.selected_tariff",
+        "spending.AMOUNT.confirmed_purchases",
+        "spending.CONVENTION.other_in_total",
+        "spending.DENIAL.lexical",
+        "spending.DENIAL.semantic",
+        "spending.KNOWN_DATA.ask_populated_field",
+        "spending.NONANSWER.semantic",
+        "spending.OTHER_TRANSFER.omitted",
+        "spending.OWN_TRANSFER.lexical",
+        "spending.OWN_TRANSFER.poison",
+        "spending.PERIOD_DEFAULT.three_months",
+        "spending.PERIOD_EXPLICIT.last_month",
+        "spending.REFUND.average",
+        "spending.REFUND.clothing",
+        "spending.REFUND.month",
+        "spending.TX_AMOUNT.merchant"
+      ],
+      "explained_spec_rule_ids": [
+        "all.CONVENTION.anchor",
+        "all.CONVENTION.links",
+        "all.CONVENTION.typo",
+        "credit.AMOUNT.remaining_debt",
+        "credit.CONVENTION.residual_interest",
+        "credit.DATE.context",
+        "credit.KNOWN_DATA.ask_populated_field",
+        "credit.KNOWN_DATA.deny_date",
+        "credit.MIN_INTEREST.lexical",
+        "credit.MIN_INTEREST.semantic",
+        "credit.NONANSWER.semantic",
+        "credit.PAID_STATUS.lexical",
+        "financial_position.CONVENTION.own_after_hold",
+        "financial_position.CREDIT_AS_MONEY.poison",
+        "financial_position.HOLD.available_amount",
+        "financial_position.KNOWN_DATA.ask_populated_field",
+        "financial_position.NET.net_amount",
+        "financial_position.NONANSWER.semantic",
+        "savings.ACTION.lexical",
+        "savings.ACTION.semantic",
+        "savings.AMOUNT.balance_cuenta_veluna",
+        "savings.CONVENTION.interest",
+        "savings.DATE.context",
+        "savings.FIXED_LOCK.lexical",
+        "savings.FIXED_LOCK.semantic",
+        "savings.KNOWN_DATA.ask_populated_field",
+        "savings.NONANSWER.semantic",
+        "savings.RATE.ahorro_flexible",
+        "savings.RATE.selected_tariff",
+        "spending.AMOUNT.confirmed_purchases",
+        "spending.CONVENTION.other_in_total",
+        "spending.DENIAL.lexical",
+        "spending.DENIAL.semantic",
+        "spending.KNOWN_DATA.ask_populated_field",
+        "spending.NONANSWER.semantic",
+        "spending.OTHER_TRANSFER.omitted",
+        "spending.OWN_TRANSFER.lexical",
+        "spending.OWN_TRANSFER.poison",
+        "spending.PERIOD_DEFAULT.three_months",
+        "spending.PERIOD_EXPLICIT.last_month",
+        "spending.REFUND.average",
+        "spending.REFUND.clothing",
+        "spending.REFUND.month",
+        "spending.TX_AMOUNT.merchant"
+      ],
+      "unmatched_rule_like_ids": [],
+      "runtime_use": "not_checked_black_box"
+    }
+  },
+  "all_structural_checks_pass": true,
+  "limits": [
+    "Human judgment is required for all five jury points.",
+    "Rule ID overlap does not prove rules are executed.",
+    "Free-format explanations can require manual review; no keywords are mandatory in README."
+  ]
+}

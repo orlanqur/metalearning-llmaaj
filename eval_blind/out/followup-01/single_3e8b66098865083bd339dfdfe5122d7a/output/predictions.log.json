@@ -1,0 +1,72 @@
+{
+  "model_status": "skipped_no_key_or_disabled",
+  "manifest_sha256": "52e791b5c75097bd2b306849c4390f6e7043174c589a608a3ce5075108fcb2d3",
+  "input_sha256": "ec5d32895545f462801d3c9af8c27644739866175cc50a02906d3e23a6a0eda7",
+  "predictions_sha256": "19cea85f4f11345f15d7b5a4c5d11133e818f90b5bac7ac4b92b70b240fc0973",
+  "stats": {
+    "key_present": false,
+    "enabled": false,
+    "induction_model": "openai/gpt-oss-120b",
+    "eval_model": "openai/gpt-oss-120b",
+    "network_calls": 0,
+    "model_calls": 0,
+    "elapsed_seconds": 0,
+    "reported_cost": 0,
+    "cost_complete": true,
+    "usage": {
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0
+    },
+    "event_statuses": {}
+  },
+  "model_events": [],
+  "semantic_events": [],
+  "decisions": [
+    {
+      "item_id": "3e8b66098865083bd339dfdfe5122d7a",
+      "label": "bad",
+      "checks": [
+        {
+          "rule_id": "spending.AMOUNT.confirmed_purchases",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.DENIAL.lexical",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OTHER_TRANSFER.omitted",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.OWN_TRANSFER.poison",
+          "violated": false,
+          "evidence": {}
+        },
+        {
+          "rule_id": "spending.PERIOD_DEFAULT.three_months",
+          "violated": true,
+          "evidence": {
+            "reason": "Default spending window is not the last three complete months",
+            "quotes": [
+              {
+                "turn": 1,
+                "text": "За последние два полных месяца (2026-08 и 2026-09) ваш средний расход ≈21,400 MXN в месяц. Разбивка: покупки (с учётом возвратов) ≈19,400 MXN; переводы другим людям ≈2,000 MXN. Недавние операции: 2026-10-03 La Comer −1,275 MXN (покупка, завершена — сеть супермаркетов; неизвестны товары и способ оплаты); 2026-09-20 Ana Rivera −1,850 MXN (перевод, выполнен — частное лицо; нет назначения); 2026-09-14 Galerías −3,200 MXN (покупка, завершена — универмаг; нет детализации). Подробно — [лента операций](lnk_feed)."
+              }
+            ],
+            "expected_months": [
+              "2026-07",
+              "2026-08",
+              "2026-09"
+            ]
+          }
+        }
+      ],
+      "fallback": false
+    }
+  ]
+}

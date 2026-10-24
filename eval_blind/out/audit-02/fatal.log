@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/run.py", line 384, in main
+    runner.run()
+    ~~~~~~~~~~^^
+  File "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/run.py", line 313, in run
+    raise RuntimeError("Full-train adapt failed; see full_adapt/adapt.log")
+RuntimeError: Full-train adapt failed; see full_adapt/adapt.log

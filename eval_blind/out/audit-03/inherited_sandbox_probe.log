@@ -1,0 +1,2 @@
+COMMAND ["python3", "-S", "-c", "import socket\ntry:\n s=socket.socket();s.bind(('127.0.0.1',0))\nexcept PermissionError:\n print('inherited sandbox denies local bind');raise SystemExit(0)\nraise SystemExit(1)"]
+inherited sandbox denies local bind

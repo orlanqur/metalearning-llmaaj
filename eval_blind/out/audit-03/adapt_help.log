@@ -1,0 +1,12 @@
+COMMAND ["python3", "-S", "-m", "solution", "adapt", "--help"]
+usage: __main__.py adapt [-h] [--input INPUT] [--artifacts ARTIFACTS]
+                         [--language {original,es,en}]
+                         [--disable-family DISABLE_FAMILY] [--no-model]
+
+options:
+  -h, --help            show this help message and exit
+  --input INPUT
+  --artifacts ARTIFACTS
+  --language {original,es,en}
+  --disable-family DISABLE_FAMILY
+  --no-model

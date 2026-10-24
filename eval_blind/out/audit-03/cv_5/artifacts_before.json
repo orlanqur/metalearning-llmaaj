@@ -1,0 +1,33 @@
+{
+  "explanation.md": {
+    "mode": 292,
+    "sha256": "3cc63ee1765a70df2ac8272ea6cd58d87f8b3835b0514cde3d6dc4cbfdd720d8"
+  },
+  "fewshot_index.json": {
+    "mode": 292,
+    "sha256": "b93423b4b3cc50d1a7acb7e9876b2e5a9933a930dc624cf4a4f7cbeb35a8e650"
+  },
+  "induction_log.json": {
+    "mode": 292,
+    "sha256": "0f77aed30cea935a54963316a2632c70fdc4d61150100f131ebeb58aa6649a09"
+  },
+  "judge_prompt.txt": {
+    "mode": 292,
+    "sha256": "c864367cf5028d57fb4612d0ff5f03701a2b1e16354b90eb6d370b94a10dd111"
+  },
+  "model_log.json": {
+    "mode": 292,
+    "sha256": "fc90b85777774cfb6f6279cf09a4738ae38d1f75c1d25c29d63b9f87d92bec3c"
+  },
+  "rules_spec.json": {
+    "mode": 292,
+    "sha256": "57b7362ece37f990b369f5b61cbbe2066057b54c13b26b455ec1754d13834552"
+  },
+  "run_meta.json": {
+    "mode": 292,
+    "sha256": "5c4fcc65b96868616ee6cc804d0bf20de5e2530721625c04342ed3db3e94777a"
+  },
+  ".": {
+    "mode": 365
+  }
+}

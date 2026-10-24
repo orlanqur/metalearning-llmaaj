@@ -1,0 +1,91 @@
+COMMAND ["python3", "-S", "src/evaluate.py", "--test", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_5/gold.jsonl", "--predictions", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_5/output/predictions.csv", "--out", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/cv_5/score.json"]
+{
+  "n": 30,
+  "correct": 28,
+  "accuracy": 0.9333333333333333,
+  "kappa": 0.8642533936651584,
+  "confusion_matrix": [
+    [
+      16,
+      1
+    ],
+    [
+      1,
+      12
+    ]
+  ],
+  "primary_metric": "macro_topic_accuracy",
+  "score": 0.9330357142857143,
+  "macro_topic_accuracy": 0.9330357142857143,
+  "macro_topic_kappa": 0.8585714285714285,
+  "confusion_matrix_order": [
+    "good",
+    "bad"
+  ],
+  "by_topic": {
+    "credit": {
+      "n": 8,
+      "correct": 7,
+      "accuracy": 0.875,
+      "kappa": 0.7142857142857143,
+      "confusion_matrix": [
+        [
+          5,
+          0
+        ],
+        [
+          1,
+          2
+        ]
+      ]
+    },
+    "financial_position": {
+      "n": 7,
+      "correct": 7,
+      "accuracy": 1.0,
+      "kappa": 1.0,
+      "confusion_matrix": [
+        [
+          4,
+          0
+        ],
+        [
+          0,
+          3
+        ]
+      ]
+    },
+    "savings": {
+      "n": 7,
+      "correct": 6,
+      "accuracy": 0.8571428571428571,
+      "kappa": 0.7199999999999999,
+      "confusion_matrix": [
+        [
+          3,
+          1
+        ],
+        [
+          0,
+          3
+        ]
+      ]
+    },
+    "spending": {
+      "n": 8,
+      "correct": 8,
+      "accuracy": 1.0,
+      "kappa": 1.0,
+      "confusion_matrix": [
+        [
+          4,
+          0
+        ],
+        [
+          0,
+          4
+        ]
+      ]
+    }
+  }
+}

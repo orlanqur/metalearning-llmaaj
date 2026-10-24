@@ -1,0 +1,2 @@
+COMMAND ["python3", "-S", "-m", "solution", "adapt", "--input", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/adapt_input", "--artifacts", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/artifacts", "--no-model"]
+adapt failed: [Errno 21] Is a directory: '/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/adapt_input'

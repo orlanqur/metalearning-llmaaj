@@ -1,0 +1,10 @@
+COMMAND ["python3", "-S", "-m", "solution", "eval", "--help"]
+usage: __main__.py eval [-h] [--input INPUT] [--artifacts ARTIFACTS]
+                        [--output OUTPUT] [--no-model]
+
+options:
+  -h, --help            show this help message and exit
+  --input INPUT
+  --artifacts ARTIFACTS
+  --output OUTPUT
+  --no-model

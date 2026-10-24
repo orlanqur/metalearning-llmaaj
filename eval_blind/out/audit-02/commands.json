@@ -1,0 +1,118 @@
+[
+  {
+    "argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/offline.sb",
+      "python3",
+      "-S",
+      "-c",
+      "import socket\ntry:\n s=socket.socket();s.bind(('127.0.0.1',0))\nexcept PermissionError:\n print('network denied');raise SystemExit(0)\nraise SystemExit(1)"
+    ],
+    "effective_argv": [
+      "/usr/bin/sandbox-exec",
+      "-f",
+      "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/offline.sb",
+      "python3",
+      "-S",
+      "-c",
+      "import socket\ntry:\n s=socket.socket();s.bind(('127.0.0.1',0))\nexcept PermissionError:\n print('network denied');raise SystemExit(0)\nraise SystemExit(1)"
+    ],
+    "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+    "exit_code": 71,
+    "seconds": 0.0104,
+    "log": "eval_blind/out/audit-02/sandbox_probe.log"
+  },
+  {
+    "argv": [
+      "python3",
+      "-S",
+      "-c",
+      "import socket\ntry:\n s=socket.socket();s.bind(('127.0.0.1',0))\nexcept PermissionError:\n print('inherited sandbox denies local bind');raise SystemExit(0)\nraise SystemExit(1)"
+    ],
+    "effective_argv": [
+      "python3",
+      "-S",
+      "-c",
+      "import socket\ntry:\n s=socket.socket();s.bind(('127.0.0.1',0))\nexcept PermissionError:\n print('inherited sandbox denies local bind');raise SystemExit(0)\nraise SystemExit(1)"
+    ],
+    "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work",
+    "exit_code": 0,
+    "seconds": 0.0193,
+    "log": "eval_blind/out/audit-02/inherited_sandbox_probe.log"
+  },
+  {
+    "argv": [
+      "python3",
+      "-S",
+      "-m",
+      "solution",
+      "adapt",
+      "--help"
+    ],
+    "effective_argv": [
+      "python3",
+      "-S",
+      "-m",
+      "solution",
+      "adapt",
+      "--help"
+    ],
+    "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/runner_cwd",
+    "exit_code": 0,
+    "seconds": 0.0763,
+    "log": "eval_blind/out/audit-02/adapt_help.log"
+  },
+  {
+    "argv": [
+      "python3",
+      "-S",
+      "-m",
+      "solution",
+      "eval",
+      "--help"
+    ],
+    "effective_argv": [
+      "python3",
+      "-S",
+      "-m",
+      "solution",
+      "eval",
+      "--help"
+    ],
+    "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/runner_cwd",
+    "exit_code": 0,
+    "seconds": 0.0758,
+    "log": "eval_blind/out/audit-02/eval_help.log"
+  },
+  {
+    "argv": [
+      "python3",
+      "-S",
+      "-m",
+      "solution",
+      "adapt",
+      "--input",
+      "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/adapt_input",
+      "--artifacts",
+      "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/artifacts",
+      "--no-model"
+    ],
+    "effective_argv": [
+      "python3",
+      "-S",
+      "-m",
+      "solution",
+      "adapt",
+      "--input",
+      "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/adapt_input",
+      "--artifacts",
+      "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/full_adapt/artifacts",
+      "--no-model"
+    ],
+    "cwd": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-02/runner_cwd",
+    "exit_code": 2,
+    "seconds": 0.0777,
+    "log": "eval_blind/out/audit-02/full_adapt/adapt.log"
+  }
+]
