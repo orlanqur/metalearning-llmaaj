@@ -91,6 +91,24 @@ class ClientTests(unittest.TestCase):
             self.assertEqual(env, dict(OPENROUTER_API_KEY="fixture-value", EVAL_MODEL="existing", X="$(touch nope)"))
             self.assertFalse((Path(temp)/"nope").exists())
 
+    @patch.dict("os.environ", {"GEMINI_API_KEY": "gemini-fixture", "GEMINI_MODEL": "gemini-4-argon"}, clear=True)
+    def test_gemini_key_selects_google_endpoint_without_openrouter(self):
+        with tempfile.TemporaryDirectory() as temp:
+            client = ChatClient(temp, dotenv=Path(temp) / "absent")
+            self.assertTrue(client.available)
+            self.assertEqual(client.base_url, "https://generativelanguage.googleapis.com/v1beta/openai")
+            self.assertEqual(client.eval_model, "gemini-4-argon")
+            self.assertNotIn("gemini-fixture", json.dumps(client.events))
+
+    @patch.dict("os.environ", {
+        "OPENROUTER_API_KEY": "router-fixture", "GEMINI_API_KEY": "gemini-fixture",
+        "GEMINI_MODEL": "gemini-4-argon"}, clear=True)
+    def test_openrouter_key_keeps_the_openrouter_endpoint(self):
+        with tempfile.TemporaryDirectory() as temp:
+            client = ChatClient(temp, dotenv=Path(temp) / "absent")
+            self.assertEqual(client.base_url, "https://openrouter.ai/api/v1")
+            self.assertEqual(client.induction_model, "openai/gpt-oss-120b")
+
     @patch.dict("os.environ", {}, clear=True)
     def test_cache_survives_separate_client_without_key(self):
         value = dict(verdict="yes", quote="unsupported", reason="fixture")

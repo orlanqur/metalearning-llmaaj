@@ -13,6 +13,8 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 DEFAULT_MODEL = "openai/gpt-oss-120b"
+GEMINI_OPENAI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai"
+DEFAULT_GEMINI_MODEL = "gemini-4-argon"
 
 
 def load_dotenv(path=".env", environ=None):
@@ -105,9 +107,26 @@ class ChatClient:
                  timeout=45, attempts=3, pause=1, dotenv=".env", disabled=False):
         load_dotenv(dotenv)
         self.disabled = disabled or os.getenv("SOLUTION_DISABLE_LLM") == "1"
-        self.api_key = (os.getenv("OPENROUTER_API_KEY", "") if api_key is None else api_key).strip()
-        self.base_url = (base_url or os.getenv("OPENROUTER_BASE_URL") or "https://openrouter.ai/api/v1").rstrip("/")
-        self.induction_model = os.getenv("INDUCTION_MODEL") or DEFAULT_MODEL
+        gemini_key = os.getenv("GEMINI_API_KEY", "").strip()
+        openrouter_key = os.getenv("OPENROUTER_API_KEY", "").strip()
+        # An explicit constructor key is a fixture or a caller override. Gemini is
+        # selected only from the environment, and only when OpenRouter is unset,
+        # so a teammate's OpenRouter run keeps its current endpoint.
+        use_gemini = api_key is None and bool(gemini_key) and not openrouter_key
+        if api_key is None:
+            self.api_key = (gemini_key if use_gemini else openrouter_key).strip()
+        else:
+            self.api_key = api_key.strip()
+        if base_url:
+            self.base_url = base_url.rstrip("/")
+        elif use_gemini:
+            self.base_url = (os.getenv("GEMINI_BASE_URL") or GEMINI_OPENAI_BASE).rstrip("/")
+        else:
+            self.base_url = (os.getenv("OPENROUTER_BASE_URL") or "https://openrouter.ai/api/v1").rstrip("/")
+        if use_gemini:
+            self.induction_model = os.getenv("INDUCTION_MODEL") or os.getenv("GEMINI_MODEL") or DEFAULT_GEMINI_MODEL
+        else:
+            self.induction_model = os.getenv("INDUCTION_MODEL") or DEFAULT_MODEL
         self.eval_model = os.getenv("EVAL_MODEL") or self.induction_model
         self.cache_dir = Path(cache_dir)
         self.read_cache_dirs = [self.cache_dir] + [Path(p) for p in read_cache_dirs]

@@ -4,7 +4,7 @@
 - done | Шаг 2: LLM-клиент, семантические правила, DSL, автопоиск правил, baseline (без ключа) | Astra (Codex) | solution/ docs/ASTRA-STEP2.md | 13:25
 - doing | Шаг 3: те же прогоны с моделью (adapt, zero-shot, LOO) | Astra (Codex) | artifacts/step3 out/step3 docs/ASTRA-STEP3.md | 13:25
 - done | Dockerfile, entrypoint, LICENSE, docs/DOCKER.md, docs/README-draft.md | Sol (Codex) | Dockerfile entrypoint.sh LICENSE docs/ | 13:25
-- doing | README.md форка по шаблону FAQ | Михаил (Cursor) | README.md | 13:14
+- doing | README.md форка по шаблону FAQ; Gemini в llm.py, если нет ключа OpenRouter | Михаил (Cursor) | README.md solution/llm.py | 13:21
 - todo | Демо-интерфейс для судей (CLI) | Claude-планировщик → Codex | demo/ | 13:25
 - todo | Ответы на 3 вопроса судей, питч 3–5 мин | — | TEAM/PITCH.md | —
 - todo | Чеклист FAQ перед сдачей, push, SHA организаторам, форма OrganizerHQ | Аркадий | — | —
