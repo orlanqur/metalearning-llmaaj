@@ -1,2 +1,0 @@
-COMMAND ["/usr/bin/sandbox-exec", "-f", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-01/offline.sb", "python3", "-S", "-c", "import socket\ntry:\n s=socket.socket();s.bind(('127.0.0.1',0))\nexcept PermissionError:\n print('network denied');raise SystemExit(0)\nraise SystemExit(1)"]
-sandbox-exec: sandbox_apply: Operation not permitted

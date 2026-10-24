@@ -1,9 +1,0 @@
-COMMAND ["python3", "-S", "-m", "solution", "eval", "--input", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/empty_content/eval_input/test.jsonl", "--artifacts", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/full_adapt/artifacts", "--no-model", "--output", "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/empty_content/output/predictions.csv"]
-[eval] model calls skipped: no enabled API key; cached responses may be reused
-{
-  "predictions": 80,
-  "output": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/empty_content/output/predictions.csv",
-  "model_calls": 0,
-  "network_calls": 0,
-  "log": "/Users/arkadijmisurov/orca/workspaces/metalearning-llmaaj/plata-clean-work/eval_blind/out/audit-03/empty_content/output/predictions.log.json"
-}
