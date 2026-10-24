@@ -2,7 +2,7 @@
 
 from .checkers import applicable, run_check
 from .facts import FactSheet
-from .llm import canonical
+from .llm import canonical, pmap
 import hashlib
 
 
@@ -14,7 +14,13 @@ def verify(candidates, rows, runtime=None):
         examples, counterexamples, nonviolating_good = [], [], []
         checked = unchecked = applicable_count = bad_count = good_count = 0
         topic_stats = {}
-        for row, facts in prepared:
+        # Model-backed checks dominate adapt time: fetch them concurrently, then aggregate in row order.
+        if runtime is not None and runtime.client.available and rule.get("checker") == "llm_predicate":
+            results = pmap(lambda rf: run_check(rule, rf[1], runtime, rf[0]["item_id"])
+                           if rule["topic"] in (rf[1].topic, "all") else None, prepared)
+        else:
+            results = [None] * len(prepared)
+        for (row, facts), ready in zip(prepared, results):
             # Every candidate visits the full dataset; its topic/applicability gate
             # is part of the candidate, not an evaluation subset chosen after hits.
             if rule["topic"] not in (facts.topic, "all"):
@@ -23,7 +29,7 @@ def verify(candidates, rows, runtime=None):
             group["bad_total" if row["label"] == "bad" else "good_total"] += 1
             bad_count += row["label"] == "bad"
             good_count += row["label"] == "good"
-            result = run_check(rule, facts, runtime, row["item_id"])
+            result = ready or run_check(rule, facts, runtime, row["item_id"])
             applies = applicable(facts, rule["applicability"])
             applicable_count += applies
             if result["violated"] is None:
