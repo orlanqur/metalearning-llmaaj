@@ -19,4 +19,7 @@
 - done | docs/APPROACH.html двуязычный EN/RU с цифрами индукции, 72 КБ | Opus → планировщик | docs/APPROACH.html | 15:45
 - done | Финальная приёмка 25400ea: accept.sh 53+9 OK, 0.9502, Docker --network none побайтно, приватность чисто | Claude-приёмщик | DIALOG 15:51 | 15:55
 - done | Дедлайн на HTTP-запрос (e02bb37) черри-пик → 240e612, тесты OK, предсказания без модели прежние | Claude-планировщик | solution/llm.py | 15:55
-- doing | Независимый критик (Gemini Argon) по пакету сдачи → сверка Opus → правки до 16:35 | Claude-планировщик | scratchpad | 15:55
+- done | Критика Argon (20 находок) → сверка Opus: 5 подтверждены, правки README/питчей слиты (308dc70); 3 находки по коду задокументированы | Claude-планировщик | README.md TEAM/PITCH*.md | 16:08
+- done | Дефолт модели → qwen/qwen3.8-27b (бенч: гибрид 0.9502, 0 FP); README/питчи/HTML обновлены | Claude-планировщик | .env.example solution/llm.py | 16:08
+- doing | Hotfix: первый ход ассистента после запроса, а не по позиции (6 флипов при приветствии) — приёмка: тесты, cmp побайтно, FP=0, 0 флипов | Codex (hotfix) | worktree ../hotfix, ветка orlanqur/hotfix | 16:08
+- doing | Qwen3.8-27B на скрытом правиле (LOO MIN_INTEREST, 8 воркеров) | Claude-планировщик | artifacts/loo_qwen | 16:08
