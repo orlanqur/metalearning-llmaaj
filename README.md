@@ -171,6 +171,7 @@ reports, not a new benchmark run for this README.
 | Public test, team-member run | Gemini `gemini-4-argon` | **0.9507** | 76/80 |
 | Public test, hybrid (rules + model) | `anthropic/claude-sonnet-5.5` | **0.9502** | 76/80, 0 false bad |
 | Public test, hybrid (rules + model) | `qwen/qwen3.8-27b` | 0.9502 | 76/80, 0 false bad |
+| Public test, hybrid (rules + model) | `openai/gpt-6.1-sol` | 0.9377 | 75/80, 1 false bad |
 | Public test, hybrid (rules + model) | `openai/gpt-oss-120b` | 0.9252 | 74/80 |
 | Public test, from scratch (model-only induction, no rule library) | `openai/gpt-oss-120b` | 0.6259 | 50/80 |
 | Same bare model, zero-shot (no rules, no few-shot) | `openai/gpt-oss-120b` | **0.7704** | 60/80 |
@@ -194,7 +195,8 @@ evidence in `out/zero_shot.score.json` (generated, not committed).
 **Which model can learn a new rule.** Hidden-rule test: the MIN_INTEREST family was
 removed and the model had to re-discover it from the residual `bad` conversations
 (`solution/validate.py leave-one-rule-out`). Claude Sonnet 5.5 re-discovered it
-(4 of 4 witnesses, 0 false alarms, 304 calls, about $4.07); Gemma 4 31B proposed
+(4 of 4 witnesses, 0 false alarms, 304 calls, about $4.07); GPT-6.1 Sol re-discovered it too (4 of 4; 400 calls, about $1.47), although its public
+hybrid run added 1 false `bad` (0.9377). Gemma 4 31B proposed
 the rule almost verbatim but verification rejected it (11 true, 3 false); gpt-oss-120b
 from scratch did not. **Qwen3.8-27B also re-discovered it** (4 of 4, 0 false alarms, three induced `credit`
 rules each covering all four witnesses; 111 new calls plus 265 cached, 8 min, about $0.21)
