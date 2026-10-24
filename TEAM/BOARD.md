@@ -7,5 +7,5 @@
 - doing | README.md форка по шаблону FAQ; Gemini в llm.py, если нет ключа OpenRouter | Михаил (Cursor) | README.md solution/llm.py | 13:21
 - done | Демо для судей: demo/judge_demo.py --id <id> (вердикт, правило, цитата, похожие train) | Codex (Sol) | demo/ tests/test_demo.py | 13:45
 - doing | Слепая проверка: независимый Codex без контекста строит тесты и эвалы по README-контракту | Codex (Blind) | eval_blind/ docs/BLIND-EVAL.md | 13:45
-- todo | Ответы на 3 вопроса судей, питч 3–5 мин | — | TEAM/PITCH.md | —
+- doing | Ответы на 3 вопроса судей, питч 3–5 мин: два черновика (Opus, Gemini Argon), слияние планировщиком | Claude-планировщик | TEAM/TASK-C-PITCH.md TEAM/PITCH-opus.md TEAM/PITCH-argon.md → TEAM/PITCH.md | 14:05
 - todo | Чеклист FAQ перед сдачей, push, SHA организаторам, форма OrganizerHQ | Аркадий | — | —
