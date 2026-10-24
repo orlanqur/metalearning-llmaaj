@@ -292,7 +292,7 @@ does not establish it.
   six spending verdicts (macro 0.9502 to 0.8850): the checks read the first
   assistant turn by position. Fixed in `solution/facts.py` (first assistant reply
   after the opening request); the 80-dialog probe now shows 0 flips and the case is
-  a regression test. The linked audit records the pre-fix failures. See
+  a regression test. The harness was re-run on the final code (`audit-05`): no contract failures, 0 flips on every prepend probe, CV unchanged at 0.922. See
   [BLIND-EVAL.md](docs/BLIND-EVAL.md) and [PITCH.md](TEAM/PITCH.md).
 
 ## Steps to first value

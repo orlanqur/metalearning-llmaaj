@@ -41,3 +41,7 @@ Across all adapt runs (full, 5 folds, topic omitted, shuffled): structurally 5/5
 ## Post-fix re-check (2026-10-24 16:00, HEAD after 4a42e6d)
 
 Re-probed against the current rules by an independent verifier: empty dialogue → exit 0, predictions written; a single prepended user message → 0 flips, 76/80. A greeting exchange (user "Hola" + assistant reply) prepended to every dialogue flipped 6 `bad` → `good` (macro 0.9502 → 0.8850), because three checkers read the first assistant turn by position; fixed in commit 89f8bcf (first assistant reply after the opening request), probe now 0 flips, regression test added. Raw audit outputs under `eval_blind/out/` are not committed.
+
+## Re-audit on the final code (2026-10-24 17:05, run `audit-05`, HEAD 00116f5)
+
+Same frozen harness, same folds, `--no-model`. Contract failures: none (the empty-dialogue case now exits 0 and writes predictions). Invariance: shuffle 0 changes; prepended "Hello." 0 changes (was 3); injection appended 0; the greeting-exchange probe (user + assistant reply) 0 flips of 80 (was 6). Grouped CV unchanged: folds 0.857 / 0.903 / 0.944 / 0.972 / 0.933, mean 0.922. Explanation lint 5/5 on every adapt. Raw outputs under `eval_blind/out/audit-05/` (not committed).
