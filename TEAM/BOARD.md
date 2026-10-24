@@ -12,4 +12,4 @@
 - done | Питч 3–5 мин + 3 вопроса судей + показ кода + 6 слабых мест; осталось подставить zero-shot и rediscovery из шага 3 | Claude-планировщик | TEAM/PITCH.md | 13:50
 - todo | Чеклист FAQ перед сдачей, push, SHA организаторам, форма OrganizerHQ | Аркадий | — | —
 - done | README.md форка по чеклисту FAQ, контракт организаторов в docs/ORGANIZER-README.md (d657261) | Codex (README) | README.md | 15:10
-- doing | docs/APPROACH.html — наглядное объяснение подхода со схемами для показа на питче | Opus → планировщик | docs/APPROACH.html | 15:10
+- done | docs/APPROACH.html — 9 экранов со схемами, офлайн, 41 КБ; zero-shot и rediscovery помечены «measuring» | Opus → планировщик | docs/APPROACH.html | 15:16
