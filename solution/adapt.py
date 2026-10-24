@@ -4,6 +4,7 @@ from collections import Counter
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 import platform
 import time
@@ -12,7 +13,7 @@ from . import __version__
 from .io import load_rows, write_json
 from .rules_library import instantiate
 from .verify import training_summary, verify
-from .llm import ChatClient
+from .llm import ChatClient, load_dotenv
 from .semantic import SemanticRuntime, build_index
 from .induce import induce
 
@@ -21,15 +22,52 @@ def manifest_hash(manifest):
     return hashlib.sha256((json.dumps(manifest, ensure_ascii=False, indent=2, allow_nan=False)+"\n").encode()).hexdigest()
 
 
+def induction_trail(induction, witnesses):
+    lines = ["", "## Induction trail", "",
+             "Only bad training conversations with no active-rule violation enter the residual set. "
+             "Each is paired with the nearest good conversation of the same topic by context TF-IDF. "
+             "Each pair proposes up to three conditions on facts; every candidate is verified on all train rows. "
+             "One false positive rejects that version, with at most one narrowing attempt. "
+             "Residuals are recomputed after each round. Rejected counts include disabled boundaries and duplicates; "
+             "narrowed counts are attempts, a subset of accepted/rejected proposals.", "",
+             f"Status: `{induction.get('status', 'not_run')}`. Stop: `{induction.get('stop_reason', 'not_run')}`.", "",
+             "| Round | Residuals before / after | Proposed | Accepted | Narrowed | Rejected |",
+             "|---|---:|---:|---:|---:|---:|"]
+    for r in induction.get("rounds", []):
+        lines.append(f"| {r['round']} | {len(r['residual_before'])} / {len(r.get('residual_after', []))} | "
+                     f"{r['proposed']} | {r['accepted']} | {r['narrowed']} | {r['rejected']} |")
+    for d in induction.get("decisions", []):
+        final = d.get("final_rule", {})
+        initial = d.get("initial_verification", {})
+        name = final.get("id", d["proposal"].get("name", "invalid proposal"))
+        lines += ["", f"- Round {d['round']}, `{name}`: **{d['status']}**. "
+                  + ("Reasons: " + ", ".join(d["reasons"]) + "." if d["reasons"] else "TP >= 1, FP = 0; all applicable train rows checked.")]
+        if final.get("status") == "active":
+            selected = final["examples"] + final["nonviolating_good"]
+            lines.append("  Training witnesses: " + "; ".join(
+                f"[{w['item_id']}](#example-{w['item_id']}) (expert label {w['label']})" for w in selected) + ".")
+            witnesses.update({w["item_id"]: w for w in selected})
+        counterexamples = {w["item_id"]: w for r in (initial, final) for w in r.get("counterexamples", [])}
+        if counterexamples:
+            lines.append("  Rejected version: false positives on good. Counterexamples: " + "; ".join(
+                f"[{w['item_id']}](#example-{w['item_id']}) (expert label good)" for w in counterexamples.values()) + ".")
+            witnesses.update(counterexamples)
+        elif d["status"] != "active":
+            lines.append("  No measured violating good counterexample: rejection is for the reason above, not an observed FP.")
+    return lines
+
+
 def explain(manifest):
     """Render only the same manifest that eval loads, including its evidence."""
     rules = manifest["rules"]
     lines = ["# Explanation — learned rules and deterministic checks", "",
              f"Manifest SHA256: `{manifest_hash(manifest)}`", "",
              "## 1. Clear criteria", "",
-             "Candidates are parameterized inherited templates. Context supplies amounts, dates, rates and periods. "
-             "Inherited templates require TP >= 1 and FP = 0 with no unchecked rows. Induced rules require precision >= 0.9, "
-             "at least three distinct TP contexts, no unchecked rows, and no accuracy loss in any topic. These observations do not establish universal rules.", "",
+             f"Adaptation mode: `{manifest.get('adapt_mode', 'hybrid')}`. "
+             "From-scratch mode starts with an empty rule set and never instantiates the family library; "
+             "hybrid mode verifies inherited candidates first. Context supplies amounts, dates, rates and periods. "
+             "All active rules require TP >= 1 and FP = 0 with no unchecked rows. Induced rules must also cause "
+             "no accuracy loss in any topic. These observations do not establish universal rules.", "",
              "| Rule | Topic | Criterion | TP | FP | Precision | Bad coverage |", "|---|---|---|---:|---:|---:|---:|"]
     for r in rules:
         if r["status"] == "active":
@@ -79,20 +117,15 @@ def explain(manifest):
               "### Internal check (limited)", "",
               f"Train resubstitution macro topic accuracy: {manifest['training_summary']['macro_topic_accuracy']:.6f}. "
               "Grouped-context split: not run. This is fitting-set performance, not an independent estimate. "
-              "Inherited templates were reconstructed using both public splits; even a separate public score is not a clean holdout.", "",
+              + manifest.get("source_limit", "Inherited templates were reconstructed using both public splits.") + " "
+              "Public test is a development comparison, not a clean independent holdout.", "",
               "### Train evaluation through the same eval engine", "",
               "| Topic | Correct / N | Accuracy | TP | FP | FN | TN |", "|---|---:|---:|---:|---:|---:|---:|"]
     for topic, g in sorted(manifest["training_summary"]["by_topic"].items()):
         lines.append(f"| {topic} | {g['correct']} / {g['n']} | {g['accuracy']:.6f} | {g['TP']} | {g['FP']} | {g['FN']} | {g['TN']} |")
     induction = manifest.get("induction", {})
-    lines += ["", "## Как найдены правила", "",
-              "Шаблоны инстанцируются из полей входного train и заново проверяются на всём train. "
-              "Индукция использует ошибки текущего манифеста и bad без объяснения: ближайший good той же темы по TF-IDF context, "
-              "1–2 атомарные гипотезы без списка известных семейств, затем до 8 канонических правил на тему. "
-              "Каждый кандидат проверяется на всём train; при FP выполняется один раунд сужения. "
-              "Все гипотезы и отказы сохраняются в induction_log.json.", "",
-              f"Фактический статус индукции: `{induction.get('status', 'not_run')}`. "
-              f"Принятые ID: {', '.join(induction.get('accepted_rule_ids', [])) or 'нет'}.", "",
+    lines += induction_trail(induction, witnesses)
+    lines += ["",
               "## Ограничения", "",
               f"Модельные шаги: `{manifest.get('model_status', 'not_checked')}`. "
               "При отсутствии ключа новые правила, семантические критерии, zero-shot baseline и rediscovery "
@@ -107,17 +140,25 @@ def explain(manifest):
     return "\n".join(lines) + "\n"
 
 
-def adapt(input_path="/input/train.jsonl", artifacts="/artifacts", language="original", disable_family=None, no_model=False):
+def adapt(input_path="/input/train.jsonl", artifacts="/artifacts", language="original", disable_family=None, no_model=False,
+          from_scratch=False):
     started = time.monotonic()
+    load_dotenv()
+    mode = "from_scratch" if from_scratch else os.getenv("ADAPT_MODE", "hybrid")
+    if mode not in ("hybrid", "from_scratch"):
+        raise ValueError("ADAPT_MODE must be hybrid or from_scratch")
     rows = load_rows(input_path, training=True)
     output = Path(artifacts)
     output.mkdir(parents=True, exist_ok=True)
     index = build_index(rows)
     write_json(output / "fewshot_index.json", index)
-    client = ChatClient(output / "cache", disabled=no_model)
+    client = ChatClient(output / "cache", disabled=no_model,
+                        max_calls=max(0, int(os.getenv("INDUCTION_MAX_CALLS", "400"))))
     runtime = SemanticRuntime(client, index)
-    candidates = [r for r in instantiate(rows) if r["family"] != disable_family]
+    candidates = [] if mode == "from_scratch" else [r for r in instantiate(rows) if r["family"] != disable_family]
     rules = verify(candidates, rows, runtime)
+    print(f"[adapt] {mode}: {len(candidates)} initial candidates verified; "
+          f"{client.network_calls} HTTP calls", flush=True)
     rules, induction_log = induce(rows, rules, runtime, output)
     topic_majority = {}
     for topic in sorted({r["topic"] for r in rows}):
@@ -126,11 +167,13 @@ def adapt(input_path="/input/train.jsonl", artifacts="/artifacts", language="ori
     summary = training_summary(rules, rows, runtime, topic_majority=topic_majority)
     train_hash = hashlib.sha256(Path(input_path).read_bytes()).hexdigest()
     manifest = dict(schema_version=1, solution_version=__version__, train_sha256=train_hash,
-                    default_label="good", topic_majority=topic_majority, disabled_family=disable_family,
+                    default_label="good", topic_majority=topic_majority, disabled_family=disable_family, adapt_mode=mode,
                     selection_policy={"template": "TP>=1 and FP=0; no unchecked rows", "induced": induction_log["selection_policy"]},
-                    model_status="partial_api_unavailable" if client.circuit_open else ("enabled" if client.available else "skipped_no_key_or_disabled"),
-                    induction={k: induction_log[k] for k in ("status", "residual_item_ids", "accepted_rule_ids") if k in induction_log},
-                    source_limit="Template library inherited from a reconstruction that inspected both public splits.",
+                    model_status=("partial_api_unavailable" if client.circuit_open else "budget_exhausted" if client.budget_exhausted
+                                  else "enabled" if client.available else "skipped_no_key_or_disabled"),
+                    induction=induction_log,
+                    source_limit=("No family instantiated; inherited FactSheet and grammar illustrations remain prior knowledge."
+                                  if mode == "from_scratch" else "Template library inherited from a reconstruction that inspected both public splits."),
                     rules=rules, training_summary=summary)
     write_json(output / "rules_spec.json", manifest)
     persisted = json.loads((output / "rules_spec.json").read_text(encoding="utf-8"))
@@ -141,7 +184,8 @@ def adapt(input_path="/input/train.jsonl", artifacts="/artifacts", language="ori
     (output / "judge_prompt.txt").write_text("\n".join(prompt)+"\n", encoding="utf-8")
     code_hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path(__file__).parent.glob("*.py"))}
     meta = dict(created_at=datetime.now(timezone.utc).isoformat(), solution_version=__version__,
-                python=platform.python_version(), model=client.eval_model if client.available else None,
+                python=platform.python_version(), model=client.eval_model if client.available else None, adapt_mode=mode,
+                induction_max_calls=client.max_calls,
                 **client.stats(), wall_seconds=time.monotonic()-started, manifest_sha256=manifest_hash(persisted),
                 language=language, language_note="Caller-declared representation; original is multilingual.",
                 train_rows=len(rows), train_sha256=train_hash, topic_counts=dict(Counter(r["topic"] for r in rows)),

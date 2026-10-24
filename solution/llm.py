@@ -104,7 +104,7 @@ def finite_number(value):
 
 class ChatClient:
     def __init__(self, cache_dir, read_cache_dirs=(), *, api_key=None, base_url=None,
-                 timeout=45, attempts=3, pause=1, dotenv=".env", disabled=False):
+                 timeout=45, attempts=3, pause=1, dotenv=".env", disabled=False, max_calls=None):
         load_dotenv(dotenv)
         self.disabled = disabled or os.getenv("SOLUTION_DISABLE_LLM") == "1"
         gemini_key = os.getenv("GEMINI_API_KEY", "").strip()
@@ -133,6 +133,17 @@ class ChatClient:
         self.timeout, self.attempts, self.pause = timeout, max(1, attempts), pause
         self.events, self._memo = [], {}
         self.circuit_open = False
+        # Count HTTP attempts, including retries; cache reads never spend budget.
+        self.max_calls = max_calls
+        self.network_calls = 0
+        limit = os.getenv("LLM_MAX_TOKENS", "").strip()
+        self.max_tokens = int(limit) if limit else None
+        if self.max_tokens is not None and self.max_tokens < 1:
+            raise ValueError("LLM_MAX_TOKENS must be a positive integer")
+
+    @property
+    def budget_exhausted(self):
+        return self.max_calls is not None and self.network_calls >= self.max_calls
 
     @property
     def available(self):
@@ -165,26 +176,35 @@ class ChatClient:
             return None
         structured = True
         for attempt in range(1, self.attempts + 1):
+            if self.budget_exhausted:
+                self.record("budget_exhausted", model=model, cache_key=key)
+                return None
             start = time.monotonic()
+            usage = {}
             payload = dict(model=model, temperature=0, messages=[
                 dict(role="system", content=system + "\nReturn only JSON matching this schema: " + canonical(schema)),
                 dict(role="user", content=user)])
+            if self.max_tokens is not None:
+                payload["max_tokens"] = self.max_tokens
             if structured:
                 payload["response_format"] = dict(type="json_schema", json_schema=dict(name="result", strict=True, schema=schema))
             try:
                 req = Request(self.base_url + "/chat/completions", data=canonical(payload).encode(),
                               headers={"Authorization": "Bearer " + self.api_key, "Content-Type": "application/json"})
+                self.network_calls += 1
                 with urlopen(req, timeout=self.timeout) as response:
                     body = json.load(response)
+                raw_usage = body.get("usage") if isinstance(body, dict) else None
+                if isinstance(raw_usage, dict):
+                    usage = {k: v for k, v in raw_usage.items() if k in
+                             ("prompt_tokens", "completion_tokens", "total_tokens", "cost") and finite_number(v)}
                 content = body["choices"][0]["message"]["content"]
                 if isinstance(content, list):
                     content = "".join(part.get("text", "") for part in content if isinstance(part, dict))
                 result = validate_json(parse_json(content), schema)
-                usage = body.get("usage")
-                usage = usage if isinstance(usage, dict) else {}
                 self.record("success", model=model, cache_key=key, attempt=attempt,
                             elapsed_seconds=time.monotonic()-start, structured=structured,
-                            usage={k: v for k, v in usage.items() if k in ("prompt_tokens", "completion_tokens", "total_tokens", "cost") and finite_number(v)})
+                            usage=usage)
                 self._memo[key] = result
                 try:
                     self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -201,7 +221,7 @@ class ChatClient:
                 code = error.code if isinstance(error, HTTPError) else None
                 self.record("request_failed", model=model, cache_key=key, attempt=attempt,
                             error_type=type(error).__name__, http_status=code,
-                            elapsed_seconds=time.monotonic()-start, structured=structured)
+                            elapsed_seconds=time.monotonic()-start, structured=structured, usage=usage)
                 if structured and (code in (400, 422) or isinstance(error, (ValueError, KeyError, TypeError))):
                     structured = False
                 if attempt < self.attempts:
@@ -214,12 +234,13 @@ class ChatClient:
     def stats(self):
         completed = [e for e in self.events if e["status"] == "success"]
         requests = [e for e in self.events if e["status"] in ("success", "request_failed")]
-        costs = [e["usage"]["cost"] for e in completed if "cost" in e["usage"]]
+        costs = [e["usage"]["cost"] for e in requests if "cost" in e["usage"]]
         return dict(key_present=bool(self.api_key), enabled=self.available,
+                    max_tokens=self.max_tokens,
                     induction_model=self.induction_model, eval_model=self.eval_model,
                     network_calls=len(requests), model_calls=len(completed),
                     elapsed_seconds=sum(e.get("elapsed_seconds", 0) for e in requests),
                     reported_cost=sum(costs) if costs else (0 if not requests else None),
                     cost_complete=not requests or len(costs) == len(requests),
-                    usage={k: sum(e["usage"].get(k, 0) for e in completed) for k in ("prompt_tokens", "completion_tokens", "total_tokens")},
+                    usage={k: sum(e["usage"].get(k, 0) for e in requests) for k in ("prompt_tokens", "completion_tokens", "total_tokens")},
                     event_statuses=dict(Counter(e["status"] for e in self.events)))

@@ -16,6 +16,7 @@ def main():
     train.add_argument("--language", choices=["original", "es", "en"], default="original")
     train.add_argument("--disable-family", default=None)
     train.add_argument("--no-model", action="store_true")
+    train.add_argument("--from-scratch", action="store_true", help="Start with no instantiated rule families")
     test = commands.add_parser("eval")
     test.add_argument("--input", default="/input/test.jsonl")
     test.add_argument("--artifacts", default="/artifacts")
@@ -23,7 +24,8 @@ def main():
     test.add_argument("--no-model", action="store_true")
     args = parser.parse_args()
     try:
-        result = (adapt(args.input, args.artifacts, args.language, args.disable_family, args.no_model) if args.command == "adapt"
+        result = (adapt(args.input, args.artifacts, args.language, args.disable_family, args.no_model,
+                        from_scratch=args.from_scratch) if args.command == "adapt"
                   else evaluate(args.input, args.artifacts, args.output, args.no_model))
     except (ValueError, OSError, KeyError, TypeError) as error:
         parser.exit(2, f"{args.command} failed: {error}\n")

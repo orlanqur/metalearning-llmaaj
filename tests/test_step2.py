@@ -212,7 +212,7 @@ class InductionTests(unittest.TestCase):
             self.assertEqual(log, json.loads((Path(temp)/"induction_log.json").read_text()))
         return rules, log
 
-    def test_residual_pair_cluster_full_verification_and_narrowing(self):
+    def test_residual_pair_full_verification_and_narrowing(self):
         rows = [row("b"+str(i), balance=100+i) for i in range(3)] + [row("g", "good", "supported", 400)]
         rules, log = self.run_induction(rows, broad=True)
         active = [r for r in rules if r["status"] == "active"]
@@ -223,22 +223,22 @@ class InductionTests(unittest.TestCase):
         self.assertEqual(len(log["pairs"]), 3)
         self.assertIsNotNone(log["decisions"][0]["narrowing"])
 
-    def test_duplicate_contexts_cannot_meet_support(self):
+    def test_single_distinct_context_is_enough_with_zero_fp(self):
         rows = [row("b"+str(i)) for i in range(3)] + [row("g", "good", "supported", 400)]
         rules, log = self.run_induction(rows)
-        self.assertEqual(rules[0]["status"], "boundary")
-        self.assertIn("fewer_than_3_distinct_contexts", rules[0]["status_reason"])
+        self.assertEqual(rules[0]["status"], "active")
+        self.assertEqual(rules[0]["distinct_contexts"], 1)
 
     def test_duplicate_refinement_cannot_duplicate_manifest_ids(self):
         rows = [row("b"+str(i), balance=100+i) for i in range(3)] + [row("g", "good", "supported", 400)]
         rules, log = self.run_induction(rows, broad=True, duplicate_refinement=True)
         self.assertEqual(len(rules), 1)
-        self.assertEqual(log["decisions"][1]["reasons"], ["duplicate_refined_candidate"])
+        self.assertEqual(log["decisions"][1]["reasons"], ["duplicate_candidate"])
 
     def test_any_topic_regression_blocks_even_high_precision(self):
         before = dict(by_topic=dict(a=dict(correct=10), b=dict(correct=9)))
         after = dict(by_topic=dict(a=dict(correct=9), b=dict(correct=10)))
-        reasons = acceptance(dict(precision=.95, distinct_contexts=5, not_checked=0), before, after)
+        reasons = acceptance(dict(TP=5, FP=0, not_checked=0), before, after)
         self.assertEqual(reasons, ["topic_accuracy_regression"])
 
     def test_induced_semantic_rule_is_verified_and_usable(self):
