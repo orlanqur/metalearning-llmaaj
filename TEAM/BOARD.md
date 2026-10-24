@@ -14,4 +14,7 @@
 - done | README.md форка по чеклисту FAQ, контракт организаторов в docs/ORGANIZER-README.md (d657261) | Codex (README) | README.md | 15:10
 - done | docs/APPROACH.html — 9 экранов со схемами, офлайн, 41 КБ; zero-shot и rediscovery помечены «measuring» | Opus → планировщик | docs/APPROACH.html | 15:16
 - done | Режим adapt --from-scratch + многораундовая индукция: измерено, from-scratch 0.626, гибрид gpt-oss 0.925 (< 0.950 без модели); слияние отложено из-за конфликтов с fix, ветка orlanqur/induce запушена как эксперимент, цифры в README | Astra-2 (Codex) | orlanqur/induce, docs/ASTRA-INDUCE.md | 15:40
-- doing | Zero-shot baseline gpt-oss на public test (80 вызовов, 8 воркеров) | Claude-планировщик | out/zero_shot.* | 15:40
+- doing | Zero-shot baseline gpt-oss на public test (80 вызовов, 8 воркеров), стартовал 15:40 | Claude-планировщик | out/zero_shot.* | 15:45
+- done | Merge induce в рабочую ветку: 25400ea, тесты 53+9, предсказания без модели побайтно прежние, 0.9502 | Claude-планировщик + Codex | solution/ tests/ docs/MERGE-INDUCE.md | 15:45
+- done | docs/APPROACH.html двуязычный EN/RU с цифрами индукции, 72 КБ | Opus → планировщик | docs/APPROACH.html | 15:45
+- todo | Финальная приёмка HEAD 25400ea: submit/accept.sh на копии, Docker rebuild + smoke --network none, приватность | Claude-приёмщик | — | 15:45
