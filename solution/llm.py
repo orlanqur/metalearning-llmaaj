@@ -21,7 +21,7 @@ GEMINI_OPENAI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai"
 def pmap(function, items):
     """Ordered map over a thread pool; model calls are I/O-bound. LLM_WORKERS=1 restores sequential runs."""
     # ponytail: fixed pool, no rate-limit backoff beyond the client retries; lower LLM_WORKERS on HTTP 429
-    workers = max(1, int(os.getenv("LLM_WORKERS", "8")))
+    workers = max(1, int(os.getenv("LLM_WORKERS", "4")))
     if workers == 1:
         return [function(item) for item in items]
     with ThreadPoolExecutor(workers) as pool:
