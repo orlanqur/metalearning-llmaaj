@@ -162,8 +162,9 @@ Public-test breakdown; accuracies are calculated from the reported counts:
 activated three semantic rules that produced 2 false `bad` labels on public test
 (0.9252 vs 0.9502 without the model; 299 calls, 33 min, about $0.07). Multi-round
 induction from scratch, with the rule library disabled, accepted 3 induced rules
-and scored 0.6259 (77 calls, 35 min): the model alone does not recover the expert's
-rules within this budget. The submitted default is therefore the deterministic
+on train, but none of them fired on the public test: every conversation was
+predicted `good`, macro 0.6259 (77 calls, 35 min, about $0.04). The model alone does
+not recover the expert's rules within this budget. The submitted default is therefore the deterministic
 mode; the model layer is opt-in via an API key. The from-scratch mode, the
 multi-round induction loop and the measurement script live in branch
 `orlanqur/induce` (report: `docs/ASTRA-INDUCE.md` there).
