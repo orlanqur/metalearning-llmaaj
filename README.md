@@ -179,8 +179,8 @@ removed and the model had to re-discover it from the residual `bad` conversation
 (`solution/validate.py leave-one-rule-out`). Claude Sonnet 5.5 re-discovered it
 (4 of 4 witnesses, 0 false alarms, 304 calls, about $4.07); Gemma 4 31B proposed
 the rule almost verbatim but verification rejected it (11 true, 3 false); gpt-oss-120b
-from scratch did not. Qwen3.8-27B on this test: see `out/loo_qwen` if present,
-otherwise not measured. Practical reading: open-weight Qwen is enough to apply known
+from scratch did not. Qwen3.8-27B on this test: not measured; the run tripped the client's
+circuit breaker on slow responses before induction started. Practical reading: open-weight Qwen is enough to apply known
 rule families at 0 false `bad`; discovering genuinely new expert rules needs a
 stronger model, which the organizers' containers may or may not allow.
 
@@ -287,6 +287,19 @@ deadline per request, three retries; see SECURITY.md) and fall back to determini
 messages are dropped, and the documented failure path still writes predictions.
 Keys come from the environment or local `.env` and are never logged; `.env` is
 excluded from Docker builds. Full policy and limits: [SECURITY.md](docs/SECURITY.md).
+
+## Next steps
+
+- **Model council.** Two or three open-weight models (Qwen, Gemma, gpt-oss) propose
+  hypotheses on the same bad/good pairs; the proposals are merged and the same
+  verifier checks them against all of train. Gemma already phrased a hidden rule
+  almost verbatim that the other open models missed; only verification rejected it.
+- **Semantic checks for meaning-only violations.** The four public-test misses and
+  the "normalmente" train miss have no number to recompute; they need the
+  yes/no/unknown predicate with a quote, measured per rule before activation.
+- **Grouped cross-validation inside `adapt`.** Report an honest expected accuracy
+  next to the artifacts instead of a resubstitution score.
+- **Hidden-rule test on Qwen3.8-27B** with a longer per-request deadline.
 
 ## Repository map
 
