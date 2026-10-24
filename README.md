@@ -292,8 +292,8 @@ excluded from Docker builds. Full policy and limits: [SECURITY.md](docs/SECURITY
 
 - **Model council.** Two or three open-weight models (Qwen, Gemma, gpt-oss) propose
   hypotheses on the same bad/good pairs; the proposals are merged and the same
-  verifier checks them against all of train. Gemma already phrased a hidden rule
-  almost verbatim that the other open models missed; only verification rejected it.
+  verifier checks them against all of train. Gemma already phrased the hidden rule
+  almost verbatim; the verifier rejected it as too noisy (11 true, 3 false).
 - **Semantic checks for meaning-only violations.** The four public-test misses and
   the "normalmente" train miss have no number to recompute; they need the
   yes/no/unknown predicate with a quote, measured per rule before activation.
