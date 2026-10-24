@@ -23,3 +23,5 @@
 - done | Дефолт модели → qwen/qwen3.8-27b (бенч: гибрид 0.9502, 0 FP); README/питчи/HTML обновлены | Claude-планировщик | .env.example solution/llm.py | 16:08
 - doing | Hotfix: первый ход ассистента после запроса, а не по позиции (6 флипов при приветствии) — приёмка: тесты, cmp побайтно, FP=0, 0 флипов | Codex (hotfix) | worktree ../hotfix, ветка orlanqur/hotfix | 16:08
 - doing | Qwen3.8-27B на скрытом правиле (LOO MIN_INTEREST, 8 воркеров) | Claude-планировщик | artifacts/loo_qwen | 16:08
+- done | Hotfix приветствий слит (89f8bcf): 0 флипов из 80, предсказания побайтно прежние, тесты OK | Claude-планировщик + Codex | solution/facts.py checkers.py tests/ | 16:13
+- todo | Повторная приёмка HEAD после 89f8bcf: accept.sh, Docker --network none, приватность | Claude-приёмщик | — | 16:13

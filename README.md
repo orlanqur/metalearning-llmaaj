@@ -251,12 +251,13 @@ does not establish it.
   performance on the translated inputs was not measured.
 - Robustness: the blind audit found an empty-dialog crash and three spending
   verdict flips after prepending a neutral greeting. Both are fixed (regression
-  tests in `tests/test_robustness.py`); the linked audit still records the pre-fix
-  failures, not a post-fix audit. A related case is not fixed: prepending a greeting
-  exchange (user message plus assistant reply) flipped six spending verdicts from
-  `bad` to `good` in a spot check (macro 0.9502 to 0.8850), because some checks read
-  only the first assistant turn. See [BLIND-EVAL.md](docs/BLIND-EVAL.md) and
-  [PITCH.md](TEAM/PITCH.md).
+  tests in `tests/test_robustness.py`). A second verifier then found that a full
+  greeting exchange (user message plus assistant reply) before the request flipped
+  six spending verdicts (macro 0.9502 to 0.8850): the checks read the first
+  assistant turn by position. Fixed in `solution/facts.py` (first assistant reply
+  after the opening request); the 80-dialog probe now shows 0 flips and the case is
+  a regression test. The linked audit records the pre-fix failures. See
+  [BLIND-EVAL.md](docs/BLIND-EVAL.md) and [PITCH.md](TEAM/PITCH.md).
 
 ## Steps to first value
 

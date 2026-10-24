@@ -40,4 +40,4 @@ Across all adapt runs (full, 5 folds, topic omitted, shuffled): structurally 5/5
 
 ## Post-fix re-check (2026-10-24 16:00, HEAD after 4a42e6d)
 
-Re-probed against the current rules by an independent verifier: empty dialogue → exit 0, predictions written; a single prepended user message → 0 flips, 76/80. Open case: prepending a greeting exchange (user "Hola" + assistant reply) still flips 6 `bad` → `good` (macro 0.9502 → 0.8850), because three checkers read the first assistant turn by position. Raw audit outputs under `eval_blind/out/` are not committed.
+Re-probed against the current rules by an independent verifier: empty dialogue → exit 0, predictions written; a single prepended user message → 0 flips, 76/80. A greeting exchange (user "Hola" + assistant reply) prepended to every dialogue flipped 6 `bad` → `good` (macro 0.9502 → 0.8850), because three checkers read the first assistant turn by position; fixed in commit 89f8bcf (first assistant reply after the opening request), probe now 0 flips, regression test added. Raw audit outputs under `eval_blind/out/` are not committed.
