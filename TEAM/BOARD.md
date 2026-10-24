@@ -6,6 +6,7 @@
 - done | Dockerfile, entrypoint, LICENSE, docs/DOCKER.md, docs/README-draft.md | Sol (Codex) | Dockerfile entrypoint.sh LICENSE docs/ | 13:25
 - doing | README.md форка по шаблону FAQ; Gemini в llm.py, если нет ключа OpenRouter | Михаил (Cursor) | README.md solution/llm.py | 13:21
 - done | Демо для судей: demo/judge_demo.py --id <id> (вердикт, правило, цитата, похожие train) | Codex (Sol) | demo/ tests/test_demo.py | 13:45
-- doing | Слепая проверка: независимый Codex без контекста строит тесты и эвалы по README-контракту | Codex (Blind) | eval_blind/ docs/BLIND-EVAL.md | 13:45
+- done | Слепая проверка: CV 0.922 vs 0.994, падение на пустом диалоге, 3 вердикта зависят от индекса хода | Codex (Blind) | eval_blind/ docs/BLIND-EVAL.md | 13:41
+- todo | Фикс по BLIND-EVAL: пустой диалог, привязка правил к роли, тесты; explanation на английском | Astra после шага 3 | solution/ tests/ | 13:41
 - doing | Ответы на 3 вопроса судей, питч 3–5 мин: два черновика (Opus, Gemini Argon), слияние планировщиком | Claude-планировщик | TEAM/TASK-C-PITCH.md TEAM/PITCH-opus.md TEAM/PITCH-argon.md → TEAM/PITCH.md | 14:05
 - todo | Чеклист FAQ перед сдачей, push, SHA организаторам, форма OrganizerHQ | Аркадий | — | —
