@@ -4,8 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Approach: a judge that learns from an expert</title>
-<meta name="description" content="One-page visual explanation of how the judge learns rules from expert-labelled banking conversations, decides good or bad, and explains itself.">
+<meta name="description" content="One-page visual explanation (English / Russian) of how the judge learns rules from expert-labelled banking conversations, decides good or bad, and explains itself.">
 <link rel="icon" href="data:,">
+<script>
+(function(){var l='en';try{var s=localStorage.getItem('approach-lang');if(s==='ru'||s==='en')l=s;}catch(e){}
+document.documentElement.setAttribute('data-lang',l);document.documentElement.lang=l;})();
+</script>
 <style>
 :root{
   --bg:#ffffff; --surface:#f4f6fb; --ink:#111827; --muted:#4b5563; --line:#cbd5e1; --grid:#e2e8f0;
@@ -18,15 +22,21 @@
 }
 *{box-sizing:border-box}
 html{font-size:max(16px,calc(14px + .3vw));scroll-padding-top:60px;-webkit-text-size-adjust:100%}
+html:not([data-lang="ru"]) [lang="ru"]{display:none}
+html[data-lang="ru"] [lang="en"]{display:none}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.45}
 a{color:var(--accent-ink)}
-a:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
+a:focus-visible,button:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
 
-nav.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:2px solid var(--line);padding:8px 4vw}
+nav.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:2px solid var(--line);padding:8px 4vw;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 18px}
 nav.top ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 6px;justify-content:center}
 nav.top a{display:block;padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--ink);font-weight:600;font-size:.9rem;border:2px solid transparent}
 nav.top a:hover{background:var(--accent-soft)}
 nav.top a[aria-current]{background:var(--accent);color:#fff}
+.langsw{display:flex;border:2px solid var(--accent);border-radius:999px;overflow:hidden}
+.langsw button{font:inherit;font-size:.9rem;font-weight:700;padding:5px 14px;border:0;background:#fff;color:var(--accent-ink);cursor:pointer}
+.langsw button+button{border-left:2px solid var(--accent)}
+.langsw button[aria-pressed="true"]{background:var(--accent);color:#fff}
 
 section.slide{min-height:100vh;padding:56px 4vw 36px;border-top:2px solid var(--line);display:flex;flex-direction:column;justify-content:center}
 section.slide:first-of-type{border-top:0}
@@ -40,11 +50,10 @@ p.lead{margin:0 0 14px;font-size:1.3rem;max-width:88ch}
 figure{margin:0 0 12px}
 figure svg{display:block;width:100%;height:auto;max-height:58vh;margin:0 auto}
 figcaption{margin-top:8px;font-size:1.05rem;color:var(--ink)}
-p.ru{margin:6px 0 0;padding:4px 0 4px 14px;border-left:5px solid var(--accent);font-size:1.05rem;color:var(--muted)}
-p.ru i{font-style:italic}
 
 .measuring{display:inline-block;padding:1px 12px;border-radius:999px;border:2px dashed var(--wait);background:var(--wait-soft);color:var(--wait);font-weight:700;font-size:.9em}
 .badge{display:inline-block;margin:0 0 12px;padding:6px 14px;border-radius:10px;background:var(--accent-soft);border:2px solid var(--accent);color:var(--accent-ink);font-weight:600;font-size:1.05rem}
+.badge.wait{background:var(--wait-soft);border-color:var(--wait);border-style:dashed;color:var(--wait)}
 
 /* svg text and shapes */
 svg text{font-family:var(--sans);fill:var(--ink)}
@@ -128,386 +137,371 @@ footer.src{margin-top:10px;font-size:1rem;color:var(--muted)}
 <marker id="ar-bad" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#b42318"/></marker>
 </defs></svg>
 
-<nav class="top" aria-label="Sections">
+<nav class="top" aria-label="Sections / Разделы">
 <ul>
-<li><a href="#hook">1 Hook</a></li>
-<li><a href="#task">2 Task</a></li>
-<li><a href="#adapt">3 Adapt</a></li>
-<li><a href="#eval">4 Eval</a></li>
-<li><a href="#explanation">5 Explanation</a></li>
-<li><a href="#model">6 Model</a></li>
-<li><a href="#results">7 Results</a></li>
-<li><a href="#limits">8 Limits</a></li>
-<li><a href="#try">9 Try it</a></li>
+<li><a href="#hook">1 <span lang="en">Hook</span><span lang="ru">Пример</span></a></li>
+<li><a href="#task">2 <span lang="en">Task</span><span lang="ru">Задача</span></a></li>
+<li><a href="#adapt">3 <span lang="en">Adapt</span><span lang="ru">Обучение</span></a></li>
+<li><a href="#eval">4 <span lang="en">Eval</span><span lang="ru">Оценка</span></a></li>
+<li><a href="#explanation">5 <span lang="en">Explanation</span><span lang="ru">Объяснение</span></a></li>
+<li><a href="#model">6 <span lang="en">Model</span><span lang="ru">Модель</span></a></li>
+<li><a href="#results">7 <span lang="en">Results</span><span lang="ru">Результаты</span></a></li>
+<li><a href="#limits">8 <span lang="en">Limits</span><span lang="ru">Слабые места</span></a></li>
+<li><a href="#try">9 <span lang="en">Try it</span><span lang="ru">Запуск</span></a></li>
 </ul>
+<div class="langsw" role="group" aria-label="Language / Язык">
+<button type="button" data-set="en" aria-pressed="true">EN</button><button type="button" data-set="ru" aria-pressed="false">RU</button>
+</div>
 </nav>
 
 <main>
 
 <!-- 1 HOOK -->
 <section class="slide" id="hook" aria-labelledby="h-hook"><div class="wrap">
-<header class="masthead"><h1>A Judge That Learns from an Expert</h1><p>Plata track · Hack Day Barcelona 2026</p></header>
-<h2 id="h-hook"><span class="n">1</span>A polite answer can still be wrong</h2>
-<p class="lead">The assistant agrees: Uber, August, 526 MXN. The bank context says completed transactions total 426 MXN. Plata's expert labelled this conversation bad. The only way to catch it is to recompute.</p>
+<header class="masthead"><h1><span lang="en">A Judge That Learns from an Expert</span><span lang="ru">Судья, который учится у эксперта</span></h1><p><span lang="en">Plata track · Hack Day Barcelona 2026</span><span lang="ru">Трек Plata · Hack Day Barcelona 2026</span></p></header>
+<h2 id="h-hook"><span class="n">1</span><span lang="en">A polite answer can still be wrong</span><span lang="ru">Вежливый ответ всё равно может быть неверным</span></h2>
+<p class="lead"><span lang="en">The assistant agrees: Uber, August, 526 MXN. The bank context says completed transactions total 426 MXN. Plata's expert labelled this conversation bad. The only way to catch it is to recompute.</span><span lang="ru">Ассистент соглашается: Uber, август, 526 MXN. В данных банка завершённые операции дают 426 MXN. Эксперт Plata пометил этот диалог как bad (плохой). Поймать ошибку можно только пересчётом.</span></p>
 <figure>
-<svg viewBox="0 0 1100 580" role="img" aria-labelledby="t-hook d-hook">
-<title id="t-hook">Uber example: 526 versus 426</title>
-<desc id="d-hook">The assistant says 526 MXN on Uber. The context total is 426 MXN. The judge recomputes from the context, finds the mismatch and returns the verdict bad.</desc>
+<svg viewBox="0 0 1100 580" role="img" aria-label="Uber example: 526 versus 426. The assistant says 526 MXN on Uber. The context total is 426 MXN. The judge recomputes from the context, finds the mismatch and returns the verdict bad." data-en="Uber example: 526 versus 426. The assistant says 526 MXN on Uber. The context total is 426 MXN. The judge recomputes from the context, finds the mismatch and returns the verdict bad." data-ru="Пример с Uber: 526 против 426. Ассистент говорит 526 MXN на Uber. В данных банка итог 426 MXN. Судья пересчитывает по данным, видит расхождение и выносит вердикт bad (плохой).">
 <rect class="card" x="10" y="20" width="460" height="260" rx="16"/>
-<text class="cap" x="36" y="58">Dialog · assistant, turn 1</text>
+<text class="cap" x="36" y="58" lang="en">Dialog · assistant, turn 1</text><text class="cap" x="36" y="58" lang="ru">Диалог · ответ ассистента</text>
 <text class="p" x="36" y="112">Sí, tienes razón: en agosto</text>
 <text class="p" x="36" y="144">de 2026 gastaste <tspan style="font-size:24px;font-weight:700;fill:#b42318">526 MXN</tspan> en Uber.</text>
-<text class="s" x="36" y="204">“Yes, you're right: in August 2026</text>
-<text class="s" x="36" y="230">you spent 526 MXN on Uber.”</text>
+<text class="s" x="36" y="204" lang="en">“Yes, you're right: in August 2026</text><text class="s" x="36" y="204" lang="ru">«Да, вы правы: в августе 2026 года вы</text>
+<text class="s" x="36" y="230" lang="en">you spent 526 MXN on Uber.”</text><text class="s" x="36" y="230" lang="ru">потратили 526 MXN на Uber.»</text>
 <rect class="card" x="630" y="20" width="460" height="260" rx="16"/>
-<text class="cap" x="656" y="58">Context · bank data</text>
-<text class="p" x="656" y="112">Uber · August 2026</text>
-<text class="s" x="656" y="142">completed transactions only</text>
-<text class="big acc" x="656" y="222">total 426 MXN</text>
+<text class="cap" x="656" y="58" lang="en">Context · bank data</text><text class="cap" x="656" y="58" lang="ru">Контекст · данные банка</text>
+<text class="p" x="656" y="112" lang="en">Uber · August 2026</text><text class="p" x="656" y="112" lang="ru">Uber · август 2026</text>
+<text class="s" x="656" y="142" lang="en">completed transactions only</text><text class="s" x="656" y="142" lang="ru">только завершённые операции</text>
+<text class="big acc" x="656" y="222" lang="en">total 426 MXN</text><text class="big acc" x="656" y="222" lang="ru">итого 426 MXN</text>
 <line class="ln-acc" x1="626" y1="150" x2="476" y2="150" marker-end="url(#ar-acc)"/>
-<text class="h acc mid" x="551" y="128">recompute</text>
-<rect class="card-badsoft" x="290" y="320" width="520" height="60" rx="30"/>
-<text class="h bad mid" x="550" y="360" style="font-size:24px">context: 426   ≠   assistant: 526</text>
+<text class="h acc mid" x="551" y="128" lang="en">recompute</text><text class="h acc mid" x="551" y="128" lang="ru">пересчёт</text>
+<rect class="card-badsoft" x="270" y="320" width="560" height="60" rx="30"/>
+<text class="h bad mid" x="550" y="360" style="font-size:24px" lang="en">context: 426   ≠   assistant: 526</text><text class="h bad mid" x="550" y="360" style="font-size:24px" lang="ru">данные: 426   ≠   ассистент: 526</text>
 <line class="ln-bad" x1="550" y1="382" x2="550" y2="416" marker-end="url(#ar-bad)"/>
 <rect class="card-bad" x="240" y="420" width="620" height="150" rx="18"/>
-<text class="w mid" x="550" y="466" style="font-size:38px;font-weight:800">VERDICT: BAD</text>
+<text class="w mid" x="550" y="466" style="font-size:38px;font-weight:800" lang="en">VERDICT: BAD</text><text class="w mid" x="550" y="466" style="font-size:38px;font-weight:800" lang="ru">ВЕРДИКТ: BAD</text>
 <text class="m w mid" x="550" y="500">spending.TX_AMOUNT.merchant · priority 10</text>
-<text class="w mid" x="550" y="530" style="font-size:18px">Recalculate completed merchant transactions</text>
-<text class="w mid" x="550" y="554" style="font-size:18px">before confirming a proposed amount.</text>
+<text class="w mid" x="550" y="530" style="font-size:18px" lang="en">Recalculate completed merchant transactions</text><text class="w mid" x="550" y="530" style="font-size:18px" lang="ru">Пересчитать завершённые операции по продавцу</text>
+<text class="w mid" x="550" y="554" style="font-size:18px" lang="en">before confirming a proposed amount.</text><text class="w mid" x="550" y="554" style="font-size:18px" lang="ru">перед тем, как подтверждать названную сумму.</text>
 </svg>
 </figure>
-<p class="ru" lang="ru"><i>Крючок: дать прочитать 526 против 426 — поймать это можно только пересчётом.</i></p>
 </div></section>
 
 <!-- 2 TASK -->
 <section class="slide" id="task" aria-labelledby="h-task"><div class="wrap">
-<h2 id="h-task"><span class="n">2</span>The task in one picture</h2>
-<p class="lead">Learn an expert's rules from labelled conversations. Save them as artifacts: rules plus an explanation. Then judge new conversations. The score rewards accuracy and a clear explanation.</p>
+<h2 id="h-task"><span class="n">2</span><span lang="en">The task in one picture</span><span lang="ru">Задача на одной картинке</span></h2>
+<p class="lead"><span lang="en">Learn an expert's rules from labelled conversations. Save them as artifacts: rules plus an explanation. Then judge new conversations. The score rewards accuracy and a clear explanation.</span><span lang="ru">Из диалогов с пометками эксперта учим его правила. Сохраняем результат: правила и объяснение. Потом оцениваем новые диалоги. В оценке важны точность и понятное объяснение.</span></p>
 <figure>
-<svg viewBox="0 0 1100 510" role="img" aria-labelledby="t-task d-task">
-<title id="t-task">Pipeline from training set to score</title>
-<desc id="d-task">Expert-labelled train set goes into adapt, which writes artifacts: rules and an explanation. Eval applies the rules to test conversations and writes predictions. Accuracy comes from predictions, the jury reads the explanation. Score equals 10 times accuracy plus 0.4 times jury.</desc>
+<svg viewBox="0 0 1100 510" role="img" aria-label="Pipeline from training set to score. Expert-labelled train set goes into adapt, which writes artifacts: rules and an explanation. Eval applies the rules to test conversations and writes predictions. Accuracy comes from predictions, the jury reads the explanation. Score equals 10 times accuracy plus 0.4 times jury." data-en="Pipeline from training set to score. Expert-labelled train set goes into adapt, which writes artifacts: rules and an explanation. Eval applies the rules to test conversations and writes predictions. Accuracy comes from predictions, the jury reads the explanation. Score equals 10 times accuracy plus 0.4 times jury." data-ru="Путь от обучающих диалогов до итоговой оценки. Диалоги с пометками эксперта идут в adapt, он записывает артефакты: правила и объяснение. Eval применяет правила к новым диалогам и выдаёт предсказания. Точность считается по предсказаниям, объяснение читает жюри. Итог равен 10 умножить на точность плюс 0,4 умножить на оценку жюри.">
 <rect class="card" x="6" y="140" width="164" height="110" rx="14"/>
-<text class="h mid" x="88" y="182">Train set</text>
-<text class="s mid" x="88" y="210">expert-labelled</text>
-<text class="s mid" x="88" y="234">conversations</text>
+<text class="h mid" x="88" y="182" lang="en">Train set</text><text class="h mid" x="88" y="182" lang="ru">Обучающие</text>
+<text class="s mid" x="88" y="210" lang="en">expert-labelled</text><text class="s mid" x="88" y="210" style="font-size:16px" lang="ru">диалоги</text>
+<text class="s mid" x="88" y="234" lang="en">conversations</text><text class="s mid" x="88" y="234" style="font-size:16px" lang="ru">с пометками</text>
 <rect class="card-acc" x="237" y="140" width="164" height="110" rx="14"/>
 <text class="w mid" x="319" y="192" style="font-size:30px;font-weight:800">adapt</text>
-<text class="w mid" x="319" y="224" style="font-size:17px">learns the rules</text>
+<text class="w mid" x="319" y="224" style="font-size:17px" lang="en">learns the rules</text><text class="w mid" x="319" y="224" style="font-size:17px" lang="ru">учит правила</text>
 <rect class="card-soft" x="468" y="140" width="164" height="110" rx="14"/>
-<text class="h mid" x="550" y="180">artifacts</text>
-<text class="s mid" x="550" y="208" style="fill:#1e3a8a">rules +</text>
-<text class="s mid" x="550" y="232" style="fill:#1e3a8a">explanation</text>
+<text class="h mid" x="550" y="180" lang="en">artifacts</text><text class="h mid" x="550" y="180" lang="ru">артефакты</text>
+<text class="s mid" x="550" y="208" style="fill:#1e3a8a" lang="en">rules +</text><text class="s mid" x="550" y="208" style="fill:#1e3a8a" lang="ru">правила +</text>
+<text class="s mid" x="550" y="232" style="fill:#1e3a8a" lang="en">explanation</text><text class="s mid" x="550" y="232" style="fill:#1e3a8a" lang="ru">объяснение</text>
 <rect class="card-acc" x="699" y="140" width="164" height="110" rx="14"/>
 <text class="w mid" x="781" y="192" style="font-size:30px;font-weight:800">eval</text>
-<text class="w mid" x="781" y="224" style="font-size:17px">applies the rules</text>
+<text class="w mid" x="781" y="224" style="font-size:17px" lang="en">applies the rules</text><text class="w mid" x="781" y="224" style="font-size:17px;font-size:16px" lang="ru">применяет правила</text>
 <rect class="card" x="930" y="140" width="164" height="110" rx="14"/>
-<text class="h mid" x="1012" y="182" style="font-size:21px">Predictions</text>
+<text class="h mid" x="1012" y="182" style="font-size:21px" lang="en">Predictions</text><text class="h mid" x="1012" y="182" style="font-size:21px;font-size:19px" lang="ru">Предсказания</text>
 <text class="s mid" x="1012" y="210">good / bad</text>
-<text class="s mid" x="1012" y="234">per conversation</text>
+<text class="s mid" x="1012" y="234" lang="en">per conversation</text><text class="s mid" x="1012" y="234" style="font-size:16px" lang="ru">на каждый диалог</text>
 <line class="ln" x1="174" y1="195" x2="232" y2="195" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="405" y1="195" x2="463" y2="195" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="636" y1="195" x2="694" y2="195" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="867" y1="195" x2="925" y2="195" marker-end="url(#ar-ink)"/>
 <rect class="card" x="699" y="14" width="164" height="76" rx="14"/>
-<text class="h mid" x="781" y="46">Test set</text>
-<text class="s mid" x="781" y="72">new conversations</text>
+<text class="h mid" x="781" y="46" lang="en">Test set</text><text class="h mid" x="781" y="46" lang="ru">Тест</text>
+<text class="s mid" x="781" y="72" lang="en">new conversations</text><text class="s mid" x="781" y="72" style="font-size:16px" lang="ru">новые диалоги</text>
 <line class="ln" x1="781" y1="93" x2="781" y2="136" marker-end="url(#ar-ink)"/>
 <line class="ln-acc" x1="550" y1="254" x2="550" y2="302" marker-end="url(#ar-acc)"/>
-<text class="s end" x="538" y="284">the jury reads it</text>
+<text class="s end" x="538" y="284" lang="en">the jury reads it</text><text class="s end" x="538" y="284" lang="ru">это читает жюри</text>
 <line class="ln-acc" x1="1012" y1="254" x2="1012" y2="302" marker-end="url(#ar-acc)"/>
-<text class="s end" x="1000" y="284">vs hidden labels</text>
+<text class="s end" x="1000" y="284" lang="en">vs hidden labels</text><text class="s end" x="1000" y="284" lang="ru">сверка со скрытыми ответами</text>
 <rect class="card-w" x="455" y="306" width="190" height="46" rx="23"/>
-<text class="sb mid" x="550" y="336" style="font-size:19px">jury: 0 to 5</text>
+<text class="sb mid" x="550" y="336" style="font-size:19px" lang="en">jury: 0 to 5</text><text class="sb mid" x="550" y="336" style="font-size:19px" lang="ru">жюри: 0–5</text>
 <rect class="card-w" x="908" y="306" width="186" height="46" rx="23"/>
-<text class="sb mid" x="1001" y="336" style="font-size:19px">accuracy: 0 to 1</text>
+<text class="sb mid" x="1001" y="336" style="font-size:19px" lang="en">accuracy: 0 to 1</text><text class="sb mid" x="1001" y="336" style="font-size:19px" lang="ru">точность: 0–1</text>
 <line class="ln-acc" x1="550" y1="354" x2="550" y2="394" marker-end="url(#ar-acc)"/>
 <line class="ln-acc" x1="1012" y1="354" x2="1012" y2="394" marker-end="url(#ar-acc)"/>
 <rect class="card-soft" x="40" y="398" width="1040" height="100" rx="18"/>
-<text class="acc mid" x="560" y="446" style="font-size:38px;font-weight:800">score = 10 × accuracy + 0.4 × jury</text>
-<text class="s mid" x="560" y="478">accuracy: mean over four topics · jury: five yes/no criteria on the explanation</text>
+<text class="acc mid" x="560" y="446" style="font-size:38px;font-weight:800" lang="en">score = 10 × accuracy + 0.4 × jury</text><text class="acc mid" x="560" y="446" style="font-size:38px;font-weight:800" lang="ru">итог = 10 × точность + 0.4 × жюри</text>
+<text class="s mid" x="560" y="478" lang="en">accuracy: mean over four topics · jury: five yes/no criteria on the explanation</text><text class="s mid" x="560" y="478" lang="ru">точность: среднее по четырём темам · жюри: пять критериев «да/нет» для объяснения</text>
 </svg>
 </figure>
-<p class="ru" lang="ru"><i>Две части оценки — точность и понятное объяснение; строили под обе.</i></p>
 </div></section>
 
 <!-- 3 ADAPT -->
 <section class="slide" id="adapt" aria-labelledby="h-adapt"><div class="wrap">
-<h2 id="h-adapt"><span class="n">3</span>How adapt learns</h2>
-<p class="lead">Three steps, all from the training set. A rule that raises even one false alarm on an expert-approved conversation may not decide. It moves to boundary and stays in the explanation as a rejected hypothesis.</p>
+<h2 id="h-adapt"><span class="n">3</span><span lang="en">How adapt learns</span><span lang="ru">Как adapt учится</span></h2>
+<p class="lead"><span lang="en">Three steps, all from the training set. A rule that raises even one false alarm on an expert-approved conversation may not decide. It moves to boundary and stays in the explanation as a rejected hypothesis.</span><span lang="ru">Три шага, все — по обучающим диалогам. Если правило хоть раз назвало плохим диалог, который эксперт признал хорошим, решать ему нельзя. Оно уходит в «границу» и остаётся в объяснении как отвергнутая гипотеза.</span></p>
 <figure>
-<svg viewBox="0 0 1100 625" role="img" aria-labelledby="t-adapt d-adapt">
-<title id="t-adapt">Adapt: three steps and the verification funnel</title>
-<desc id="d-adapt">Step one builds a fact sheet from the context. Step two instantiates rule families from train. Step three verifies every candidate on all train. Of 44 candidate rules, 26 become active and 18 go to boundary. Always include a link is an example of a rejected hypothesis.</desc>
+<svg viewBox="0 0 1100 625" role="img" aria-label="Adapt: three steps and the verification funnel. Step one builds a fact sheet from the context. Step two instantiates rule families from train. Step three verifies every candidate on all train. Of 44 candidate rules, 26 become active and 18 go to boundary. Always include a link is an example of a rejected hypothesis." data-en="Adapt: three steps and the verification funnel. Step one builds a fact sheet from the context. Step two instantiates rule families from train. Step three verifies every candidate on all train. Of 44 candidate rules, 26 become active and 18 go to boundary. Always include a link is an example of a rejected hypothesis." data-ru="Обучение (adapt): три шага и воронка проверки. Шаг 1: сводка фактов из данных банка. Шаг 2: шаблоны правил наполняются числами из обучающих диалогов. Шаг 3: каждое правило проверяется на всех обучающих диалогах. Из 44 правил-кандидатов 26 становятся активными, 18 уходят в границу. «Всегда давать ссылку» — пример отвергнутой гипотезы.">
 <rect class="card" x="0" y="8" width="340" height="196" rx="16"/>
 <circle cx="40" cy="46" r="22" fill="#1d4ed8"/><text class="w mid" x="40" y="55" style="font-size:24px;font-weight:800">1</text>
-<text class="h" x="76" y="54" style="font-size:24px">Fact sheet</text>
-<text class="p" x="22" y="106" style="font-size:19px">Recomputed from the context:</text>
-<text class="p" x="22" y="134" style="font-size:19px">totals, balances, interest.</text>
-<text class="p" x="22" y="162" style="font-size:19px">Never the assistant's word.</text>
+<text class="h" x="76" y="54" style="font-size:24px" lang="en">Fact sheet</text><text class="h" x="76" y="54" style="font-size:24px" lang="ru">Сводка фактов</text>
+<text class="p" x="22" y="106" style="font-size:19px" lang="en">Recomputed from the context:</text><text class="p" x="22" y="106" style="font-size:19px;font-size:18px" lang="ru">Считаем сами по данным</text>
+<text class="p" x="22" y="134" style="font-size:19px" lang="en">totals, balances, interest.</text><text class="p" x="22" y="134" style="font-size:19px;font-size:18px" lang="ru">банка: суммы, остатки,</text>
+<text class="p" x="22" y="162" style="font-size:19px" lang="en">Never the assistant's word.</text><text class="p" x="22" y="162" style="font-size:19px;font-size:18px" lang="ru">проценты. Словам</text>
+<text class="p" x="22" y="190" style="font-size:18px" lang="ru">ассистента не верим.</text>
 <rect class="card" x="380" y="8" width="340" height="196" rx="16"/>
 <circle cx="420" cy="46" r="22" fill="#1d4ed8"/><text class="w mid" x="420" y="55" style="font-size:24px;font-weight:800">2</text>
-<text class="h" x="456" y="54" style="font-size:24px">Rules from families</text>
-<text class="p" x="402" y="106" style="font-size:19px">Hand-made families give the</text>
-<text class="p" x="402" y="134" style="font-size:19px">shape. Amounts and thresholds</text>
-<text class="p" x="402" y="162" style="font-size:19px">come from the training set.</text>
+<text class="h" x="456" y="54" style="font-size:24px" lang="en">Rules from families</text><text class="h" x="456" y="54" style="font-size:24px" lang="ru">Шаблоны правил</text>
+<text class="p" x="402" y="106" style="font-size:19px" lang="en">Hand-made families give the</text><text class="p" x="402" y="106" style="font-size:19px;font-size:18px" lang="ru">Шаблоны правил придумали</text>
+<text class="p" x="402" y="134" style="font-size:19px" lang="en">shape. Amounts and thresholds</text><text class="p" x="402" y="134" style="font-size:19px;font-size:18px" lang="ru">мы. Суммы и пороги берём</text>
+<text class="p" x="402" y="162" style="font-size:19px" lang="en">come from the training set.</text><text class="p" x="402" y="162" style="font-size:19px;font-size:18px" lang="ru">из обучающих диалогов.</text>
 <rect class="card" x="760" y="8" width="340" height="196" rx="16"/>
 <circle cx="800" cy="46" r="22" fill="#1d4ed8"/><text class="w mid" x="800" y="55" style="font-size:24px;font-weight:800">3</text>
-<text class="h" x="836" y="54" style="font-size:24px">Verify on all train</text>
-<text class="p" x="782" y="106" style="font-size:19px">One false bad on a good one</text>
-<text class="p" x="782" y="134" style="font-size:19px">and the rule goes to</text>
-<text class="p" x="782" y="162" style="font-size:19px">boundary.</text>
+<text class="h" x="836" y="54" style="font-size:24px" lang="en">Verify on all train</text><text class="h" x="836" y="54" style="font-size:24px" lang="ru">Проверка</text>
+<text class="p" x="782" y="106" style="font-size:19px" lang="en">One false bad on a good one</text><text class="p" x="782" y="106" style="font-size:19px;font-size:18px" lang="ru">Каждое правило — на всех</text>
+<text class="p" x="782" y="134" style="font-size:19px" lang="en">and the rule goes to</text><text class="p" x="782" y="134" style="font-size:19px;font-size:18px" lang="ru">обучающих диалогах. Одно</text>
+<text class="p" x="782" y="162" style="font-size:19px" lang="en">boundary.</text><text class="p" x="782" y="162" style="font-size:19px;font-size:18px" lang="ru">ложное «плохо» на хорошем</text>
+<text class="p" x="782" y="190" style="font-size:18px" lang="ru">диалоге — и в границу.</text>
 <line class="ln" x1="344" y1="106" x2="376" y2="106" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="724" y1="106" x2="756" y2="106" marker-end="url(#ar-ink)"/>
 
 <rect class="card-soft" x="140" y="246" width="820" height="62" rx="12"/>
-<text class="acc mid" x="550" y="288" style="font-size:30px;font-weight:800">44 candidate rules</text>
+<text class="acc mid" x="550" y="288" style="font-size:30px;font-weight:800" lang="en">44 candidate rules</text><text class="acc mid" x="550" y="288" style="font-size:30px;font-weight:800" lang="ru">44 правила-кандидата</text>
 <polygon class="funnel" points="140,314 960,314 680,386 420,386"/>
-<text class="acc mid" x="550" y="360" style="font-size:22px;font-weight:700">verify on all train</text>
+<text class="acc mid" x="550" y="360" style="font-size:22px;font-weight:700" lang="en">verify on all train</text><text class="acc mid" x="550" y="360" style="font-size:22px;font-weight:700;font-size:19px" lang="ru">проверка на всех обучающих диалогах</text>
 <line class="ln" x1="480" y1="388" x2="330" y2="436" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="620" y1="388" x2="770" y2="436" marker-end="url(#ar-ink)"/>
 <rect class="card-acc" x="90" y="440" width="440" height="92" rx="14"/>
-<text class="w mid" x="310" y="484" style="font-size:36px;font-weight:800">26 active</text>
-<text class="w mid" x="310" y="514" style="font-size:17px">caught ≥1 bad, zero false alarms</text>
+<text class="w mid" x="310" y="484" style="font-size:36px;font-weight:800" lang="en">26 active</text><text class="w mid" x="310" y="484" style="font-size:36px;font-weight:800" lang="ru">26 активных</text>
+<text class="w mid" x="310" y="514" style="font-size:17px" lang="en">caught ≥1 bad, zero false alarms</text><text class="w mid" x="310" y="514" style="font-size:17px;font-size:16px" lang="ru">поймали ≥1 плохой диалог, 0 ложных тревог</text>
 <rect class="card-dash" x="570" y="440" width="440" height="92" rx="14"/>
-<text class="mid" x="790" y="484" style="font-size:36px;font-weight:800">18 boundary</text>
-<text class="s mid" x="790" y="514">silent · shown as rejected hypotheses</text>
+<text class="mid" x="790" y="484" style="font-size:36px;font-weight:800" lang="en">18 boundary</text><text class="mid" x="790" y="484" style="font-size:36px;font-weight:800" lang="ru">18 пограничных</text>
+<text class="s mid" x="790" y="514" lang="en">silent · shown as rejected hypotheses</text><text class="s mid" x="790" y="514" style="font-size:16px" lang="ru">молчат · видны как отвергнутые гипотезы</text>
 <rect class="card-w" x="90" y="548" width="440" height="66" rx="12"/>
-<text class="m" x="110" y="578" style="font-size:17px">e.g. spending.TX_AMOUNT.merchant</text>
-<text class="s" x="110" y="602">Recompute merchant totals before confirming.</text>
+<text class="m" x="110" y="578" style="font-size:17px" lang="en">e.g. spending.TX_AMOUNT.merchant</text><text class="m" x="110" y="578" style="font-size:17px" lang="ru">напр. spending.TX_AMOUNT.merchant</text>
+<text class="s" x="110" y="602" lang="en">Recompute merchant totals before confirming.</text><text class="s" x="110" y="602" style="font-size:16px" lang="ru">Пересчитать операции по продавцу перед ответом.</text>
 <rect class="card-w" x="570" y="548" width="440" height="66" rx="12"/>
-<text class="sb" x="590" y="578" style="font-size:19px">Rejected: “always include a link”</text>
-<text class="s" x="590" y="602">Sounded plausible. The labels said no.</text>
+<text class="sb" x="590" y="578" style="font-size:19px" lang="en">Rejected: “always include a link”</text><text class="sb" x="590" y="578" style="font-size:19px;font-size:18px" lang="ru">Отвергнуто: «всегда давать ссылку»</text>
+<text class="s" x="590" y="602" lang="en">Sounded plausible. The labels said no.</text><text class="s" x="590" y="602" style="font-size:16px" lang="ru">Звучало разумно, но метки эксперта против.</text>
 </svg>
 </figure>
-<p class="ru" lang="ru"><i>Главный аргумент: 18 отвергнутых гипотез — учимся у меток эксперта, а не у себя.</i></p>
 </div></section>
 
 <!-- 4 EVAL -->
 <section class="slide" id="eval" aria-labelledby="h-eval"><div class="wrap">
-<h2 id="h-eval"><span class="n">4</span>How eval decides</h2>
-<p class="lead">Rules are checked in priority order. The first violated rule gives bad, with the assistant's own quote. If none is violated, the answer is good.</p>
+<h2 id="h-eval"><span class="n">4</span><span lang="en">How eval decides</span><span lang="ru">Как eval выносит вердикт</span></h2>
+<p class="lead"><span lang="en">Rules are checked in priority order. The first violated rule gives bad, with the assistant's own quote. If none is violated, the answer is good.</span><span lang="ru">Правила проверяются по приоритету. Первое нарушенное правило даёт bad, вместе с цитатой из ответа ассистента. Если нарушений нет — good.</span></p>
 <figure>
-<svg viewBox="0 0 1100 520" role="img" aria-labelledby="t-eval d-eval">
-<title id="t-eval">Eval: first violated rule decides</title>
-<desc id="d-eval">A conversation and its context pass through active rules in priority order. If a rule is violated the verdict is bad with a quote and checking stops. If no rule is violated the verdict is good.</desc>
+<svg viewBox="0 0 1100 520" role="img" aria-label="Eval: first violated rule decides. A conversation and its context pass through active rules in priority order. If a rule is violated the verdict is bad with a quote and checking stops. If no rule is violated the verdict is good." data-en="Eval: first violated rule decides. A conversation and its context pass through active rules in priority order. If a rule is violated the verdict is bad with a quote and checking stops. If no rule is violated the verdict is good." data-ru="Как eval выносит вердикт: решает первое нарушенное правило. Диалог и данные банка проходят через активные правила по приоритету. Если правило нарушено — вердикт bad с цитатой, проверка останавливается. Если ничего не нарушено — good.">
 <rect class="card" x="0" y="20" width="170" height="110" rx="14"/>
-<text class="h mid" x="85" y="68">Conversation</text>
-<text class="s mid" x="85" y="96">+ context</text>
+<text class="h mid" x="85" y="68" lang="en">Conversation</text><text class="h mid" x="85" y="68" lang="ru">Диалог</text>
+<text class="s mid" x="85" y="96" lang="en">+ context</text><text class="s mid" x="85" y="96" lang="ru">+ данные банка</text>
 <rect class="card-soft" x="225" y="20" width="170" height="110" rx="14"/>
-<text class="h acc mid" x="310" y="54">Rule 1</text>
-<text class="s mid" x="310" y="80">top priority</text>
-<text class="sb mid" x="310" y="108">violated?</text>
+<text class="h acc mid" x="310" y="54" lang="en">Rule 1</text><text class="h acc mid" x="310" y="54" lang="ru">Правило 1</text>
+<text class="s mid" x="310" y="80" lang="en">top priority</text><text class="s mid" x="310" y="80" style="font-size:16px" lang="ru">высший приоритет</text>
+<text class="sb mid" x="310" y="108" lang="en">violated?</text><text class="sb mid" x="310" y="108" lang="ru">нарушено?</text>
 <rect class="card-soft" x="450" y="20" width="170" height="110" rx="14"/>
-<text class="h acc mid" x="535" y="54">Rule 2</text>
-<text class="s mid" x="535" y="80">next priority</text>
-<text class="sb mid" x="535" y="108">violated?</text>
+<text class="h acc mid" x="535" y="54" lang="en">Rule 2</text><text class="h acc mid" x="535" y="54" lang="ru">Правило 2</text>
+<text class="s mid" x="535" y="80" lang="en">next priority</text><text class="s mid" x="535" y="80" lang="ru">следующий</text>
+<text class="sb mid" x="535" y="108" lang="en">violated?</text><text class="sb mid" x="535" y="108" lang="ru">нарушено?</text>
 <rect class="card-soft" x="675" y="20" width="170" height="110" rx="14"/>
-<text class="h acc mid" x="760" y="54">… Rule N</text>
-<text class="s mid" x="760" y="80">lowest priority</text>
-<text class="sb mid" x="760" y="108">violated?</text>
+<text class="h acc mid" x="760" y="54" lang="en">… Rule N</text><text class="h acc mid" x="760" y="54" lang="ru">… Правило N</text>
+<text class="s mid" x="760" y="80" lang="en">lowest priority</text><text class="s mid" x="760" y="80" style="font-size:16px" lang="ru">низший приоритет</text>
+<text class="sb mid" x="760" y="108" lang="en">violated?</text><text class="sb mid" x="760" y="108" lang="ru">нарушено?</text>
 <rect class="card-good" x="900" y="20" width="170" height="110" rx="14"/>
 <text class="good mid" x="985" y="68" style="font-size:32px;font-weight:800">GOOD</text>
-<text class="s mid" x="985" y="98">none violated</text>
+<text class="s mid" x="985" y="98" lang="en">none violated</text><text class="s mid" x="985" y="98" style="font-size:16px" lang="ru">ничего не нарушено</text>
 <line class="ln" x1="173" y1="75" x2="221" y2="75" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="398" y1="75" x2="446" y2="75" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="623" y1="75" x2="671" y2="75" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="848" y1="75" x2="896" y2="75" marker-end="url(#ar-ink)"/>
-<text class="sb mid" x="422" y="62">no</text>
-<text class="sb mid" x="647" y="62">no</text>
-<text class="sb mid" x="872" y="62">no</text>
+<text class="sb mid" x="422" y="62" lang="en">no</text><text class="sb mid" x="422" y="62" lang="ru">нет</text>
+<text class="sb mid" x="647" y="62" lang="en">no</text><text class="sb mid" x="647" y="62" lang="ru">нет</text>
+<text class="sb mid" x="872" y="62" lang="en">no</text><text class="sb mid" x="872" y="62" lang="ru">нет</text>
 <line class="ln-bad" x1="310" y1="134" x2="310" y2="224" marker-end="url(#ar-bad)"/>
 <line class="ln-bad" x1="535" y1="134" x2="535" y2="224" marker-end="url(#ar-bad)"/>
 <line class="ln-bad" x1="760" y1="134" x2="760" y2="224" marker-end="url(#ar-bad)"/>
-<text class="sb bad" x="322" y="186">yes</text>
-<text class="sb bad" x="547" y="186">yes</text>
-<text class="sb bad" x="772" y="186">yes</text>
+<text class="sb bad" x="322" y="186" lang="en">yes</text><text class="sb bad" x="322" y="186" lang="ru">да</text>
+<text class="sb bad" x="547" y="186" lang="en">yes</text><text class="sb bad" x="547" y="186" lang="ru">да</text>
+<text class="sb bad" x="772" y="186" lang="en">yes</text><text class="sb bad" x="772" y="186" lang="ru">да</text>
 <rect class="card-bad" x="230" y="228" width="660" height="130" rx="16"/>
 <text class="w mid" x="560" y="278" style="font-size:40px;font-weight:800">BAD</text>
-<text class="w mid" x="560" y="312" style="font-size:22px;font-weight:700">plus the assistant's own quote</text>
-<text class="w mid" x="560" y="342" style="font-size:18px">The first violated rule decides. Later rules are not evaluated.</text>
+<text class="w mid" x="560" y="312" style="font-size:22px;font-weight:700" lang="en">plus the assistant's own quote</text><text class="w mid" x="560" y="312" style="font-size:22px;font-weight:700" lang="ru">и цитата из ответа ассистента</text>
+<text class="w mid" x="560" y="342" style="font-size:18px" lang="en">The first violated rule decides. Later rules are not evaluated.</text><text class="w mid" x="560" y="342" style="font-size:18px" lang="ru">Решает первое нарушенное правило. Остальные не проверяются.</text>
 <rect class="card" x="0" y="396" width="535" height="112" rx="14"/>
-<text class="h" x="24" y="432" style="font-size:21px">Boundary rules never vote.</text>
-<text class="s" x="24" y="462">They stay in the explanation</text>
-<text class="s" x="24" y="486">as rejected hypotheses.</text>
+<text class="h" x="24" y="432" style="font-size:21px" lang="en">Boundary rules never vote.</text><text class="h" x="24" y="432" style="font-size:21px" lang="ru">Пограничные правила не голосуют.</text>
+<text class="s" x="24" y="462" lang="en">They stay in the explanation</text><text class="s" x="24" y="462" lang="ru">Они остаются в объяснении</text>
+<text class="s" x="24" y="486" lang="en">as rejected hypotheses.</text><text class="s" x="24" y="486" lang="ru">как отвергнутые гипотезы.</text>
 <rect class="card" x="565" y="396" width="535" height="112" rx="14"/>
-<text class="h" x="589" y="432" style="font-size:21px">A check that cannot run is “unknown”.</text>
-<text class="s" x="589" y="462">The manifest's fallback applies.</text>
-<text class="s" x="589" y="486">No violation is ever invented.</text>
+<text class="h" x="589" y="432" style="font-size:21px" lang="en">A check that cannot run is “unknown”.</text><text class="h" x="589" y="432" style="font-size:21px;font-size:20px" lang="ru">Проверку нельзя выполнить — «не знаю».</text>
+<text class="s" x="589" y="462" lang="en">The manifest's fallback applies.</text><text class="s" x="589" y="462" style="font-size:16px" lang="ru">Берётся ответ по умолчанию из файла правил.</text>
+<text class="s" x="589" y="486" lang="en">No violation is ever invented.</text><text class="s" x="589" y="486" lang="ru">Нарушение никогда не выдумывается.</text>
 </svg>
 </figure>
-<p class="ru" lang="ru"><i>eval намеренно простой: первое нарушенное правило по приоритету — bad с цитатой, иначе good.</i></p>
 </div></section>
 
 <!-- 5 EXPLANATION -->
 <section class="slide" id="explanation" aria-labelledby="h-expl"><div class="wrap">
-<h2 id="h-expl"><span class="n">5</span>The explanation is the implementation</h2>
-<p class="lead">One manifest produces the explanation and drives the predictions. Its SHA-256 is stored in run_meta.json. The text a judge reads is the rule set that predicts.</p>
+<h2 id="h-expl"><span class="n">5</span><span lang="en">The explanation is the implementation</span><span lang="ru">Объяснение — это и есть то, что работает</span></h2>
+<p class="lead"><span lang="en">One manifest produces the explanation and drives the predictions. Its SHA-256 is stored in run_meta.json. The text a judge reads is the rule set that predicts.</span><span lang="ru">Один файл с правилами порождает и объяснение, и предсказания. Его цифровой отпечаток (SHA-256) записан в run_meta.json. Текст, который читает жюри, — это ровно те правила, что делают предсказания.</span></p>
 <figure>
-<svg viewBox="0 0 1100 290" role="img" aria-labelledby="t-expl d-expl">
-<title id="t-expl">One manifest, two outputs</title>
-<desc id="d-expl">The rules manifest rules_spec.json generates explanation.md and is read by eval to make predictions. run_meta.json stores the manifest's SHA-256.</desc>
+<svg viewBox="0 0 1100 290" role="img" aria-label="One manifest, two outputs. The rules manifest rules_spec.json generates explanation.md and is read by eval to make predictions. run_meta.json stores the manifest's SHA-256." data-en="One manifest, two outputs. The rules manifest rules_spec.json generates explanation.md and is read by eval to make predictions. run_meta.json stores the manifest's SHA-256." data-ru="Один файл с правилами, два результата. Файл rules_spec.json порождает explanation.md, и его же читает eval, чтобы выдать предсказания. В run_meta.json хранится отпечаток SHA-256 этого файла.">
 <rect class="card-acc" x="380" y="8" width="340" height="86" rx="16"/>
 <text class="m w mid" x="550" y="50" style="font-size:26px">rules_spec.json</text>
-<text class="w mid" x="550" y="78" style="font-size:17px">the rule manifest</text>
+<text class="w mid" x="550" y="78" style="font-size:17px" lang="en">the rule manifest</text><text class="w mid" x="550" y="78" style="font-size:17px" lang="ru">файл с правилами</text>
 <rect class="card-w" x="800" y="12" width="290" height="78" rx="14"/>
 <text class="m mid" x="945" y="46" style="font-size:20px">run_meta.json</text>
-<text class="s mid" x="945" y="74">stores the manifest's SHA-256</text>
+<text class="s mid" x="945" y="74" lang="en">stores the manifest's SHA-256</text><text class="s mid" x="945" y="74" lang="ru">хранит отпечаток SHA-256</text>
 <line class="ln-thin" x1="724" y1="51" x2="796" y2="51" marker-end="url(#ar-ink)"/>
 <rect class="card-soft" x="10" y="176" width="430" height="100" rx="16"/>
 <text class="m acc mid" x="225" y="218" style="font-size:24px">explanation.md</text>
-<text class="s mid" x="225" y="248">generated from the manifest</text>
+<text class="s mid" x="225" y="248" lang="en">generated from the manifest</text><text class="s mid" x="225" y="248" lang="ru">создаётся из файла с правилами</text>
 <rect class="card-soft" x="660" y="176" width="430" height="100" rx="16"/>
 <text class="m acc mid" x="875" y="218" style="font-size:22px">eval → predictions.csv</text>
-<text class="s mid" x="875" y="248">reads the same manifest</text>
+<text class="s mid" x="875" y="248" lang="en">reads the same manifest</text><text class="s mid" x="875" y="248" lang="ru">читает тот же файл с правилами</text>
 <line class="ln-acc" x1="440" y1="98" x2="290" y2="172" marker-end="url(#ar-acc)"/>
 <line class="ln-acc" x1="660" y1="98" x2="810" y2="172" marker-end="url(#ar-acc)"/>
-<text class="s end" x="330" y="128">generates</text>
-<text class="s" x="770" y="128">is read by</text>
-<line class="ln-thin" x1="444" y1="226" x2="484" y2="226"/>
-<line class="ln-thin" x1="616" y1="226" x2="656" y2="226"/>
-<rect class="card-good" x="488" y="198" width="124" height="56" rx="28"/>
-<text class="good mid" x="550" y="233" style="font-size:19px;font-weight:800">same rules</text>
+<text class="s end" x="330" y="128" lang="en">generates</text><text class="s end" x="330" y="128" lang="ru">порождает</text>
+<text class="s" x="770" y="128" lang="en">is read by</text><text class="s" x="770" y="128" lang="ru">читает eval</text>
+<line class="ln-thin" x1="444" y1="226" x2="470" y2="226"/>
+<line class="ln-thin" x1="630" y1="226" x2="656" y2="226"/>
+<rect class="card-good" x="474" y="198" width="152" height="56" rx="28"/>
+<text class="good mid" x="550" y="233" style="font-size:19px;font-weight:800" lang="en">same rules</text><text class="good mid" x="550" y="233" style="font-size:19px;font-weight:800" lang="ru">те же правила</text>
 </svg>
 </figure>
 <table class="crit">
-<thead><tr><th>Jury criterion</th><th>What the explanation shows</th></tr></thead>
+<thead><tr><th><span lang="en">Jury criterion</span><span lang="ru">Критерий жюри</span></th><th><span lang="en">What the explanation shows</span><span lang="ru">Что показывает объяснение</span></th></tr></thead>
 <tbody>
-<tr><td>Clear criteria</td><td>Every rule as a plain condition, e.g. “Recalculate completed merchant transactions before confirming a proposed amount”</td></tr>
-<tr><td>Clear priorities</td><td>Rules sorted by priority; the first violation wins</td></tr>
-<tr><td>Links to training examples</td><td>Real train IDs with the expert's labels and quotes</td></tr>
-<tr><td>Clear boundaries</td><td>Rejected hypotheses, each with its condition</td></tr>
-<tr><td>Consistency with the implementation</td><td>Same manifest for text and predictions; hash in <code>run_meta.json</code></td></tr>
+<tr><td><span lang="en">Clear criteria</span><span lang="ru">Понятные критерии</span></td><td><span lang="en">Every rule as a plain condition, e.g. “Recalculate completed merchant transactions before confirming a proposed amount”</span><span lang="ru">Каждое правило — простым условием, например: «Пересчитать завершённые операции по продавцу, прежде чем подтверждать названную сумму»</span></td></tr>
+<tr><td><span lang="en">Clear priorities</span><span lang="ru">Понятные приоритеты</span></td><td><span lang="en">Rules sorted by priority; the first violation wins</span><span lang="ru">Правила стоят по приоритету; решает первое нарушение</span></td></tr>
+<tr><td><span lang="en">Links to training examples</span><span lang="ru">Ссылки на обучающие примеры</span></td><td><span lang="en">Real train IDs with the expert's labels and quotes</span><span lang="ru">Настоящие ID обучающих диалогов, пометки эксперта и цитаты</span></td></tr>
+<tr><td><span lang="en">Clear boundaries</span><span lang="ru">Понятные границы</span></td><td><span lang="en">Rejected hypotheses, each with its condition</span><span lang="ru">Отвергнутые гипотезы, у каждой своё условие</span></td></tr>
+<tr><td><span lang="en">Consistency with the implementation</span><span lang="ru">Совпадение с реализацией</span></td><td><span lang="en">Same manifest for text and predictions; hash in <code>run_meta.json</code></span><span lang="ru">Один файл с правилами и для текста, и для предсказаний; отпечаток в <code>run_meta.json</code></span></td></tr>
 </tbody>
 </table>
-<p class="tiny">An independent structural check found all five present on every adapt run. Jury points themselves are not claimed.</p>
-<p class="ru" lang="ru"><i>Объяснение и есть реализация: один манифест, SHA-256 в run_meta.json.</i></p>
+<p class="tiny"><span lang="en">An independent structural check found all five present on every adapt run. Jury points themselves are not claimed.</span><span lang="ru">Независимая проверка структуры нашла все пять пунктов в каждом запуске adapt. Сколько баллов даст жюри, мы не обещаем.</span></p>
 </div></section>
 
 <!-- 6 MODEL -->
 <section class="slide" id="model" aria-labelledby="h-model"><div class="wrap">
-<h2 id="h-model"><span class="n">6</span>Optional model layer</h2>
-<p class="lead">A model answers yes, no or unknown, and must quote the assistant. It can also propose rules for bad cases nothing explains. Every proposal is verified on all of train first.</p>
-<p><span class="badge">No API key: everything stays deterministic.</span> <span class="badge" style="background:var(--wait-soft);border-color:var(--wait);border-style:dashed;color:var(--wait)">Does induction rediscover rules? measuring</span></p>
+<h2 id="h-model"><span class="n">6</span><span lang="en">Optional model layer</span><span lang="ru">Необязательный слой с моделью</span></h2>
+<p class="lead"><span lang="en">A model answers yes, no or unknown, and must quote the assistant. It can also propose rules for bad cases nothing explains. Every proposal is verified on all of train first.</span><span lang="ru">Модель отвечает «да», «нет» или «не знаю» и обязана привести цитату ассистента. Ещё она может предложить правила для плохих диалогов, которые ни одно правило не объяснило. Каждое предложение сначала проверяется на всех обучающих диалогах.</span></p>
+<p><span class="badge"><span lang="en">No API key: everything stays deterministic.</span><span lang="ru">Без ключа API модель не нужна: всё считают правила, результат всегда одинаковый.</span></span> <span class="badge wait"><span lang="en">Does induction rediscover rules? measuring</span><span lang="ru">Находит ли модель правила сама? Измеряем</span></span></p>
 <figure>
-<svg viewBox="0 0 1100 515" role="img" aria-labelledby="t-model d-model">
-<title id="t-model">Semantic predicate and induction loop</title>
-<desc id="d-model">Left: a model gets a dialog and a question and answers yes with an exact quote, no, or unknown. Right: a bad conversation no rule explains is paired with the nearest good one, the model proposes a hypothesis, it is verified on all train, and is accepted, narrowed or sent to boundary, then the loop continues.</desc>
+<svg viewBox="0 0 1100 515" role="img" aria-label="Semantic predicate and induction loop. Left: a model gets a dialog and a question and answers yes with an exact quote, no, or unknown. Right: a bad conversation no rule explains is paired with the nearest good one, the model proposes a hypothesis, it is verified on all train, and is accepted, narrowed or sent to boundary, then the loop continues." data-en="Semantic predicate and induction loop. Left: a model gets a dialog and a question and answers yes with an exact quote, no, or unknown. Right: a bad conversation no rule explains is paired with the nearest good one, the model proposes a hypothesis, it is verified on all train, and is accepted, narrowed or sent to boundary, then the loop continues." data-ru="Слева: проверка-вопрос к модели. Модель получает диалог и один вопрос и отвечает «да» с точной цитатой, «нет» или «не знаю». Справа: поиск новых правил. Плохой диалог, который ни одно правило не объяснило, сравнивают с ближайшим хорошим. Модель предлагает гипотезу, её проверяют на всех обучающих диалогах: принять, сузить или отправить в границу. Потом берут следующий необъяснённый диалог.">
 <rect class="card" x="0" y="0" width="410" height="505" rx="18"/>
-<text class="cap" x="24" y="40">Semantic predicate</text>
+<text class="cap" x="24" y="40" lang="en">Semantic predicate</text><text class="cap" x="24" y="40" lang="ru">Проверка-вопрос к модели</text>
 <rect class="card-w" x="40" y="66" width="330" height="62" rx="12"/>
-<text class="h mid" x="205" y="104" style="font-size:20px">dialog + one question</text>
+<text class="h mid" x="205" y="104" style="font-size:20px" lang="en">dialog + one question</text><text class="h mid" x="205" y="104" style="font-size:20px" lang="ru">диалог + один вопрос</text>
 <line class="ln" x1="205" y1="130" x2="205" y2="164" marker-end="url(#ar-ink)"/>
 <rect class="card-acc" x="105" y="168" width="200" height="60" rx="14"/>
-<text class="w mid" x="205" y="208" style="font-size:26px;font-weight:800">model</text>
+<text class="w mid" x="205" y="208" style="font-size:26px;font-weight:800" lang="en">model</text><text class="w mid" x="205" y="208" style="font-size:26px;font-weight:800" lang="ru">модель</text>
 <line class="ln" x1="170" y1="230" x2="96" y2="288" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="205" y1="230" x2="222" y2="288" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="240" y1="230" x2="330" y2="288" marker-end="url(#ar-ink)"/>
 <rect class="card-good" x="14" y="292" width="160" height="68" rx="12"/>
-<text class="good mid" x="94" y="320" style="font-size:22px;font-weight:800">yes</text>
-<text class="s mid" x="94" y="346" style="font-size:16px">+ exact quote</text>
+<text class="good mid" x="94" y="320" style="font-size:22px;font-weight:800" lang="en">yes</text><text class="good mid" x="94" y="320" style="font-size:22px;font-weight:800" lang="ru">да</text>
+<text class="s mid" x="94" y="346" style="font-size:16px" lang="en">+ exact quote</text><text class="s mid" x="94" y="346" style="font-size:16px" lang="ru">+ точная цитата</text>
 <rect class="card-w" x="184" y="292" width="76" height="68" rx="12"/>
-<text class="h mid" x="222" y="333">no</text>
+<text class="h mid" x="222" y="333" lang="en">no</text><text class="h mid" x="222" y="333" lang="ru">нет</text>
 <rect class="card-dash" x="270" y="292" width="128" height="68" rx="12"/>
-<text class="sb mid" x="334" y="333" style="font-size:19px">unknown</text>
-<text class="s" x="24" y="404">“yes” without an exact quote</text>
-<text class="s" x="24" y="428">becomes “unknown”.</text>
-<text class="s" x="24" y="462">“unknown” is never a violation.</text>
+<text class="sb mid" x="334" y="333" style="font-size:19px" lang="en">unknown</text><text class="sb mid" x="334" y="333" style="font-size:19px" lang="ru">не знаю</text>
+<text class="s" x="24" y="404" lang="en">“yes” without an exact quote</text><text class="s" x="24" y="404" lang="ru">«Да» без точной цитаты</text>
+<text class="s" x="24" y="428" lang="en">becomes “unknown”.</text><text class="s" x="24" y="428" lang="ru">считается ответом «не знаю».</text>
+<text class="s" x="24" y="462" lang="en">“unknown” is never a violation.</text><text class="s" x="24" y="462" lang="ru">«Не знаю» — это не нарушение.</text>
 
 <rect class="card" x="440" y="0" width="660" height="505" rx="18"/>
-<text class="cap" x="464" y="40">Induction on residuals</text>
+<text class="cap" x="464" y="40" lang="en">Induction on residuals</text><text class="cap" x="464" y="40" lang="ru">Новые правила из необъяснённых диалогов</text>
 <rect class="card-w" x="460" y="68" width="180" height="104" rx="12"/>
-<text class="sb mid" x="550" y="100" style="font-size:19px">Unexplained</text>
-<text class="sb mid" x="550" y="124" style="font-size:19px">bad case</text>
-<text class="s mid" x="550" y="152" style="font-size:16px">no rule catches it</text>
+<text class="sb mid" x="550" y="100" style="font-size:19px" lang="en">Unexplained</text><text class="sb mid" x="550" y="100" style="font-size:19px;font-size:18px" lang="ru">Необъяснённый</text>
+<text class="sb mid" x="550" y="124" style="font-size:19px" lang="en">bad case</text><text class="sb mid" x="550" y="124" style="font-size:19px;font-size:18px" lang="ru">плохой диалог</text>
+<text class="s mid" x="550" y="152" style="font-size:16px" lang="en">no rule catches it</text><text class="s mid" x="550" y="152" style="font-size:16px" lang="ru">правила его не ловят</text>
 <rect class="card-w" x="680" y="68" width="180" height="104" rx="12"/>
-<text class="sb mid" x="770" y="100" style="font-size:19px">Nearest good</text>
-<text class="s mid" x="770" y="128">same topic</text>
+<text class="sb mid" x="770" y="100" style="font-size:19px" lang="en">Nearest good</text><text class="sb mid" x="770" y="100" style="font-size:19px;font-size:18px" lang="ru">Похожий хороший</text>
+<text class="s mid" x="770" y="128" lang="en">same topic</text><text class="s mid" x="770" y="128" lang="ru">той же темы</text>
 <rect class="card-w" x="900" y="68" width="180" height="104" rx="12"/>
-<text class="sb mid" x="990" y="100" style="font-size:19px">Model proposes</text>
-<text class="s mid" x="990" y="128">a hypothesis</text>
+<text class="sb mid" x="990" y="100" style="font-size:19px" lang="en">Model proposes</text><text class="sb mid" x="990" y="100" style="font-size:19px;font-size:17px" lang="ru">Модель предлагает</text>
+<text class="s mid" x="990" y="128" lang="en">a hypothesis</text><text class="s mid" x="990" y="128" lang="ru">гипотезу-правило</text>
 <line class="ln" x1="644" y1="120" x2="676" y2="120" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="864" y1="120" x2="896" y2="120" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="990" y1="176" x2="990" y2="236" marker-end="url(#ar-ink)"/>
 <rect class="card-acc" x="900" y="240" width="180" height="112" rx="12"/>
-<text class="w mid" x="990" y="272" style="font-size:20px;font-weight:800">Verify</text>
-<text class="w mid" x="990" y="298" style="font-size:17px">on all train</text>
-<text class="w mid" x="990" y="322" style="font-size:16px">precision ≥ 0.9</text>
-<text class="w mid" x="990" y="344" style="font-size:16px">≥ 3 contexts</text>
+<text class="w mid" x="990" y="272" style="font-size:20px;font-weight:800" lang="en">Verify</text><text class="w mid" x="990" y="272" style="font-size:20px;font-weight:800" lang="ru">Проверка</text>
+<text class="w mid" x="990" y="298" style="font-size:17px" lang="en">on all train</text><text class="w mid" x="990" y="298" style="font-size:17px;font-size:16px" lang="ru">на всех обучающих</text>
+<text class="w mid" x="990" y="322" style="font-size:16px" lang="en">precision ≥ 0.9</text><text class="w mid" x="990" y="322" style="font-size:16px" lang="ru">точность ≥ 0.9</text>
+<text class="w mid" x="990" y="344" style="font-size:16px" lang="en">≥ 3 contexts</text><text class="w mid" x="990" y="344" style="font-size:16px" lang="ru">≥ 3 контекстов</text>
 <line class="ln" x1="950" y1="354" x2="712" y2="396" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="990" y1="354" x2="860" y2="396" marker-end="url(#ar-ink)"/>
 <line class="ln" x1="1030" y1="354" x2="1010" y2="396" marker-end="url(#ar-ink)"/>
 <rect class="card-good" x="640" y="400" width="132" height="58" rx="12"/>
-<text class="good mid" x="706" y="436" style="font-size:21px;font-weight:800">accept</text>
+<text class="good mid" x="706" y="436" style="font-size:21px;font-weight:800" lang="en">accept</text><text class="good mid" x="706" y="436" style="font-size:21px;font-weight:800" lang="ru">принять</text>
 <rect class="card-soft" x="794" y="400" width="132" height="58" rx="12"/>
-<text class="acc mid" x="860" y="436" style="font-size:21px;font-weight:800">narrow</text>
+<text class="acc mid" x="860" y="436" style="font-size:21px;font-weight:800" lang="en">narrow</text><text class="acc mid" x="860" y="436" style="font-size:21px;font-weight:800" lang="ru">сузить</text>
 <rect class="card-dash" x="948" y="400" width="132" height="58" rx="12"/>
-<text class="mid" x="1014" y="436" style="font-size:21px;font-weight:800">boundary</text>
-<text class="s mid" x="706" y="486" style="font-size:16px">new rule</text>
-<text class="s mid" x="860" y="486" style="font-size:16px">tighter rule</text>
-<text class="s mid" x="1014" y="486" style="font-size:16px">stays silent</text>
+<text class="mid" x="1014" y="436" style="font-size:21px;font-weight:800" lang="en">boundary</text><text class="mid" x="1014" y="436" style="font-size:21px;font-weight:800" lang="ru">граница</text>
+<text class="s mid" x="706" y="486" style="font-size:16px" lang="en">new rule</text><text class="s mid" x="706" y="486" style="font-size:16px" lang="ru">новое правило</text>
+<text class="s mid" x="860" y="486" style="font-size:16px" lang="en">tighter rule</text><text class="s mid" x="860" y="486" style="font-size:16px" lang="ru">правило строже</text>
+<text class="s mid" x="1014" y="486" style="font-size:16px" lang="en">stays silent</text><text class="s mid" x="1014" y="486" style="font-size:16px" lang="ru">молчит</text>
 <path class="ln-acc" d="M636 429 H550 V178" marker-end="url(#ar-acc)"/>
-<text class="s" x="562" y="296" style="font-size:16px">after any outcome:</text>
-<text class="s" x="562" y="318" style="font-size:16px">next unexplained case</text>
+<text class="s" x="562" y="296" style="font-size:16px" lang="en">after any outcome:</text><text class="s" x="562" y="296" style="font-size:16px" lang="ru">после любого исхода —</text>
+<text class="s" x="562" y="318" style="font-size:16px" lang="en">next unexplained case</text><text class="s" x="562" y="318" style="font-size:16px" lang="ru">следующий необъяснённый диалог</text>
 </svg>
 </figure>
-<p class="ru" lang="ru"><i>Модель опциональна: без ключа всё детерминировано; качество индукции пока измеряется.</i></p>
 </div></section>
 
 <!-- 7 RESULTS -->
 <section class="slide" id="results" aria-labelledby="h-res"><div class="wrap">
-<h2 id="h-res"><span class="n">7</span>Results</h2>
-<p class="lead">Macro accuracy: the mean over four topics. The public test is not a clean holdout, so read the cross-validation bar as the honest estimate.</p>
+<h2 id="h-res"><span class="n">7</span><span lang="en">Results</span><span lang="ru">Результаты</span></h2>
+<p class="lead"><span lang="en">Macro accuracy: the mean over four topics. The public test is not a clean holdout, so read the cross-validation bar as the honest estimate.</span><span lang="ru">Точность — среднее по четырём темам. Публичный тест нельзя считать чистой проверкой, поэтому честная оценка — полоса перекрёстной проверки.</span></p>
 <figure>
-<svg viewBox="0 0 1100 546" role="img" aria-labelledby="t-res d-res"><title id="t-res">Macro accuracy by evaluation</title><desc id="d-res">Horizontal bars on an axis from 0.80 to 1.00. No model: train 0.994, public test 0.950 (credit 0.933, financial_position 0.955, savings 1.000, spending 0.913), grouped five-fold cross-validation 0.922. With Gemini on the public test: 0.951. Bare model zero-shot is still being measured.</desc><defs><pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#ffffff"/><rect width="5" height="10" fill="#1d4ed8"/></pattern></defs><line class="grid" x1="360.0" y1="14" x2="360.0" y2="506"/><text class="s mid" x="360.0" y="532" style="font-size:16px">0.80</text><line class="grid" x1="520.0" y1="14" x2="520.0" y2="506"/><text class="s mid" x="520.0" y="532" style="font-size:16px">0.85</text><line class="grid" x1="680.0" y1="14" x2="680.0" y2="506"/><text class="s mid" x="680.0" y="532" style="font-size:16px">0.90</text><line class="grid" x1="840.0" y1="14" x2="840.0" y2="506"/><text class="s mid" x="840.0" y="532" style="font-size:16px">0.95</text><line class="grid" x1="1000.0" y1="14" x2="1000.0" y2="506"/><text class="s mid" x="1000.0" y="532" style="font-size:16px">1.00</text><text class="s" x="0" y="532" style="font-size:16px">axis starts at 0.80</text><text class="cap" x="0" y="40">No model (deterministic)</text><text class="h" x="0" y="79.0" style="font-size:20px">Train (fit on itself)</text><text class="s" x="0" y="100.0" style="font-size:16px">149 / 150</text><rect x="360" y="68.0" width="621.8" height="28" rx="5" fill="#1d4ed8"/><text class="h" x="993.8" y="90.0" style="font-size:24px;font-weight:800">0.994</text><text class="h" x="0" y="135.0" style="font-size:20px">Public test</text><text class="s" x="0" y="156.0" style="font-size:16px">76 / 80 · not a clean holdout</text><rect x="360" y="124.0" width="480.6" height="28" rx="5" fill="#1d4ed8"/><text class="h" x="852.6" y="146.0" style="font-size:24px;font-weight:800">0.950</text><text class="sb" x="28" y="188.0" style="font-size:17px">credit<tspan class="s" style="font-weight:400;fill:#4b5563" dx="10">14/15</tspan></text><rect x="360" y="173.0" width="426.7" height="18" rx="4" fill="#5f86ea"/><text class="h" x="798.7" y="188.0" style="font-size:18px;font-weight:800">0.933</text><text class="sb" x="28" y="220.0" style="font-size:17px">financial_position<tspan class="s" style="font-weight:400;fill:#4b5563" dx="10">21/22</tspan></text><rect x="360" y="205.0" width="494.5" height="18" rx="4" fill="#5f86ea"/><text class="h" x="866.5" y="220.0" style="font-size:18px;font-weight:800">0.955</text><text class="sb" x="28" y="252.0" style="font-size:17px">savings<tspan class="s" style="font-weight:400;fill:#4b5563" dx="10">20/20</tspan></text><rect x="360" y="237.0" width="640.0" height="18" rx="4" fill="#5f86ea"/><text class="h" x="1012.0" y="252.0" style="font-size:18px;font-weight:800">1.000</text><text class="sb" x="28" y="284.0" style="font-size:17px">spending<tspan class="s" style="font-weight:400;fill:#4b5563" dx="10">21/23</tspan></text><rect x="360" y="269.0" width="361.7" height="18" rx="4" fill="#5f86ea"/><text class="h" x="733.7" y="284.0" style="font-size:18px;font-weight:800">0.913</text><rect x="-6" y="296" width="1112" height="52" rx="10" fill="#e3ebff"/><text class="h" x="0" y="319.0" style="font-size:20px">Grouped 5-fold CV (train)</text><text class="s" x="0" y="340.0" style="font-size:16px">honest estimate · folds 0.857–0.972</text><rect x="360" y="308.0" width="390.4" height="28" rx="5" fill="#1d4ed8"/><g stroke-linecap="round"><line x1="542.4" y1="322.0" x2="910.4" y2="322.0" stroke="#fff" stroke-width="8"/><line x1="542.4" y1="313.0" x2="542.4" y2="331.0" stroke="#fff" stroke-width="8"/><line x1="910.4" y1="313.0" x2="910.4" y2="331.0" stroke="#fff" stroke-width="8"/><line x1="542.4" y1="322.0" x2="910.4" y2="322.0" stroke="#111827" stroke-width="3"/><line x1="542.4" y1="313.0" x2="542.4" y2="331.0" stroke="#111827" stroke-width="3"/><line x1="910.4" y1="313.0" x2="910.4" y2="331.0" stroke="#111827" stroke-width="3"/></g><text x="374" y="330.0" style="font-size:24px;font-weight:800;fill:#ffffff;font-family:var(--sans)">0.922</text><text class="s" x="926.4" y="320.0" style="font-size:16px">expect the private</text><text class="s" x="926.4" y="340.0" style="font-size:16px">score nearer here</text><text class="cap" x="0" y="376">With a model</text><text class="h" x="0" y="415.0" style="font-size:20px">Public test + Gemini</text><text class="s" x="0" y="436.0" style="font-size:16px">team member's local run · 76 / 80</text><rect x="360" y="404.0" width="482.2" height="28" rx="4" fill="url(#hatch)" stroke="#1d4ed8" stroke-width="2.5"/><text class="h" x="854.2" y="426.0" style="font-size:24px;font-weight:800">0.951</text><text class="h" x="0" y="471.0" style="font-size:20px">Bare model, zero-shot</text><text class="s" x="0" y="492.0" style="font-size:16px">earlier run: no network, not a score</text><rect class="card-wait" x="360" y="460.0" width="640" height="28" rx="8"/><text class="wait mid" x="680.0" y="481.0" style="font-size:20px;font-weight:800">measuring</text></svg>
-<figcaption>No model: false bad = 0, every public-test error is a miss. Gemini run: 1 false bad, 3 misses.<br>Switch off one rule family (MIN_INTEREST): train 0.9943 → 0.9665.</figcaption>
+<svg viewBox="0 0 1100 546" role="img" aria-label="Macro accuracy by evaluation. Horizontal bars on an axis from 0.80 to 1.00. No model: train 0.994, public test 0.950 (credit 0.933, financial_position 0.955, savings 1.000, spending 0.913), grouped five-fold cross-validation 0.922. With Gemini on the public test: 0.951. Bare model zero-shot is still being measured." data-en="Macro accuracy by evaluation. Horizontal bars on an axis from 0.80 to 1.00. No model: train 0.994, public test 0.950 (credit 0.933, financial_position 0.955, savings 1.000, spending 0.913), grouped five-fold cross-validation 0.922. With Gemini on the public test: 0.951. Bare model zero-shot is still being measured." data-ru="Точность по видам проверки. Горизонтальные полосы на шкале от 0,80 до 1,00. Без модели: обучающие 0,994, публичный тест 0,950 (credit 0,933, financial_position 0,955, savings 1,000, spending 0,913), перекрёстная проверка 0,922. С Gemini на публичном тесте: 0,951. Модель без наших правил пока измеряется."><defs><pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#ffffff"/><rect width="5" height="10" fill="#1d4ed8"/></pattern></defs><line class="grid" x1="360.0" y1="14" x2="360.0" y2="506"/><text class="s mid" x="360.0" y="532" style="font-size:16px">0.80</text><line class="grid" x1="520.0" y1="14" x2="520.0" y2="506"/><text class="s mid" x="520.0" y="532" style="font-size:16px">0.85</text><line class="grid" x1="680.0" y1="14" x2="680.0" y2="506"/><text class="s mid" x="680.0" y="532" style="font-size:16px">0.90</text><line class="grid" x1="840.0" y1="14" x2="840.0" y2="506"/><text class="s mid" x="840.0" y="532" style="font-size:16px">0.95</text><line class="grid" x1="1000.0" y1="14" x2="1000.0" y2="506"/><text class="s mid" x="1000.0" y="532" style="font-size:16px">1.00</text><text class="s" x="0" y="532" style="font-size:16px" lang="en">axis starts at 0.80</text><text class="s" x="0" y="532" style="font-size:16px" lang="ru">шкала начинается с 0.80</text><text class="cap" x="0" y="40" lang="en">No model (deterministic)</text><text class="cap" x="0" y="40" lang="ru">Без модели (только правила)</text><text class="h" x="0" y="79.0" style="font-size:20px" lang="en">Train (fit on itself)</text><text class="h" x="0" y="79.0" style="font-size:20px" lang="ru">Обучающие (на них учились)</text><text class="s" x="0" y="100.0" style="font-size:16px">149 / 150</text><rect x="360" y="68.0" width="621.8" height="28" rx="5" fill="#1d4ed8"/><text class="h" x="993.8" y="90.0" style="font-size:24px;font-weight:800">0.994</text><text class="h" x="0" y="135.0" style="font-size:20px" lang="en">Public test</text><text class="h" x="0" y="135.0" style="font-size:20px" lang="ru">Публичный тест</text><text class="s" x="0" y="156.0" style="font-size:16px" lang="en">76 / 80 · not a clean holdout</text><text class="s" x="0" y="156.0" style="font-size:16px" lang="ru">76 / 80 · не чистая проверка</text><rect x="360" y="124.0" width="480.6" height="28" rx="5" fill="#1d4ed8"/><text class="h" x="852.6" y="146.0" style="font-size:24px;font-weight:800">0.950</text><text class="sb" x="28" y="188.0" style="font-size:17px">credit<tspan class="s" style="font-weight:400;fill:#4b5563" dx="10">14/15</tspan></text><rect x="360" y="173.0" width="426.7" height="18" rx="4" fill="#5f86ea"/><text class="h" x="798.7" y="188.0" style="font-size:18px;font-weight:800">0.933</text><text class="sb" x="28" y="220.0" style="font-size:17px">financial_position<tspan class="s" style="font-weight:400;fill:#4b5563" dx="10">21/22</tspan></text><rect x="360" y="205.0" width="494.5" height="18" rx="4" fill="#5f86ea"/><text class="h" x="866.5" y="220.0" style="font-size:18px;font-weight:800">0.955</text><text class="sb" x="28" y="252.0" style="font-size:17px">savings<tspan class="s" style="font-weight:400;fill:#4b5563" dx="10">20/20</tspan></text><rect x="360" y="237.0" width="640.0" height="18" rx="4" fill="#5f86ea"/><text class="h" x="1012.0" y="252.0" style="font-size:18px;font-weight:800">1.000</text><text class="sb" x="28" y="284.0" style="font-size:17px">spending<tspan class="s" style="font-weight:400;fill:#4b5563" dx="10">21/23</tspan></text><rect x="360" y="269.0" width="361.7" height="18" rx="4" fill="#5f86ea"/><text class="h" x="733.7" y="284.0" style="font-size:18px;font-weight:800">0.913</text><rect x="-6" y="296" width="1112" height="52" rx="10" fill="#e3ebff"/><text class="h" x="0" y="319.0" style="font-size:20px" lang="en">Grouped 5-fold CV (train)</text><text class="h" x="0" y="319.0" style="font-size:20px" lang="ru">Перекрёстная проверка</text><text class="s" x="0" y="340.0" style="font-size:16px" lang="en">honest estimate · folds 0.857–0.972</text><text class="s" x="0" y="340.0" style="font-size:16px" lang="ru">честная оценка · части 0.857–0.972</text><rect x="360" y="308.0" width="390.4" height="28" rx="5" fill="#1d4ed8"/><g stroke-linecap="round"><line x1="542.4" y1="322.0" x2="910.4" y2="322.0" stroke="#fff" stroke-width="8"/><line x1="542.4" y1="313.0" x2="542.4" y2="331.0" stroke="#fff" stroke-width="8"/><line x1="910.4" y1="313.0" x2="910.4" y2="331.0" stroke="#fff" stroke-width="8"/><line x1="542.4" y1="322.0" x2="910.4" y2="322.0" stroke="#111827" stroke-width="3"/><line x1="542.4" y1="313.0" x2="542.4" y2="331.0" stroke="#111827" stroke-width="3"/><line x1="910.4" y1="313.0" x2="910.4" y2="331.0" stroke="#111827" stroke-width="3"/></g><text x="374" y="330.0" style="font-size:24px;font-weight:800;fill:#ffffff;font-family:var(--sans)">0.922</text><text class="s" x="926.4" y="320.0" style="font-size:16px" lang="en">expect the private</text><text class="s" x="926.4" y="320.0" style="font-size:16px" lang="ru">на закрытых данных</text><text class="s" x="926.4" y="340.0" style="font-size:16px" lang="en">score nearer here</text><text class="s" x="926.4" y="340.0" style="font-size:16px" lang="ru">ждём ближе к этому</text><text class="cap" x="0" y="376" lang="en">With a model</text><text class="cap" x="0" y="376" lang="ru">С моделью</text><text class="h" x="0" y="415.0" style="font-size:20px" lang="en">Public test + Gemini</text><text class="h" x="0" y="415.0" style="font-size:20px" lang="ru">Публичный тест + Gemini</text><text class="s" x="0" y="436.0" style="font-size:16px" lang="en">team member's local run · 76 / 80</text><text class="s" x="0" y="436.0" style="font-size:16px" lang="ru">запуск участника команды · 76 / 80</text><rect x="360" y="404.0" width="482.2" height="28" rx="4" fill="url(#hatch)" stroke="#1d4ed8" stroke-width="2.5"/><text class="h" x="854.2" y="426.0" style="font-size:24px;font-weight:800">0.951</text><text class="h" x="0" y="471.0" style="font-size:20px" lang="en">Bare model, zero-shot</text><text class="h" x="0" y="471.0" style="font-size:20px" lang="ru">Модель без наших правил</text><text class="s" x="0" y="492.0" style="font-size:16px" lang="en">earlier run: no network, not a score</text><text class="s" x="0" y="492.0" style="font-size:16px" lang="ru">прошлый запуск: не было сети, не оценка</text><rect class="card-wait" x="360" y="460.0" width="640" height="28" rx="8"/><text class="wait mid" x="680.0" y="481.0" style="font-size:20px;font-weight:800" lang="en">measuring</text><text class="wait mid" x="680.0" y="481.0" style="font-size:20px;font-weight:800" lang="ru">измеряем</text></svg>
+<figcaption><span lang="en">No model: false bad = 0, every public-test error is a miss. Gemini run: 1 false bad, 3 misses.<br>Switch off one rule family (MIN_INTEREST): train 0.9943 → 0.9665.</span><span lang="ru">Без модели: ложных bad — 0 (хороший диалог назван плохим), все ошибки на публичном тесте — пропуски (плохой диалог не пойман).<br>Прогон с Gemini: 1 ложный bad, 3 пропуска. Отключили одно семейство правил (MIN_INTEREST): на обучающих 0.9943 → 0.9665.</span></figcaption>
 </figure>
-<p class="ru" lang="ru"><i>Честно: 0,950 — не чистый holdout, ориентир — CV 0,922; голая модель ещё измеряется.</i></p>
 </div></section>
 
 <!-- 8 LIMITS -->
 <section class="slide" id="limits" aria-labelledby="h-lim"><div class="wrap">
-<h2 id="h-lim"><span class="n">8</span>Where it fails, honestly</h2>
+<h2 id="h-lim"><span class="n">8</span><span lang="en">Where it fails, honestly</span><span lang="ru">Где мы ошибаемся — честно</span></h2>
 <div class="cards">
-<div class="cardh"><h3>Meaning, not numbers</h3><p>Public 4, train 1: all semantic.</p></div>
-<div class="cardh"><h3>New expert rules</h3><p>Without a model, not found. Rediscovery: <span class="measuring">measuring</span></p></div>
-<div class="cardh"><h3>Not a clean holdout</h3><p>Seen in design. Expect nearer 0.922.</p></div>
+<div class="cardh"><h3><span lang="en">Meaning, not numbers</span><span lang="ru">Смысл, а не числа</span></h3><p><span lang="en">Public 4, train 1: all semantic.</span><span lang="ru">Публичный тест: 4, обучающие: 1 — все про смысл фраз.</span></p></div>
+<div class="cardh"><h3><span lang="en">New expert rules</span><span lang="ru">Новые требования эксперта</span></h3><p><span lang="en">Without a model, not found. Rediscovery: <span class="measuring">measuring</span></span><span lang="ru">Без модели не находятся. Находит ли их модель: <span class="measuring">измеряем</span></span></p></div>
+<div class="cardh"><h3><span lang="en">Not a clean holdout</span><span lang="ru">Не чистая проверка</span></h3><p><span lang="en">Seen in design. Expect nearer 0.922.</span><span lang="ru">Мы видели этот тест при разработке. Ждём ближе к 0.922.</span></p></div>
 </div>
 <div class="audit">
-<h3>Blind audit: two defects, both fixed.</h3>
+<h3><span lang="en">Blind audit: two defects, both fixed.</span><span lang="ru">Слепая проверка нашла два дефекта, оба исправлены.</span></h3>
 <ul>
-<li><b>Empty dialog:</b> eval crashed; now returns a verdict.</li>
-<li><b>Leading “Hello.”:</b> flipped 3 verdicts. Rules now follow roles.</li>
-<li class="wait">Post-fix re-audit: <span class="measuring">measuring</span></li>
+<li><span lang="en"><b>Empty dialog:</b> eval crashed; now returns a verdict.</span><span lang="ru"><b>Пустой диалог:</b> eval падал; теперь выдаёт вердикт.</span></li>
+<li><span lang="en"><b>Leading “Hello.”:</b> flipped 3 verdicts. Rules now follow roles.</span><span lang="ru"><b>«Hello.» в начале:</b> менялись 3 вердикта. Теперь правила смотрят на роль, а не на номер реплики.</span></li>
+<li class="wait"><span lang="en">Post-fix re-audit: <span class="measuring">measuring</span></span><span lang="ru">Повторная проверка после исправлений: <span class="measuring">измеряем</span></span></li>
 </ul>
 </div>
-<p class="ru" lang="ru"><i>Ошибки — в смысле, а не в числах; слепой аудит нашёл два дефекта, оба исправлены и покрыты тестами.</i></p>
 </div></section>
 
 <!-- 9 TRY IT -->
 <section class="slide" id="try" aria-labelledby="h-try"><div class="wrap">
-<h2 id="h-try"><span class="n">9</span>Try it</h2>
-<p class="lead">Docker containers get no API key. Start each adapt with an empty artifacts folder. Bring your own example: a dialog and a context as two JSON files.</p>
+<h2 id="h-try"><span class="n">9</span><span lang="en">Try it</span><span lang="ru">Запуск</span></h2>
+<p class="lead"><span lang="en">Docker containers get no API key. Start each adapt with an empty artifacts folder. Bring your own example: a dialog and a context as two JSON files.</span><span lang="ru">Контейнеры Docker не получают ключ API. Каждый adapt запускайте с пустой папкой artifacts. Можно принести свой пример: диалог и данные банка (context) в двух JSON-файлах.</span></p>
 <pre>mkdir -p out/public_input out/public_artifacts out/public_output
 python3 src/prepare_inputs.py --train data/public_train.csv --test data/public_test.csv --out-dir out/public_input
 docker build -t plata-judge .</pre>
 <div class="cmds">
-<div class="cmd"><h3><span class="n">1</span>Adapt</h3>
+<div class="cmd"><h3><span class="n">1</span><span lang="en">Adapt</span><span lang="ru">Adapt (обучение)</span></h3>
 <pre>docker run --rm \
   -v "$PWD/out/public_input:/input:ro" \
   -v "$PWD/out/public_artifacts:/artifacts" \
   plata-judge adapt</pre></div>
-<div class="cmd"><h3><span class="n">2</span>Eval</h3>
+<div class="cmd"><h3><span class="n">2</span><span lang="en">Eval</span><span lang="ru">Eval (оценка)</span></h3>
 <pre>docker run --rm \
   -v "$PWD/out/public_input:/input:ro" \
   -v "$PWD/out/public_artifacts:/artifacts:ro" \
   -v "$PWD/out/public_output:/output" \
   plata-judge eval</pre></div>
-<div class="cmd"><h3><span class="n">3</span>Demo, one command</h3>
+<div class="cmd"><h3><span class="n">3</span><span lang="en">Demo, one command</span><span lang="ru">Демо — одна команда</span></h3>
 <pre>python3 -S demo/judge_demo.py \
   --id 100a727946a7a45a72c46771e608090f \
   --artifacts out/public_artifacts</pre></div>
-<div class="cmd"><h3><span class="n">+</span>Your own example</h3>
+<div class="cmd"><h3><span class="n">+</span><span lang="en">Your own example</span><span lang="ru">Свой пример</span></h3>
 <pre>python3 -S demo/judge_demo.py \
   --dialog-file /tmp/plata-dialog.json \
   --context-file /tmp/plata-context.json \
@@ -517,16 +511,21 @@ docker build -t plata-judge .</pre>
 [{"role":"user","content":"How much money?"},{"role":"assistant","content":"You have 100 MXN."}]
 # /tmp/plata-context.json
 {"today":"2026-01-10","accounts":[{"product":"Cash","balance":100,"current_debt":20}]}</pre>
-<footer class="src">Code and docs: <a href="https://github.com/orlanqur/metalearning-llmaaj">github.com/orlanqur/metalearning-llmaaj</a></footer>
-<p class="ru" lang="ru"><i>Три команды; если судья даст свой диалог и context — запускаем сразу.</i></p>
+<footer class="src"><span lang="en">Code and docs</span><span lang="ru">Код и документация</span>: <a href="https://github.com/orlanqur/metalearning-llmaaj">github.com/orlanqur/metalearning-llmaaj</a></footer>
 </div></section>
 
 </main>
 
 <script>
 (function () {
+  var KEY = 'approach-lang';
+  var TITLES = {
+    en: 'Approach: a judge that learns from an expert',
+    ru: 'Как это работает: судья, который учится у эксперта'
+  };
   var secs = [].slice.call(document.querySelectorAll('section.slide'));
-  var links = [].slice.call(document.querySelectorAll('nav.top a'));
+  var links = [].slice.call(document.querySelectorAll('nav.top ul a'));
+  var buttons = [].slice.call(document.querySelectorAll('.langsw button'));
   function current() {
     var y = window.scrollY + window.innerHeight * 0.35, c = 0;
     for (var i = 0; i < secs.length; i++) { if (secs[i].offsetTop <= y) c = i; }
@@ -538,6 +537,32 @@ docker build -t plata-judge .</pre>
       if (i === c) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
     });
   }
+  function apply(l) {
+    var root = document.documentElement;
+    root.setAttribute('data-lang', l);
+    root.lang = l;
+    document.title = TITLES[l];
+    [].forEach.call(document.querySelectorAll('svg[role="img"]'), function (s) {
+      var v = s.getAttribute('data-' + l);
+      if (v) s.setAttribute('aria-label', v);
+    });
+    buttons.forEach(function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-set') === l ? 'true' : 'false');
+    });
+  }
+  function choose(l) {
+    var c = current();
+    apply(l);
+    try { localStorage.setItem(KEY, l); } catch (e) {}
+    secs[c].scrollIntoView();
+    mark();
+  }
+  var start = document.documentElement.getAttribute('data-lang');
+  apply(start === 'ru' ? 'ru' : 'en');
+  document.querySelector('.langsw').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-set]');
+    if (b) choose(b.getAttribute('data-set'));
+  });
   window.addEventListener('scroll', mark, { passive: true });
   window.addEventListener('resize', mark);
   document.addEventListener('keydown', function (e) {
