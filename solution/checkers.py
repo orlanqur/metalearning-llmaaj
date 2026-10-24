@@ -8,7 +8,7 @@ from functools import wraps
 import fnmatch
 import re
 
-from .facts import NUM, contains, dates_in, money, month_in, norm, number
+from .facts import NUM, contains, dates_in, money, month_in, norm, number, opening_exchange
 
 
 def evidence(facts, reason, **details):
@@ -33,14 +33,7 @@ def values(facts):
 
 
 def opening_request(facts):
-    """All user text before the first assistant reply, so a greeting turn does not hide the request."""
-    parts = []
-    for m in facts.conversation:
-        if m["role"] == "assistant":
-            break
-        if m["role"] == "user":
-            parts.append(norm(m["content"]))
-    return "\n".join(parts) or next((norm(m["content"]) for m in facts.conversation if m["role"] == "user"), "")
+    return opening_exchange(facts)[0]
 
 
 def known(facts, field):
@@ -59,10 +52,10 @@ def applicable(facts, condition):
 @checker
 def poison_number_present(f, p):
     kind = p["kind"]
-    if not f.assistant_turns:
+    _, first = opening_exchange(f)
+    if first is None:
         return None
     ns = values(f)
-    first = f.assistant_turns[0]
     if p.get("scope") == "first_amount":
         ns = first["money"][:1]
     wrong = f.poison.get(kind, [])
@@ -137,10 +130,10 @@ def wrong_period(f, p):
             if not month_in(answer, int(previous[-2:])) and previous not in answer:
                 return evidence(f, "Last-month answer omits the preceding calendar month", expected_month=previous, reply=answer)
     elif p["kind"] == "default_three_months":
-        user = opening_request(f)
-        if not re.search(p["request_pattern"], user) or len(f.last3) != 3:
+        user, reply = opening_exchange(f)
+        if reply is None or not re.search(p["request_pattern"], user) or len(f.last3) != 3:
             return None
-        first = f.assistant_turns[0]["normalized"]
+        first = reply["normalized"]
         answer = re.split(p["offer_pattern"], first)[0]
         endpoints = [f.last3[0]["month"], f.last3[-1]["month"]]
         covered = all(month_in(answer, int(m[-2:])) or m in answer for m in endpoints)
@@ -199,11 +192,10 @@ def lexical_predicate(f, p):
 
 @checker
 def amount_mismatch(f, p):
-    if not f.assistant_turns:
+    user, first = opening_exchange(f)
+    if first is None:
         return None
     kind = p["kind"]
-    user = opening_request(f)
-    first = f.assistant_turns[0]
     if kind == "remaining_debt":
         cs = f.expected["credit_statement"]
         if "total_debt" not in cs:

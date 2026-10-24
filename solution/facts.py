@@ -20,6 +20,21 @@ def norm(text):
     return re.sub(r"\s+", " ", text.lower().replace("ё", "е").replace("*", "")).strip()
 
 
+def opening_exchange(facts):
+    """Return the opening user request and its reply, skipping greeting-only turns."""
+    parts = []
+    for i, message in enumerate(facts.conversation):
+        if message["role"] == "user":
+            content = norm(message["content"])
+            if content and not re.fullmatch(
+                    r"[\W_]*(?:hola|hello|hi|hey|привет|здравствуйте|добрый день|"
+                    r"buenos días|buenas tardes|buenas noches)[\W_]*", content):
+                parts.append(content)
+        elif message["role"] == "assistant" and parts:
+            return "\n".join(parts), next(t for t in facts.assistant_turns if t["index"] == i)
+    return "\n".join(parts), None
+
+
 def number(text):
     """Parse grouped and decimal formats; 21.6k is deliberately unsupported."""
     value = re.sub(r"\s", "", text)

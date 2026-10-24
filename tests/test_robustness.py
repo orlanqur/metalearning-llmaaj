@@ -7,9 +7,12 @@ import tempfile
 import unittest
 
 from solution.checkers import opening_request
+from solution.eval import predict
 from solution.facts import FactSheet
 from solution.io import load_rows
+from solution.rules_library import instantiate
 from solution.verify import verify
+from src.common import load_dataset
 
 
 def write_rows(rows):
@@ -45,6 +48,19 @@ class RobustnessTests(unittest.TestCase):
                  dict(role="assistant", content="You spent 10 MXN.")]
         facts = FactSheet.from_row(dict(item_id="x", topic="spending", context=dict(today="2026-01-10"), conversation=convo))
         self.assertIn("spend", opening_request(facts))
+
+    def test_greeting_exchange_preserves_all_public_test_verdicts(self):
+        root = Path(__file__).resolve().parents[1]
+        train = load_dataset(root / "data/public_train.csv", require_labels=True)
+        rows = load_dataset(root / "data/public_test.csv")
+        rules = verify(instantiate(train), train)
+        greeting = [dict(role="user", content="Hola"),
+                    dict(role="assistant", content="¡Hola! ¿En qué te puedo ayudar?")]
+        self.assertEqual(len(rows), 80)
+        for row in rows:
+            with self.subTest(item_id=row["item_id"]):
+                changed = dict(row, conversation=greeting + row["conversation"])
+                self.assertEqual(predict(changed, rules), predict(row, rules))
 
     def test_concurrent_verify_matches_sequential(self):
         rows = [dict(item_id=f"r{i}", topic="savings", label="bad" if i % 2 else "good", context=dict(today="2026-01-10"),
