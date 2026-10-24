@@ -195,7 +195,7 @@ Public-test breakdown; accuracies are calculated from the reported counts:
 | GPT-6.1 Sol | 0.938 | 1 | found 4/4 | $1.47 |
 | Gemini 4 (team member's run) | 0.951 | 1 | not tested | — |
 | gpt-oss-120b | 0.925 | 2 | not found (from scratch) | $0.07 |
-| Gemma 4 31B | 0.938 | 1 | phrased it, rejected by the verifier | $0.28 |
+| Gemma 4 31B | 0.938 | 1 | phrased it, rejected by the verifier | $0.28 (its adapt run) |
 
 Takeaway: open-weight Qwen matches the closed default on accuracy and on rule
 discovery at roughly 1/20 of the cost; it needs the longer per-request deadline.
