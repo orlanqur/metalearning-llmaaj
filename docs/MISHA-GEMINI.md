@@ -1,22 +1,22 @@
-# Михаил остановился здесь
+# Mikhail stopped here
 
-24.10.2026, 14:25 CEST. Ветка `orlanqur/plata-clean-work`.
+24.10.2026, 14:25 CEST. Branch `orlanqur/plata-clean-work`.
 
-Я довёл до конца один публичный прогон с Gemini и записал цифры. README форка не писал: в корне по-прежнему контракт организаторов. Питч не брал, его уже собрали в `TEAM/PITCH.md`. Сдачу в OrganizerHQ, SHA и чеклист не делал.
+I completed one public run with Gemini and recorded the numbers. I did not write the fork README: the root still contains the organizers' contract. I did not take on the pitch; it had already been assembled in `TEAM/PITCH.md`. I did not handle the OrganizerHQ submission, SHA, or checklist.
 
-Код выбора провайдера уже лежит в коммите `c7173a8`. Этот файл ничего в `solution/` не меняет. Ключ из `.env` и каталог `out/` в git не входят: оба в `.gitignore`.
+The provider-selection code is already in commit `c7173a8`. This file changes nothing in `solution/`. The key from `.env` and the `out/` directory are not tracked in git: both are in `.gitignore`.
 
-## Что именно поменялось в коде
+## What exactly changed in the code
 
-`solution/llm.py` выбирает провайдера так. Если в конструктор ключ не передали, `GEMINI_API_KEY` задан, а `OPENROUTER_API_KEY` пустой, клиент идёт на `https://generativelanguage.googleapis.com/v1beta/openai/`. Модель берётся из `INDUCTION_MODEL`, иначе из `GEMINI_MODEL`, иначе `gemini-4-argon`. `EVAL_MODEL`, если задан, перекрывает её на оценке.
+`solution/llm.py` selects the provider as follows. If no key is passed to the constructor, `GEMINI_API_KEY` is set, and `OPENROUTER_API_KEY` is empty, the client uses `https://generativelanguage.googleapis.com/v1beta/openai/`. The model comes from `INDUCTION_MODEL`, otherwise from `GEMINI_MODEL`, otherwise `gemini-4-argon`. `EVAL_MODEL`, if set, overrides it during evaluation.
 
-Если ключ OpenRouter есть, остаётся прежний путь, даже когда ключ Gemini тоже лежит в окружении. Явный ключ, переданный в конструктор из теста, тоже не переключается. Поэтому прогон Аркадия через OpenRouter этим коммитом не подменяется.
+If an OpenRouter key is present, the previous path remains, even when a Gemini key is also in the environment. An explicit key passed to the constructor by a test does not switch providers either. This commit therefore does not redirect Arkady's run through OpenRouter.
 
-Живой короткий запрос к `gemini-4-argon` прошёл с первого раза и вернул JSON схемы `verdict` / `quote` / `reason`.
+A short live request to `gemini-4-argon` succeeded on the first attempt and returned JSON with the `verdict` / `quote` / `reason` schema.
 
-## Как прогон устроен
+## How the run works
 
-Официальный локальный порядок такой:
+The official local sequence is:
 
 ```
 python3 src/prepare_inputs.py --train data/public_train.csv --test data/public_test.csv --out-dir out/in
@@ -25,56 +25,56 @@ python3 -m solution eval --input out/in/test.jsonl --artifacts out/art-gemini --
 python3 src/evaluate.py --test data/public_test.csv --predictions out/pred-gemini.csv
 ```
 
-`adapt` смотрит только на 150 размеченных обучающих диалогов. Метки публичного теста в него не попадают.
+`adapt` sees only the 150 labeled training conversations. Public test labels are not passed to it.
 
-Сначала библиотека собирает шаблоны правил из схемы train. Потом каждое правило прогоняется по всем диалогам своей темы. Правило становится `active`, только если есть хотя бы одно верное пойманое нарушение, ноль ложных и ни одной непроверенной строки. Иначе оно остаётся `boundary` и на тесте молчит.
+First, the library builds rule templates from the train schema. Then each rule is run against every conversation in its topic. A rule becomes `active` only if it has at least one correctly detected violation, zero false positives, and no unchecked rows. Otherwise it remains `boundary` and does not contribute on the test set.
 
-Смысловой шаблон спрашивает модель: да, нет или неизвестно, плюс дословная цитата из реплики ассистента. Цитата, которой нет в тексте, превращается в неизвестно. Неизвестно нарушением не считается. Один такой ответ на всём train уводит всё правило в `boundary`.
+A semantic template asks the model for yes, no, or unknown, plus a verbatim quote from an assistant response. A quote absent from the text makes the result unknown. Unknown does not count as a violation. A single such answer anywhere in train moves the entire rule to `boundary`.
 
-После шаблонов `induce` смотрит диалоги, которые активные правила объяснили неверно, и просит модель предложить новое правило. Новое правило проходит ту же проверку на всём train.
+After the templates, `induce` examines conversations that the active rules explained incorrectly and asks the model to propose a new rule. The new rule undergoes the same check on the full train set.
 
-`eval` читает уже записанный `rules_spec.json`. Идёт по активным правилам в порядке приоритета. Первое подтверждённое нарушение даёт `bad`. Граничные правила не голосуют. `src/evaluate.py` сравнивает `predictions.csv` с публичными метками и пишет `macro_topic_accuracy`.
+`eval` reads the saved `rules_spec.json`. It goes through active rules in priority order. The first confirmed violation yields `bad`. Boundary rules do not vote. `src/evaluate.py` compares `predictions.csv` with public labels and writes `macro_topic_accuracy`.
 
-Отсюда следует практическая деталь. Артефакты, собранные без ключа, нельзя «дооценить» тем же ключом. В том прогоне все 8 смысловых правил остались `boundary` с причиной `not_checked`, вызовов модели на тесте было 0, скор остался 0.9502. Чтобы модель вообще участвовала, `adapt` нужно запустить заново. Я так и сделал, в отдельный каталог `out/art-gemini`, не в `out/art` и не в `out/step3`.
+This has a practical consequence. Artifacts built without a key cannot be “evaluated further” using that key. In that run, all 8 semantic rules remained `boundary` with reason `not_checked`, there were 0 model calls on test, and the score remained 0.9502. For the model to participate at all, `adapt` must be rerun. I did exactly that, in a separate directory, `out/art-gemini`, not in `out/art` or `out/step3`.
 
-## Почему прогон дошёл до цифры
+## Why the run produced a score
 
-`gemini-4-argon` отвечал структурированным JSON. За 35 минут `adapt` сделал 302 успешных вызова и 304 сетевых; два запроса сорвались и ушли в повтор, предохранитель после этого не открылся. `model_status` в манифесте: `enabled`.
+`gemini-4-argon` returned structured JSON. Over 35 minutes, `adapt` made 302 successful calls and 304 network calls; two requests failed and were retried, and the circuit breaker did not open afterward. `model_status` in the manifest: `enabled`.
 
-Из восьми смысловых шаблонов шесть стали активными, у всех precision 1:
+Of the eight semantic templates, six became active, all with precision 1:
 
-- `credit.MIN_INTEREST.semantic`, 4 верных нарушения
+- `credit.MIN_INTEREST.semantic`, 4 correctly detected violations
 - `credit.NONANSWER.semantic`, 7
 - `financial_position.NONANSWER.semantic`, 6
 - `savings.ACTION.semantic`, 1
 - `savings.FIXED_LOCK.semantic`, 4
 - `spending.DENIAL.semantic`, 3
 
-Два шаблона «ассистент не ответил на вопрос» остались границей из-за ложных `bad`: `savings.NONANSWER.semantic` (1 верное и 1 ложное) и `spending.NONANSWER.semantic` (6 верных и 2 ложных).
+Two “the assistant did not answer the question” templates remained boundary rules due to false `bad` verdicts: `savings.NONANSWER.semantic` (1 true positive and 1 false positive) and `spending.NONANSWER.semantic` (6 true positives and 2 false positives).
 
-На остатке был один обучающий диалог, `5f9ae3d8d52eaf3dade5beee0fce7f0e`, тема spending. Модель предложила правило про среднее за три полных месяца, `spending.induced.563a7b934d0064b5`. Проверка приняла его: 7 верных, 0 ложных. Второе предложенное правило, про вычитание возвратов, не активировалось: две обучающие строки модель не смогла проверить.
+One training conversation remained in the residuals, `5f9ae3d8d52eaf3dade5beee0fce7f0e`, topic spending. The model proposed a rule about the average over three full months, `spending.induced.563a7b934d0064b5`. Verification accepted it: 7 true positives, 0 false positives. The second proposed rule, about subtracting refunds, was not activated: the model could not check two training rows.
 
-Повторная разметка тех же 150 обучающих диалогов после этого дала macro 1.0, ошибок 0. Это не тест. Модель видела эти метки, пока правила отбирались.
+Relabeling the same 150 training conversations then yielded macro 1.0, with 0 errors. This is not a test. The model saw these labels while the rules were being selected.
 
-Дальше `eval` по 80 публичным диалогам сделал 77 вызовов, все успешные. Ложных обрывов не было.
+Next, `eval` on 80 public conversations made 77 calls, all successful. There were no spurious interruptions.
 
-## Что получилось на публичном тесте
+## Public test results
 
-Официальный `src/evaluate.py`:
+Official `src/evaluate.py`:
 
-| | без модели | Gemini, этот прогон |
+| | no model | Gemini, this run |
 |---|---:|---:|
 | macro_topic_accuracy | 0.9502 | 0.9507 |
-| верных | 76/80 | 76/80 |
-| матрица good/bad | 50 верных good, 0 ложных bad, 4 пропуска, 26 верных bad | 49, 1, 3, 27 |
+| correct | 76/80 | 76/80 |
+| good/bad matrix | 50 correct good, 0 false bad, 4 misses, 26 correct bad | 49, 1, 3, 27 |
 
-По темам с моделью: credit 14/15, financial_position 22/22, savings 20/20, spending 20/23.
+By topic with the model: credit 14/15, financial_position 22/22, savings 20/20, spending 20/23.
 
-Без модели financial_position была 21/22, spending 21/23. Модель закрыла пропуск по финансовой позиции и добавила одну ложную «плохую» по тратам. Число верных ответов поэтому не сдвинулось, macro вырос на 0.0005, потому что темы усредняются отдельно.
+Without the model, financial_position was 21/22 and spending 21/23. The model caught a missed violation in financial position and added one false “bad” in spending. The number of correct answers therefore stayed the same; macro increased by 0.0005 because topics are averaged separately.
 
-Пять строк, где хоть один из двух прогонов не совпал с меткой:
+The five rows where at least one of the two runs disagreed with the label:
 
-| item_id | тема | метка | Gemini | без модели |
+| item_id | topic | label | Gemini | no model |
 |---|---|---|---|---|
 | `9273f1d3f88303616b4e658ef581c389` | financial_position | bad | bad | good |
 | `f97db6875c365928b32f79930721b834` | spending | good | bad | good |
@@ -82,14 +82,14 @@ python3 src/evaluate.py --test data/public_test.csv --predictions out/pred-gemin
 | `73380ff8277a4289397c9acadd797641` | spending | bad | good | good |
 | `ac17233bc6736cf20601c097638fe414` | credit | bad | good | good |
 
-`15b42e35` так и остался пропуском.
+`15b42e35` remained a miss.
 
-Токены, как их вернул API, без денежной оценки: adapt 1 446 334 prompt и 20 333 completion, eval 333 660 prompt и 4 222 completion. Поле стоимости провайдер не заполнил.
+Tokens as returned by the API, without a monetary estimate: adapt 1 446 334 prompt and 20 333 completion, eval 333 660 prompt and 4 222 completion. The provider did not populate the cost field.
 
-## Чего этой цифрой нельзя закрыть
+## What this score cannot establish
 
-Организаторы возьмут коммит форка и сами запустят `adapt` на приватном обучении, с пустого каталога артефактов. Скрытых правил в публичном тесте нет, так что 0.9507 ничего не говорит про них. Слепая проверка по группам train, уже в `docs/BLIND-EVAL.md`, даёт 0.922; я её не пересчитывал.
+The organizers will take the fork commit and run `adapt` themselves on private training data, starting with an empty artifacts directory. The public test contains no hidden rules, so 0.9507 says nothing about them. The blind evaluation grouped by train contexts, already in `docs/BLIND-EVAL.md`, gives 0.922; I did not rerun it.
 
-Прогон шёл локально, не в Docker. Модель была закрытая Gemini, потому что в моём `.env` нет ключа OpenRouter. Командный дефолт для сдачи другой: открытая модель через OpenRouter. В `docs` шага 3 живого ответа OpenRouter на момент 14:05 ещё не было, там падение на DNS. Если в контейнере организаторов ключа не окажется, код вернётся к детерминированным правилам и к 0.9502, это уже проверено отдельно, в том числе контейнером без сети.
+The run was local, not in Docker. The model was closed-source Gemini because my `.env` has no OpenRouter key. The team's submission default is different: an open model through OpenRouter. In the step 3 `docs`, there was still no live OpenRouter response as of 14:05; that run failed at DNS. If the organizers' container has no key, the code will fall back to deterministic rules and 0.9502; this has already been checked separately, including in a container without network access.
 
-Локальные файлы прогона, если они ещё на диске: `out/art-gemini/`, `out/pred-gemini.csv`, `out/score-gemini.json`, `out/adapt-gemini.log`. В форк они не коммитятся.
+Local run files, if they are still on disk: `out/art-gemini/`, `out/pred-gemini.csv`, `out/score-gemini.json`, `out/adapt-gemini.log`. They are not committed to the fork.

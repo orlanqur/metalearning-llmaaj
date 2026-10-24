@@ -1,3 +1,4 @@
+> Internal working report, written in Russian during the hackathon. The judge-facing documentation is README.md, docs/APPROACH.html, docs/BLIND-EVAL.md, docs/DOCKER.md and docs/SECURITY.md.
 Готово. Демо, README с тремя командами и реальным выводом, один тест и [10-строчный отчёт](docs/SOL-DEMO.md) добавлены.
 
 ```sh

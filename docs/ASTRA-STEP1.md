@@ -1,3 +1,4 @@
+> Internal working report, written in Russian during the hackathon. The judge-facing documentation is README.md, docs/APPROACH.html, docs/BLIND-EVAL.md, docs/DOCKER.md and docs/SECURITY.md.
 # ШАГ 1 — детерминированная основа Plata
 
 Дата: 2026-10-24. Язык входа: `original` (исходные многоязычные диалоги).

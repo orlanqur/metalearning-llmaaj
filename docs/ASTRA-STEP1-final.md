@@ -1,3 +1,4 @@
+> Internal working report, written in Russian during the hackathon. The judge-facing documentation is README.md, docs/APPROACH.html, docs/BLIND-EVAL.md, docs/DOCKER.md and docs/SECURITY.md.
 Шаг 1 готов. Реализованы `solution/`, adapt/eval, артефакты и конфигурационные файлы.
 
 - **Public test:** macro accuracy **0.95023**, 76/80 — цель выполнена.

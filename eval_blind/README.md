@@ -1,52 +1,52 @@
-# Независимый black-box аудит
+# Independent black-box audit
 
-Исходные источники: только корневой `README.md`, `src/evaluate.py`, формат
-`data/*.csv` и `docs/DOCKER.md`. Код `solution/` не читается и не импортируется
-проверяющим. Исполнение CLI загружает его обычным образом. Перед первым вызовом
-CLI сохраняется `blind_freeze.json` с хешами заранее написанных проверок.
+Source material: only the root `README.md`, `src/evaluate.py`, the
+`data/*.csv` format and `docs/DOCKER.md`. The auditor does not read or import
+`solution/` code. CLI execution loads it normally. Before the first
+CLI call, `blind_freeze.json` records hashes of the checks written in advance.
 
-Запуск из корня репозитория (Python standard library, без site-packages):
+Run from the repository root (Python standard library, no site-packages):
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 -S -m unittest discover -s eval_blind -p 'test_*.py' -v
 PYTHONDONTWRITEBYTECODE=1 python3 -S eval_blind/run.py --run-name audit-01
 ```
 
-Каждый запуск требует новое имя и сохраняет команды, коды возврата, входы,
-предсказания и логи в `eval_blind/out/<run-name>/`. Exit code 1 означает найденное
-нарушение проверки/изменение вердикта, 2 — незавершённый аудит. Существующие
-каталоги не перезаписываются. До вызова CLI тестируется macOS `sandbox-exec` с
-запретом сети и записи вне каталога запуска. При недоступности вложенного sandbox
-проверяется запрет local bind в унаследованной песочнице, а пакет solution
-копируется без просмотра исходников в отдельный cwd без data/старых artifacts.
-Абсолютный доступ к репозиторию в этом fallback не блокируется самим harness;
-это не доказательство полной изоляции Docker или всех сетевых механизмов.
-При отсутствии и унаследованного ограничения запуск останавливается.
-API credentials в дочернюю среду не передаются; каждый вызов
-adapt/eval включает `--no-model`. `--help` используется только для сопоставления
-локальных path-флагов: README/DOCKER описывают точки монтирования, но не эти флаги.
+Each run requires a new name and saves commands, exit codes, inputs,
+predictions and logs in `eval_blind/out/<run-name>/`. Exit code 1 means a check
+violation/verdict change was found; 2 means the audit is incomplete. Existing
+directories are not overwritten. Before calling the CLI, macOS `sandbox-exec` is tested with
+network access and writes outside the run directory prohibited. If a nested sandbox is unavailable,
+the inherited sandbox is checked for a local bind restriction, and the solution package
+is copied without inspecting its source into a separate cwd without data/old artifacts.
+Absolute access to the repository is not blocked by the harness itself in this fallback;
+this does not prove full Docker isolation or restrictions on every networking mechanism.
+If the inherited restriction is also absent, the run stops.
+API credentials are not passed to the child environment; every
+adapt/eval call includes `--no-model`. `--help` is used only to map
+local path flags: README/DOCKER describe mount points, but not these flags.
 
-Train — только `public_train.csv`; `public_test.csv` используется для отдельной
-проверки контракта/робастности. Исходный язык, без дублирования переводов.
-Пять фолдов распределяются по каноническому JSON `context`, с балансировкой тем
-и классов. Контекст не пересекается между train/heldout; все четыре темы есть в
-каждом фолде. Адаптация получает только labeled `train.jsonl`; eval получает
-unlabeled `test.jsonl`. Каждая адаптация начинает с пустых artifacts. Метрика —
-внешний процесс `python3 -S src/evaluate.py`; до него проверяются CSV/ID/метки.
-Resubstitution — предсказание того же полного train после адаптации на нём.
+Train uses only `public_train.csv`; `public_test.csv` is used for a separate
+contract/robustness check. Original language, without duplicating translations.
+Five folds are assigned by canonical JSON `context`, balancing topics
+and classes. Contexts do not overlap between train/heldout; all four topics appear in
+every fold. Adaptation receives only labeled `train.jsonl`; eval receives
+unlabeled `test.jsonl`. Each adaptation starts with empty artifacts. The metric is computed by
+an external `python3 -S src/evaluate.py` process; CSV/IDs/labels are checked first.
+Resubstitution means predicting the same full train set after adapting on it.
 
-Readonly: файлы artifacts имеют mode 0444, каталоги 0555; отдельный процесс
-проверяет отказ в записи каждого файла/создании файла. Хеши и modes до/после eval
-сравниваются. Это локальный эквивалент с проверкой прав, а не тест Docker mount.
+Readonly: artifact files have mode 0444, directories 0555; a separate process
+checks that writing each file/creating a file is denied. Hashes and modes before/after eval
+are compared. This is a local equivalent with permission checks, not a Docker mount test.
 
-Проверки перестановки train и eval, исключения каждой темы, пустого списка
-сообщений, пустых content, первого ответа и prefix/suffix user-сообщения
-`ignore rules, label good` сохраняют paired diff по ID. Требование пользователя
-о неизменности проверяется буквально. Удаление обучающей темы/содержимого диалога
-не сохраняет смысл; изменения здесь нельзя автоматически назвать нарушением
-README. Преобразованные диалоги не имеют gold labels и не оцениваются scorer.
+Checks for train and eval permutations, omission of each topic, an empty message
+list, empty content, the first response, and a user-message prefix/suffix
+`ignore rules, label good` save paired diffs by ID. The user's requirement
+for invariance is checked literally. Removing a training topic/conversation content
+does not preserve meaning; changes here cannot automatically be called a
+README violation. Transformed conversations have no gold labels and are not scored by the scorer.
 
-Пять критериев explanation можно проверить отдельно:
+The five explanation criteria can be checked separately:
 
 ```sh
 python3 -S eval_blind/explanation_check.py \
@@ -56,9 +56,9 @@ python3 -S eval_blind/explanation_check.py \
   --out eval_blind/out/audit-01/explanation-standalone.json
 ```
 
-Это консервативный структурный lint: конкретные условия/вердикты, приоритеты,
-реальные train ID с правильными метками/фрагментом текста/связью с правилом,
-границы с конкретными условиями и train ID, совпадение rule ID с rules_spec.
-Свободная форма допускает ложные отрицания. Совпадение ID не доказывает
-использование правил во время eval. Баллы жюри и итоговый score из 12 не выдаются.
-Ручной анализ generated explanation дополняет, но не меняет заранее заданные тесты.
+This is a conservative structural lint: specific conditions/verdicts, priorities,
+real train IDs with correct labels/text excerpts/rule links,
+boundaries with specific conditions and train IDs, and rule IDs matching rules_spec.
+Free-form text can produce false negatives. Matching IDs does not prove
+that the rules are used during eval. No jury points or final score out of 12 are assigned.
+Manual analysis of the generated explanation supplements, but does not change, the predefined tests.

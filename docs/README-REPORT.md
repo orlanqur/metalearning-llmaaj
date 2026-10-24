@@ -1,3 +1,4 @@
+> Internal working report, written in Russian during the hackathon. The judge-facing documentation is README.md, docs/APPROACH.html, docs/BLIND-EVAL.md, docs/DOCKER.md and docs/SECURITY.md.
 # README report — 2026-10-24
 - English README: 247 lines; all requested sections, relative links, Docker/local/demo commands, model/license and repository map filled.
 - Results filled: train 0.9943 (149/150), no-model public 0.9502 (76/80), per-topic counts/accuracies, grouped CV 0.922.

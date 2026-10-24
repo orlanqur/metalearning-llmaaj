@@ -1,3 +1,4 @@
+> Internal working report, written in Russian during the hackathon. The judge-facing documentation is README.md, docs/APPROACH.html, docs/BLIND-EVAL.md, docs/DOCKER.md and docs/SECURITY.md.
 # Docker delivery report
 
 Date: 2026-10-24

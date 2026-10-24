@@ -1,3 +1,4 @@
+> Internal working report, written in Russian during the hackathon. The judge-facing documentation is README.md, docs/APPROACH.html, docs/BLIND-EVAL.md, docs/DOCKER.md and docs/SECURITY.md.
 # Решение трека Plata: судья, который сам выводит правила эксперта
 
 Рабочая папка решения — этот форк. Исходные материалы анализа: `../analysis/` (отчёты Astra и Argon, ручной судья на правилах), `../prep/` (FAQ, планы). Контракт задачи — `README.md` в корне.

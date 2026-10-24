@@ -1,3 +1,4 @@
+> Internal working report, written in Russian during the hackathon. The judge-facing documentation is README.md, docs/APPROACH.html, docs/BLIND-EVAL.md, docs/DOCKER.md and docs/SECURITY.md.
 # Шаг 2 — модельные предикаты и индукция правил
 
 Дата: 2026-10-24. Версия решения: `0.2.0`. Вход: `original`.

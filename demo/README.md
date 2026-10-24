@@ -1,68 +1,68 @@
-# Демо судьи
+# Judge demo
 
-Python 3.10+, только stdlib. Запуск из корня репозитория; установка пакета и API-ключ не нужны.
-CLI импортирует `solution.eval.predict` и `SemanticRuntime.fewshot`; код и артефакты решения не изменяет.
-По умолчанию читает `artifacts/step2` относительно корня репозитория. Явный `--artifacts` разрешается относительно текущего каталога.
+Python 3.10+, stdlib only. Run from the repository root; no package installation or API key is required.
+The CLI imports `solution.eval.predict` and `SemanticRuntime.fewshot`; it does not modify the solution code or artifacts.
+By default, it reads `artifacts/step2` relative to the repository root. An explicit `--artifacts` is resolved relative to the current directory.
 
-## Подготовка артефактов
+## Preparing artifacts
 
-Нужны `rules_spec.json` и `fewshot_index.json` от одного запуска adapt, опционально `cache/`.
-Артефакты игнорируются Git. Если step2 отсутствует, подготовьте его на public train:
+Requires `rules_spec.json` and `fewshot_index.json` from the same adapt run, optionally `cache/`.
+Artifacts are ignored by Git. If step2 is missing, prepare it on public train:
 
 ```sh
 python3 -S src/prepare_inputs.py --train data/public_train.csv --test data/public_test.csv --out-dir out/demo_input
 python3 -S -m solution adapt --input out/demo_input/train.jsonl --artifacts artifacts/step2 --no-model
 ```
 
-Демо всегда работает как `eval --no-model`: HTTP запрещён даже при наличии ключа, но сохранённый семантический кэш может использоваться.
-Модель кэша выбирается штатными `EVAL_MODEL`/`INDUCTION_MODEL` из окружения или корневого `.env`.
-При неизвестных проверках выводится fallback из манифеста. У `good` может не быть сработавшего правила;
-`bad` также может быть меткой большинства при неизвестных проверках — CLI не выдумывает нарушение.
+The demo always runs as `eval --no-model`: HTTP is disabled even if a key is present, but the saved semantic cache may be used.
+The cache model is selected using the standard `EVAL_MODEL`/`INDUCTION_MODEL` settings from the environment or the root `.env`.
+For unknown checks, the fallback from the manifest is displayed. A `good` verdict may have no triggered rule;
+`bad` may also be the majority label when checks are unknown — the CLI does not invent a violation.
 
-## Три команды запуска
+## Three run commands
 
-1. Пример public test:
+1. Public test example:
 
 ```sh
 python3 -S demo/judge_demo.py --id 100a727946a7a45a72c46771e608090f
 ```
 
-2. Пример train с явным каталогом артефактов:
+2. Train example with an explicit artifacts directory:
 
 ```sh
 python3 -S demo/judge_demo.py --id 788b8ddedccb1543d09913a7eb1eea12 --artifacts artifacts/step2
 ```
 
-3. Собственный диалог и context:
+3. Your own conversation and context:
 
 ```sh
 python3 -S demo/judge_demo.py --dialog-file /tmp/plata-dialog.json --context-file /tmp/plata-context.json --topic financial_position
 ```
 
-Для третьей команды сохраните в `/tmp/plata-dialog.json`:
+For the third command, save the following in `/tmp/plata-dialog.json`:
 
 ```json
 [{"role":"user","content":"How much money?"},{"role":"assistant","content":"You have 100 MXN."}]
 ```
 
-И в `/tmp/plata-context.json`:
+And in `/tmp/plata-context.json`:
 
 ```json
 {"today":"2026-01-10","accounts":[{"product":"Cash","balance":100,"current_debt":20}]}
 ```
 
-Вместо `--topic` можно передать context как `{"topic":"financial_position","context":{...}}`
-либо диалог как `{"topic":"financial_position","conversation":[...]}`. Тема нужна API для выбора правил;
-противоречащие значения отклоняются. Допустимы `credit`, `financial_position`, `savings`, `spending`.
-Неизвестный ID, отсутствующий файл/тема или неверный JSON завершают CLI с кодом 2.
+Instead of `--topic`, you can pass context as `{"topic":"financial_position","context":{...}}`
+or the conversation as `{"topic":"financial_position","conversation":[...]}`. The API requires a topic to select rules;
+conflicting values are rejected. Valid values are `credit`, `financial_position`, `savings`, `spending`.
+An unknown ID, missing file/topic, or invalid JSON causes the CLI to exit with code 2.
 
-## Реальный вывод
+## Actual output
 
-Ниже полный stdout первой команды на локально восстановленном step2 (public train, `--no-model`).
-Цитата взята из проверяемого диалога, условие — из манифеста, вычисленные суммы — из evidence checker.
-Похожие примеры взяты из `fewshot_index.json`, метки относятся ко всему диалогу.
-Близость текста не доказывает одинаковое нарушение; поиск исключает собственный ID и идентичный диалог.
-Если в другом индексе меньше двух подходящих примеров, CLI сообщает фактическое число.
+Below is the complete stdout of the first command using locally rebuilt step2 artifacts (public train, `--no-model`).
+The quote comes from the conversation being evaluated, the condition from the manifest, and the calculated amounts from the evidence checker.
+Similar examples come from `fewshot_index.json`; labels apply to the entire conversation.
+Text similarity does not prove the same violation; retrieval excludes the query ID and identical conversations.
+If another index contains fewer than two suitable examples, the CLI reports the actual count.
 
 ```text
 Example: 100a727946a7a45a72c46771e608090f (public_test.csv; topic=spending)
@@ -89,9 +89,9 @@ Similar train examples (TF-IDF dialog; same topic; self/identical dialog exclude
 Similarity does not imply the same violation; labels belong to whole train conversations.
 ```
 
-## Проверка
+## Verification
 
 `python3 -S -m unittest discover -s tests -p test_demo.py -v`
 
-Один интеграционный test создаёт временные train-only артефакты, сверяет good/bad, правило и цитаты с `predict`,
-метки соседей с исходным train, оба входных режима, ошибки ввода, неизвестную семантическую проверку и отсутствие записи в артефакты.
+One integration test creates temporary train-only artifacts, checks good/bad, the rule and quotes against `predict`,
+neighbor labels against the source train data, both input modes, input errors, an unknown semantic check, and the absence of writes to artifacts.

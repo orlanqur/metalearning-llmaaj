@@ -1,3 +1,4 @@
+> Internal working report, written in Russian during the hackathon. The judge-facing documentation is README.md, docs/APPROACH.html, docs/BLIND-EVAL.md, docs/DOCKER.md and docs/SECURITY.md.
 Шаг 2 реализован: LLM-клиент, кэш, семантика, безопасный DSL, индукция, baseline и leave-one-rule-out.
 
 - Public test: **0.9502305665**, 76/80 — результат сохранён.
