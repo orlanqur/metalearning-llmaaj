@@ -11,5 +11,7 @@ __pycache__/
 .DS_Store
 /runs/
 /out/
+/artifacts/
 /dist/
 *.egg-info/
+/PROJECT-MEMORY.md
