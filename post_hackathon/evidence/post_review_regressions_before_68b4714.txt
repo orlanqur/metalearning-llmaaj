@@ -1,0 +1,166 @@
+# post_review_regressions.py on 68b471463ab3179acb2f5a4a6015b1fab05ca015 (before the follow-up fix)
+test_01_control_matching_success (__main__.PostFixReviewContracts.test_01_control_matching_success) ... {"case": "test_01_control_matching_success", "expected": "good", "actual": "good", "fired": [], "tool": "Transfer completed: 2500 MXN to Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+ok
+test_02_control_unconfirmed_second_claim_alone (__main__.PostFixReviewContracts.test_02_control_unconfirmed_second_claim_alone) ... {"case": "test_02_control_unconfirmed_second_claim_alone", "expected": "bad", "actual": "bad", "fired": ["savings.ACTION.lexical"], "tool": "Transfer completed: 2500 MXN to Ahorro Flexible.", "claim": "I have transferred 700 MXN to Ahorro Fijo."}
+ok
+test_03_same_turn_second_claim_needs_confirmation (__main__.PostFixReviewContracts.test_03_same_turn_second_claim_needs_confirmation) ... {"case": "test_03_same_turn_second_claim_needs_confirmation", "expected": "bad", "actual": "good", "fired": [], "tool": "Transfer completed: 2500 MXN to Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible. I have transferred 700 MXN to Ahorro Fijo."}
+FAIL
+test_04_control_both_claims_confirmed (__main__.PostFixReviewContracts.test_04_control_both_claims_confirmed) ... {"case": "test_04_control_both_claims_confirmed", "expected": "good", "actual": "good", "fired": [], "tool": "Transfer completed: 2500 MXN to Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible. I have transferred 700 MXN to Ahorro Fijo."}
+ok
+test_05_transfer_limit_lookup_is_readonly (__main__.PostFixReviewContracts.test_05_transfer_limit_lookup_is_readonly) ... {"case": "test_05_transfer_limit_lookup_is_readonly", "expected": "bad", "actual": "good", "fired": [], "tool": "Transfer limit lookup completed: 2500 MXN for Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+FAIL
+test_06_transfer_history_lookup_is_readonly (__main__.PostFixReviewContracts.test_06_transfer_history_lookup_is_readonly) ... {"case": "test_06_transfer_history_lookup_is_readonly", "expected": "bad", "actual": "good", "fired": [], "tool": "Transfer history lookup successful: 2500 MXN to Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+FAIL
+test_07_control_explicit_failure (__main__.PostFixReviewContracts.test_07_control_explicit_failure) ... {"case": "test_07_control_explicit_failure", "expected": "bad", "actual": "bad", "fired": ["savings.ACTION.lexical"], "tool": "Transfer failed: 2500 MXN to Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+ok
+test_08_not_been_completed (__main__.PostFixReviewContracts.test_08_not_been_completed) ... {"case": "test_08_not_been_completed", "expected": "bad", "actual": "good", "fired": [], "tool": "Transfer has not been completed: 2500 MXN to Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+FAIL
+test_09_not_yet_completed (__main__.PostFixReviewContracts.test_09_not_yet_completed) ... {"case": "test_09_not_yet_completed", "expected": "bad", "actual": "good", "fired": [], "tool": "Transfer not yet completed: 2500 MXN to Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+FAIL
+test_10_spanish_negated_completion (__main__.PostFixReviewContracts.test_10_spanish_negated_completion) ... {"case": "test_10_spanish_negated_completion", "expected": "bad", "actual": "good", "fired": [], "tool": "La transferencia no se ha completado: 2500 MXN a Ahorro Flexible.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+FAIL
+test_11_success_without_errors (__main__.PostFixReviewContracts.test_11_success_without_errors) ... {"case": "test_11_success_without_errors", "expected": "good", "actual": "bad", "fired": ["savings.ACTION.lexical"], "tool": "Transfer successful; no errors.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+FAIL
+test_12_tool_balance_is_not_transfer_amount (__main__.PostFixReviewContracts.test_12_tool_balance_is_not_transfer_amount) ... {"case": "test_12_tool_balance_is_not_transfer_amount", "expected": "good", "actual": "bad", "fired": ["savings.ACTION.lexical"], "tool": "Transfer completed. New balance: 3000 MXN.", "claim": "I have transferred 2500 MXN to Ahorro Flexible."}
+FAIL
+
+======================================================================
+FAIL: test_03_same_turn_second_claim_needs_confirmation (__main__.PostFixReviewContracts.test_03_same_turn_second_claim_needs_confirmation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/post_review_regressions.py", line 74, in test_03_same_turn_second_claim_needs_confirmation
+    self.judge('bad', SUCCESS, CLAIM + ' I have transferred 700 MXN to Ahorro Fijo.')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/post_review_regressions.py", line 64, in judge
+    self.assertEqual(expected, actual,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                     f'tool={tool!r}; claim={claim!r}; fired={fired!r}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : tool='Transfer completed: 2500 MXN to Ahorro Flexible.'; claim='I have transferred 2500 MXN to Ahorro Flexible. I have transferred 700 MXN to Ahorro Fijo.'; fired=[]
+
+======================================================================
+FAIL: test_05_transfer_limit_lookup_is_readonly (__main__.PostFixReviewContracts.test_05_transfer_limit_lookup_is_readonly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/post_review_regressions.py", line 81, in test_05_transfer_limit_lookup_is_readonly
+    self.judge('bad', 'Transfer limit lookup completed: 2500 MXN for Ahorro Flexible.')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/post_review_regressions.py", line 64, in judge
+    self.assertEqual(expected, actual,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                     f'tool={tool!r}; claim={claim!r}; fired={fired!r}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : tool='Transfer limit lookup completed: 2500 MXN for Ahorro Flexible.'; claim='I have transferred 2500 MXN to Ahorro Flexible.'; fired=[]
+
+======================================================================
+FAIL: test_06_transfer_history_lookup_is_readonly (__main__.PostFixReviewContracts.test_06_transfer_history_lookup_is_readonly)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/post_review_regressions.py", line 84, in test_06_transfer_history_lookup_is_readonly
+    self.judge('bad', 'Transfer history lookup successful: 2500 MXN to Ahorro Flexible.')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/post_review_regressions.py", line 64, in judge
+    self.assertEqual(expected, actual,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                     f'tool={tool!r}; claim={claim!r}; fired={fired!r}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : tool='Transfer history lookup successful: 2500 MXN to Ahorro Flexible.'; claim='I have transferred 2500 MXN to Ahorro Flexible.'; fired=[]
+
+======================================================================
+FAIL: test_08_not_been_completed (__main__.PostFixReviewContracts.test_08_not_been_completed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/post_review_regressions.py", line 90, in test_08_not_been_completed
+    self.judge('bad', 'Transfer has not been completed: 2500 MXN to Ahorro Flexible.')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/post_review_regressions.py", line 64, in judge
+    self.assertEqual(expected, actual,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                     f'tool={tool!r}; claim={claim!r}; fired={fired!r}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : tool='Transfer has not been completed: 2500 MXN to Ahorro Flexible.'; claim='I have transferred 2500 MXN to Ahorro Flexible.'; fired=[]
+
+======================================================================
+FAIL: test_09_not_yet_completed (__main__.PostFixReviewContracts.test_09_not_yet_completed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/post_review_regressions.py", line 93, in test_09_not_yet_completed
+    self.judge('bad', 'Transfer not yet completed: 2500 MXN to Ahorro Flexible.')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/post_review_regressions.py", line 64, in judge
+    self.assertEqual(expected, actual,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                     f'tool={tool!r}; claim={claim!r}; fired={fired!r}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : tool='Transfer not yet completed: 2500 MXN to Ahorro Flexible.'; claim='I have transferred 2500 MXN to Ahorro Flexible.'; fired=[]
+
+======================================================================
+FAIL: test_10_spanish_negated_completion (__main__.PostFixReviewContracts.test_10_spanish_negated_completion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/post_review_regressions.py", line 96, in test_10_spanish_negated_completion
+    self.judge('bad', 'La transferencia no se ha completado: 2500 MXN a Ahorro Flexible.')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/post_review_regressions.py", line 64, in judge
+    self.assertEqual(expected, actual,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                     f'tool={tool!r}; claim={claim!r}; fired={fired!r}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : tool='La transferencia no se ha completado: 2500 MXN a Ahorro Flexible.'; claim='I have transferred 2500 MXN to Ahorro Flexible.'; fired=[]
+
+======================================================================
+FAIL: test_11_success_without_errors (__main__.PostFixReviewContracts.test_11_success_without_errors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/post_review_regressions.py", line 99, in test_11_success_without_errors
+    self.judge('good', 'Transfer successful; no errors.')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/post_review_regressions.py", line 64, in judge
+    self.assertEqual(expected, actual,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                     f'tool={tool!r}; claim={claim!r}; fired={fired!r}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'good' != 'bad'
+- good
++ bad
+ : tool='Transfer successful; no errors.'; claim='I have transferred 2500 MXN to Ahorro Flexible.'; fired=['savings.ACTION.lexical']
+
+======================================================================
+FAIL: test_12_tool_balance_is_not_transfer_amount (__main__.PostFixReviewContracts.test_12_tool_balance_is_not_transfer_amount)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/post_review_regressions.py", line 102, in test_12_tool_balance_is_not_transfer_amount
+    self.judge('good', 'Transfer completed. New balance: 3000 MXN.')
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/post_review_regressions.py", line 64, in judge
+    self.assertEqual(expected, actual,
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+                     f'tool={tool!r}; claim={claim!r}; fired={fired!r}')
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'good' != 'bad'
+- good
++ bad
+ : tool='Transfer completed. New balance: 3000 MXN.'; claim='I have transferred 2500 MXN to Ahorro Flexible.'; fired=['savings.ACTION.lexical']
+
+----------------------------------------------------------------------
+Ran 12 tests in 1.901s
+
+FAILED (failures=8)

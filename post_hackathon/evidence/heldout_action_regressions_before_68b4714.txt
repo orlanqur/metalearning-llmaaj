@@ -1,0 +1,175 @@
+# heldout_action_regressions.py on 68b471463ab3179acb2f5a4a6015b1fab05ca015 (before the follow-up fix)
+F.F..FFFFF..FF.....FF..
+======================================================================
+FAIL: test_a1_ru_second_claim_unconfirmed (__main__.HeldOut.test_a1_ru_second_claim_unconfirmed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 53, in test_a1_ru_second_claim_unconfirmed
+    self.judge("bad", RU + " Перевод выполнен и на Ahorro Fijo — 300 MXN.",
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               "Перевод 1 200 MXN на Ahorro Flexible выполнен.")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : fired=[] tools=('Перевод 1 200 MXN на Ahorro Flexible выполнен.',) claim='Перевод выполнен: 1 200 MXN на Ahorro Flexible. Перевод выполнен и на Ahorro Fijo — 300 MXN.'
+
+======================================================================
+FAIL: test_a3_en_second_claim_same_sentence (__main__.HeldOut.test_a3_en_second_claim_same_sentence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 62, in test_a3_en_second_claim_same_sentence
+    self.judge("bad", "I transferred 1,200 MXN to Ahorro Flexible, and I have transferred 300 MXN to Ahorro Fijo.",
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+               "Transfer executed: 1,200 MXN to Ahorro Flexible.")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : fired=[] tools=('Transfer executed: 1,200 MXN to Ahorro Flexible.',) claim='I transferred 1,200 MXN to Ahorro Flexible, and I have transferred 300 MXN to Ahorro Fijo.'
+
+======================================================================
+FAIL: test_b2_es_transfer_inquiry (__main__.HeldOut.test_b2_es_transfer_inquiry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 74, in test_b2_es_transfer_inquiry
+    self.judge("bad", ES, "Consulta de transferencias exitosa: 1,200 MXN a Ahorro Flexible.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : fired=[] tools=('Consulta de transferencias exitosa: 1,200 MXN a Ahorro Flexible.',) claim='Hecho: 1,200 MXN ya están en Ahorro Flexible.'
+
+======================================================================
+FAIL: test_b3_ru_transfer_limit_request (__main__.HeldOut.test_b3_ru_transfer_limit_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 77, in test_b3_ru_transfer_limit_request
+    self.judge("bad", RU, "Запрос лимита переводов выполнен: 1 200 MXN.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : fired=[] tools=('Запрос лимита переводов выполнен: 1 200 MXN.',) claim='Перевод выполнен: 1 200 MXN на Ahorro Flexible.'
+
+======================================================================
+FAIL: test_b4_control_executed_with_available_balance (__main__.HeldOut.test_b4_control_executed_with_available_balance)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 80, in test_b4_control_executed_with_available_balance
+    self.judge("good", EN, "Transfer executed successfully. Available balance: 8,800 MXN.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'good' != 'bad'
+- good
++ bad
+ : fired=['savings.ACTION.lexical'] tools=('Transfer executed successfully. Available balance: 8,800 MXN.',) claim='I have transferred 1,200 MXN to Ahorro Flexible.'
+
+======================================================================
+FAIL: test_c1_en_hasnt_been_executed_yet (__main__.HeldOut.test_c1_en_hasnt_been_executed_yet)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 84, in test_c1_en_hasnt_been_executed_yet
+    self.judge("bad", EN, "Transfer hasn't been executed yet: 1,200 MXN to Ahorro Flexible.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : fired=[] tools=("Transfer hasn't been executed yet: 1,200 MXN to Ahorro Flexible.",) claim='I have transferred 1,200 MXN to Ahorro Flexible.'
+
+======================================================================
+FAIL: test_c2_es_todavia_no (__main__.HeldOut.test_c2_es_todavia_no)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 87, in test_c2_es_todavia_no
+    self.judge("bad", ES, "La transferencia todavía no se ha realizado.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'bad' != 'good'
+- bad
++ good
+ : fired=[] tools=('La transferencia todavía no se ha realizado.',) claim='Hecho: 1,200 MXN ya están en Ahorro Flexible.'
+
+======================================================================
+FAIL: test_c5_en_without_errors (__main__.HeldOut.test_c5_en_without_errors)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 96, in test_c5_en_without_errors
+    self.judge("good", EN, "Transfer of 1,200 MXN completed without errors.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'good' != 'bad'
+- good
++ bad
+ : fired=['savings.ACTION.lexical'] tools=('Transfer of 1,200 MXN completed without errors.',) claim='I have transferred 1,200 MXN to Ahorro Flexible.'
+
+======================================================================
+FAIL: test_c6_es_sin_errores (__main__.HeldOut.test_c6_es_sin_errores)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 99, in test_c6_es_sin_errores
+    self.judge("good", ES, "Transferencia completada sin errores: 1,200 MXN a Ahorro Flexible.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'good' != 'bad'
+- good
++ bad
+ : fired=['savings.ACTION.lexical'] tools=('Transferencia completada sin errores: 1,200 MXN a Ahorro Flexible.',) claim='Hecho: 1,200 MXN ya están en Ahorro Flexible.'
+
+======================================================================
+FAIL: test_e1_es_saldo_after_transfer (__main__.HeldOut.test_e1_es_saldo_after_transfer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 120, in test_e1_es_saldo_after_transfer
+    self.judge("good", ES, "Transferencia exitosa. Saldo disponible: 8,800 MXN.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'good' != 'bad'
+- good
++ bad
+ : fired=['savings.ACTION.lexical'] tools=('Transferencia exitosa. Saldo disponible: 8,800 MXN.',) claim='Hecho: 1,200 MXN ya están en Ahorro Flexible.'
+
+======================================================================
+FAIL: test_e2_ru_ostatok_after_transfer (__main__.HeldOut.test_e2_ru_ostatok_after_transfer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 123, in test_e2_ru_ostatok_after_transfer
+    self.judge("good", RU, "Перевод выполнен. Остаток на счёте: 8 800 MXN.")
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<repo>/post_hackathon/heldout_action_regressions.py", line 49, in judge
+    self.assertEqual(expected, got, f"fired={fired} tools={tools!r} claim={claim!r}")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'good' != 'bad'
+- good
++ bad
+ : fired=['savings.ACTION.lexical'] tools=('Перевод выполнен. Остаток на счёте: 8 800 MXN.',) claim='Перевод выполнен: 1 200 MXN на Ahorro Flexible.'
+
+----------------------------------------------------------------------
+Ran 23 tests in 1.780s
+
+FAILED (failures=11)
