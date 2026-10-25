@@ -10,7 +10,7 @@ import json
 import re
 
 from .facts import (NUM, OPERATION_CUE, SENTENCE_END, bound_amount, contains, dates_in, flatten, money,
-                    month_in, norm, number, opening_exchange)
+                    money_spans, month_in, norm, number, opening_exchange)
 
 
 def evidence(facts, reason, **details):
@@ -251,55 +251,206 @@ def date_mismatch(f, p):
         return evidence(f, "Asserted date is absent from context", unexpected_dates=sorted(wrong, key=str), expected_dates=f.dates)
 
 
-# Tool-result vocabulary (RU/ES/EN, matched on facts.norm text). A failure cue wins over a
-# pending cue, which wins over a success cue, so negations such as "not completed",
-# "no se pudo completar" or "не выполнен" never read as success.
-TOOL_FAILURE = re.compile(
-    r"\b(?:fail\w*|reject\w*|declin\w*|denied|den[ie]gad\w*|error\w*|cancel\w*|abort\w*|revers\w*|refus\w*|"
-    r"insufficient|exceeded|unsuccessful|unable|timed out|timeout|"
-    r"(?:not|wasn.t|could not|couldn.t|didn.t|did not|cannot|can.t)\s+(?:be\s+)?"
-    r"(?:complet\w*|success\w*|process\w*|execut\w*|sen[dt]|transfer\w*|mov\w*|made|go through)|"
-    r"fall[oó]|fallid\w*|rechazad\w*|declinad\w*|insuficiente\w*|cancelad\w*|anulad\w*|revertid\w*|"
-    r"no (?:se )?(?:pudo|pudieron|complet\w*|realiz\w*|proces\w*|ejecut\w*|envi\w*|transfir\w*)|no fue posible|"
-    r"отклонен\w*|ошибк\w*|отказ\w*|отменен\w*|сбой|недостаточно|превышен\w*|"
-    r"не (?:удалось|прош\w*|выполнен\w*|проведен\w*|завершен\w*|исполнен\w*|отправлен\w*|переведен\w*))\b")
-TOOL_PENDING = re.compile(
-    r"\b(?:pending|processing|in progress|queued|scheduled|awaiting|initiated|submitted|under review|"
+# --- Reading tool results for completed-action claims (RU / ES / EN, on facts.norm text) ---
+# Status cues. Each cue is read inside its negation scope (cue_status): "has not been
+# completed", "no se ha completado" and "ещё не выполнен" are not success, "no errors",
+# "sin errores", "без ошибок", "0 errors" and "errors: none" are not failure.
+SUCCESS_CUE = (
+    r"success\w*|succeeded|complet(?:ed|e)|done|ok|okay|confirmed|executed|processed|approved|posted|finished|settled|"
+    r"transferred|sent|moved|deposited|credited|debited|"
+    r"[eé]xito|exitos[oa]s?|complet[ao]s?|completad[oa]s?|realizad[oa]s?|efectuad[oa]s?|ejecutad[oa]s?|procesad[oa]s?|"
+    r"confirmad[oa]s?|aprobad[oa]s?|finalizad[oa]s?|transferid[oa]s?|enviad[oa]s?|movid[oa]s?|depositad[oa]s?|"
+    r"abonad[oa]s?|acreditad[oa]s?|(?:complet|realiz|efectu|ejecut|proces|confirm|aprob|finaliz|acredit)[oó]|"
+    r"list[oa]|hecho|correcto|"
+    r"успешн\w*|успех\w*|выполнен\w*|завершен\w*|подтвержден\w*|проведен\w*|исполнен\w*|переведен\w*|"
+    r"отправлен\w*|зачислен\w*|списан\w*|готово")
+FAILURE_CUE = (
+    r"fail\w*|reject\w*|declin\w*|denied|den[ie]gad\w*|errors?|cancel\w*|abort\w*|revers\w*|refus\w*|"
+    r"insufficient|exceeded|unsuccessful|unable|invalid|timed out|timeout|could not|couldn.t|cannot|can.t|"
+    r"fall[oó]|fallid\w*|rechazad\w*|declinad\w*|insuficiente\w*|cancelad\w*|anulad\w*|revertid\w*|inv[aá]lid\w*|"
+    r"imposible|no fue posible|no (?:se )?(?:pudo|pudieron)|"
+    r"отклонен\w*|ошибк\w*|отказ\w*|отменен\w*|сбой|недостаточно|превышен\w*|неудач\w*|невозможно|не удалось")
+PENDING_CUE = (
+    r"pending|processing|in[- ]progress|queued|scheduled|awaiting|initiated|submitted|under review|on hold|"
     r"(?:is being|being|will be|to be)\s+(?:process\w*|complet\w*|execut\w*|sent|transferred|moved|review\w*)|"
     r"pendiente\w*|en proceso|procesando|en curso|programad\w*|en espera|iniciad\w*|en revisi[oó]n|"
     r"ser[aá] (?:procesad|realizad|completad|enviad|transferid)\w*|se (?:realizar|procesar|completar|enviar|transferir)[aá]n?|"
     r"est[aá] siendo procesad\w*|"
     r"в обработке|обрабатыва\w*|в процессе|ожида\w*|запланирован\w*|принят\w*|инициирован\w*|"
-    r"будет (?:выполнен\w*|переведен\w*|отправлен\w*|обработан\w*|проведен\w*))\b")
-TOOL_SUCCESS = re.compile(
-    r"\b(?:success\w*|succeeded|complet(?:ed|e)|done|ok|okay|confirmed|executed|processed|approved|posted|"
-    r"transferred|sent|moved|deposited|credited|debited|"
-    r"[eé]xito|exitos[oa]\w*|completad[oa]s?|realizad[oa]s?|efectuad[oa]s?|ejecutad[oa]s?|procesad[oa]s?|"
-    r"confirmad[oa]s?|aprobad[oa]s?|transferid[oa]s?|enviad[oa]s?|movid[oa]s?|depositad[oa]s?|abonad[oa]s?|"
-    r"acreditad[oa]s?|list[oa]|hecho|correcto|"
-    r"успешн\w*|выполнен\w*|завершен\w*|подтвержден\w*|проведен\w*|исполнен\w*|переведен\w*|отправлен\w*|"
-    r"зачислен\w*|списан\w*|готово)\b")
-TOOL_MOVEMENT = re.compile(
-    r"\b(?:transfer\w*|remit\w*|wire\w*|sen[dt]|sending|mov(?:e|ed|ing)|deposit\w*|withdraw\w*|pa(?:y|id|yment\w*)|top[- ]?up|"
-    r"transferen\w*|transferid\w*|transfir\w*|env[ií]\w*|mov(?:er|id)\w*|traspas\w*|dep[oó]sit\w*|retir\w*|pag[oa]\w*|abon\w*|"
-    r"перевод\w*|переведен\w*|перевест\w*|перечисл\w*|отправ\w*|зачисл\w*|пополн\w*|списан\w*|снят\w*|платеж\w*|оплат\w*)\b")
-TOOL_READONLY = re.compile(
-    r"\b(?:balance\w*|lookup|look-up|inquiry|query|statement|history|rate\w*|limit\w*|details?|info\w*|"
-    r"saldo\w*|consulta\w*|estado de cuenta|historial|movimientos|tasa\w*|l[ií]mite\w*|detalle\w*|"
-    r"баланс\w*|остат\w*|запрос\w*|проверк\w*|выписк\w*|истори\w*|ставк\w*|лимит\w*|сведени\w*|информац\w*)\b")
-AMOUNT_KEY = re.compile(r"amount|sum|total|monto|importe|cantidad|сумм", re.I)
+    r"будет (?:выполнен\w*|переведен\w*|отправлен\w*|обработан\w*|проведен\w*)")
+STATUS_CUE = re.compile(rf"\b(?:(?P<failure>{FAILURE_CUE})|(?P<pending>{PENDING_CUE})|(?P<success>{SUCCESS_CUE}))\b")
+# A negator up to three words before a cue, inside the same comma/colon segment, negates it.
+NEGATOR = (r"not|no|never|none|neither|nor|without|zero|cannot|\w+n['’]t|"
+           r"sin|nunca|ning[uú]n[oa]?|tampoco|cero|не|нет|без|ни|ноль")
+NEGATED_BEFORE = re.compile(rf"(?:\b(?:{NEGATOR})\b|(?<![\d.,])0)\s+(?:\S+\s+){{0,3}}$")
+NEGATED_AFTER = re.compile(r"^\s*(?:count|total|number|cantidad|число|количество)?\s*(?:[:=-]\s*)?"
+                           r"(?:no|not|false|none|0|ninguno|нет|cero|ноль)\b|^[- ]free\b")
+YET = re.compile(r"\b(?:yet|still|todav[ií]a|a[uú]n|ещ[её]|пока)\b")
+SEGMENT_BREAK = re.compile(r"[,;:()]")
 CLAUSE_BREAK = re.compile(r"[.!?;](?:\s|$)|\n|\s[—–-]\s")
+# What a tool result is about. A read-only head (lookup, history, limit, check...) makes the
+# result read-only even when "transfer" is its modifier; a bare balance word is read-only too.
+READONLY_HEAD = re.compile(
+    r"\b(?:lookups?|look-ups?|inquir(?:y|ies)|quer(?:y|ies)|history|limits?|checks?|statements?|details?|info\w*|"
+    r"verification|consultas?|historial|l[ií]mites?|verificaci[oó]n|detalles?|informaci[oó]n|"
+    r"запрос\w*|истори\w*|лимит\w*|проверк\w*|выписк\w*|сведени\w*|информаци\w*)\b")
+MOVEMENT = (
+    r"transfer\w*|remit\w*|wire\w*|sen[dt]|sending|mov(?:e|ed|ing)|deposit\w*|withdraw\w*|pa(?:y|id|yment\w*)|top[- ]?up|"
+    r"transferen\w*|transferid\w*|transfir\w*|transfer[ií]|env[ií]\w*|mov(?:er|id)\w*|traspas\w*|dep[oó]sit\w*|retir\w*|"
+    r"pag[oa]\w*|abon\w*|"
+    r"перевод\w*|переведен\w*|перевест\w*|перев[её]л\w*|перечисл\w*|отправ\w*|зачисл\w*|пополн\w*|списан\w*|снят\w*|"
+    r"платеж\w*|оплат\w*")
+MOVEMENT_WORD = re.compile(rf"\b(?:{MOVEMENT})\b")
+BALANCE_WORD = re.compile(r"\b(?:balances?|saldos?|баланс\w*|остат\w*)\b")
+# Amount roles: an amount introduced by one of these is a balance, fee, limit or the like, not
+# the operation amount; a movement word (or "amount") switches back to the operation amount.
+OTHER_AMOUNT_CUE = re.compile(
+    r"\b(?:balances?|saldos?|баланс\w*|остат\w*|остал\w*|остае\w*|на счет[еу]|quedan?|restantes?|remaining|left|"
+    r"leaving|holds?|available|disponibles?|доступн\w*|limits?|l[ií]mites?|лимит\w*|fees?|comisi[oó]n\w*|комисси\w*|"
+    r"cargos?|charges?|interest|inter[eé]s|процент\w*|you (?:now )?have|now has|tienes|tiene|у вас|hay|est[aá]n? en)\b")
+MOVEMENT_AMOUNT_CUE = re.compile(rf"\b(?:{MOVEMENT}|amount|monto|importe|cantidad|сумм\w*)\b")
+# Structured results: status-like and operation-like fields are preferred over the other text.
+STATUS_KEY = re.compile(r"^(?:status|state|result|outcome|success(?:ful)?|ok|completed|done|confirmed|"
+                        r"estado|resultado|[eé]xito|статус|результат|успех)$")
+OPERATION_KEY = re.compile(r"^(?:operation|op|type|action|kind|method|operaci[oó]n|tipo|acci[oó]n|операция|тип|действие)$")
+AMOUNT_KEY = re.compile(r"amount|\bsum\b|total|monto|importe|cantidad|сумм")
+OTHER_AMOUNT_KEY = re.compile(r"balance|saldo|баланс|остат|available|disponible|доступн|limit|l[ií]mite|лимит|"
+                              r"fee|comisi|комисси|interest|inter[eé]s|процент")
+
+
+def cue_status(clause, match):
+    """The kind a status cue stands for after its negation scope; None when it is negated away.
+
+    A negated success cue is a failure ("has not been completed", "no se ha
+    completado", "не выполнен") or, with a "yet" marker ("not yet", "todavía no",
+    "ещё не"), pending. A negated failure or pending cue ("no errors", "sin
+    errores", "0 errors", "errors: none", "error-free", "no longer pending") is
+    dropped. The scope is the comma/colon segment holding the cue.
+    """
+    kind = match.lastgroup
+    segment_start = max((m.end() for m in SEGMENT_BREAK.finditer(clause, 0, match.start())), default=0)
+    before = clause[segment_start:match.start()]
+    after = clause[match.end():]
+    negation = NEGATED_BEFORE.search(before)
+    if not negation and not NEGATED_AFTER.match(after):
+        return kind
+    if kind != "success":
+        return None
+    return "pending" if YET.search(before + SEGMENT_BREAK.split(after, 1)[0]) else "failure"
+
+
+def cue_operation(clause, match):
+    """What the clause carrying this status cue is about: readonly, movement or unspecified."""
+    segment_start = max((m.end() for m in SEGMENT_BREAK.finditer(clause, 0, match.start())), default=0)
+    after = clause[match.end():]
+    cut = re.search(r"[,:;(]|\d", after)
+    head = clause[segment_start:match.start()] + " " + " ".join((after[:cut.start()] if cut else after).split()[:4])
+    for scope in (head, clause):
+        if READONLY_HEAD.search(scope):
+            return "readonly"
+        if MOVEMENT_WORD.search(scope):
+            return "movement"
+    return "readonly" if BALANCE_WORD.search(clause) else "unspecified"
+
+
+def text_operation(text):
+    if READONLY_HEAD.search(text):
+        return "readonly"
+    if MOVEMENT_WORD.search(text):
+        return "movement"
+    return "readonly" if BALANCE_WORD.search(text) else "unspecified"
+
+
+def read_status(text):
+    """(status, operation) of a tool text from the clauses that carry its decisive status cues.
+
+    Status: any non-negated failure cue in any clause makes it failure, else any
+    pending cue makes it pending, else any success cue makes it success, else
+    unknown. Operation: among the cues of that status, movement if any clause is
+    about a money movement, else readonly if any is a lookup; None when they say
+    nothing, so the caller falls back to the whole text.
+    """
+    found = [(clause, kind, m) for clause in CLAUSE_BREAK.split(text) if clause and clause.strip()
+             for m in STATUS_CUE.finditer(clause) for kind in [cue_status(clause, m)] if kind]
+    status = next((k for k in ("failure", "pending", "success") if any(kind == k for _, kind, _ in found)), "unknown")
+    operations = {cue_operation(clause, m) for clause, kind, m in found if kind == status}
+    return status, ("movement" if "movement" in operations else "readonly" if "readonly" in operations else None)
+
+
+def amount_roles(text):
+    """[(value, role)] for each MXN amount: 'operation', or 'other' for a balance, fee, limit, available amount.
+
+    The role comes from the nearest cue in the segments before the amount (a balance
+    word beats a movement word inside one segment: "balance after transfer: 7 500 MXN");
+    an amount with no cue of its own keeps the previous amount's role, so "quedan 29 500
+    MXN y en Ahorro Flexible 6 000 MXN" are both balances and "transferred 2 500 MXN to
+    Ahorro Flexible and 700 MXN to Ahorro Fijo" are both operation amounts. A cue right
+    after the amount ("10 MXN fee", "10 MXN de comisión", "7 500 MXN remaining") also
+    makes it other.
+    """
+    roles, mode, cursor = [], "operation", 0
+    for start, end, value in money_spans(text):
+        for segment in reversed(re.split(r"[,;:.!?()]|\s[—–-]\s", text[cursor:start])):
+            if OTHER_AMOUNT_CUE.search(segment):
+                mode = "other"
+                break
+            if MOVEMENT_AMOUNT_CUE.search(segment):
+                mode = "operation"
+                break
+        trailing = re.match(r"\s*(?:mxn|песо|pesos)\s+(?:\w+\s+)?(?=\S)", text[end:])
+        role = "other" if trailing and OTHER_AMOUNT_CUE.match(text[end + trailing.end():]) else mode
+        roles.append((value, role))
+        cursor = end
+    return roles
+
+
+def structured_event(parsed):
+    """Fields of a JSON tool result: status/operation texts, operation and other amounts, and its text."""
+    status_texts, operation_texts, lines, amounts, other = [], [], [], [], []
+    for path, value in flatten(parsed).items():
+        key = norm(path.replace("_", " "))
+        leaf = key.rsplit(".", 1)[-1]
+        if isinstance(value, bool):
+            if STATUS_KEY.match(leaf):
+                status_texts.append("success" if value else "failure")
+            if value:
+                lines.append(leaf)
+            continue
+        # Absent fields are not cues: {"error": null}, {"errors": 0}, {"message": ""} say nothing.
+        if value is None or value == "" or value == 0 or (isinstance(value, str) and norm(value) in ("none", "null", "n/a", "-")):
+            continue
+        text_value = norm(str(value).replace("_", " "))
+        if STATUS_KEY.match(leaf):
+            status_texts.append(text_value)
+        if OPERATION_KEY.match(leaf):
+            operation_texts.append(text_value)
+        if isinstance(value, (int, float)) or re.fullmatch(NUM, text_value):
+            numeric = float(value) if isinstance(value, (int, float)) else number(text_value)
+            if OTHER_AMOUNT_KEY.search(key):
+                other.append(numeric)
+            elif AMOUNT_KEY.search(key):
+                amounts.append(numeric)
+        lines.append(f"{leaf}: {text_value}")
+    return dict(text="\n".join(lines), status_texts=status_texts, operation_texts=operation_texts,
+                amounts=amounts, other_amounts=other)
 
 
 def classify_tool_event(content, products=()):
     """Best-effort reading of one tool result (free text, or JSON when it parses).
 
-    Returns ``status`` (success | failure | pending | unknown), ``operation``
-    (movement | readonly | unspecified), the MXN ``amounts`` it names (JSON
-    amount-like fields included) and the context ``products`` it mentions.
-    Nothing here is required to exist: a bare string is classified on its words.
+    Returns ``status`` (success | failure | pending | unknown; see read_status and
+    cue_status for negation), ``operation`` (movement | readonly | unspecified; a
+    lookup/history/limit/check result is read-only even when it concerns a
+    transfer, and "status: completed" reports completion), the operation
+    ``amounts`` in MXN (balances, fees, limits and available amounts go to
+    ``other_amounts`` instead, see amount_roles) and the context ``products`` it
+    mentions. In JSON, status-like fields (status/state/result/ok/success...) and
+    operation-like fields (operation/type/action...) are preferred over the other
+    text, amount-like keys are operation amounts unless the key names a balance,
+    fee or limit, and null/empty/false/zero fields say nothing. Nothing here is
+    required to exist: a bare string is classified on its words.
     """
-    parsed, amounts = None, []
+    parsed = None
     if isinstance(content, (dict, list)):
         parsed = content
     elif isinstance(content, str):
@@ -308,84 +459,82 @@ def classify_tool_event(content, products=()):
         except ValueError:
             parsed = None
     if isinstance(parsed, (dict, list)):
-        flat = flatten(parsed)
-        # Absent fields must not read as cues: {"error": null} or {"failed": false} says nothing.
-        raw = "\n".join(key if isinstance(value, bool) else f"{key}: {value}" for key, value in flat.items()
-                        if value not in (None, "", False))
-        for key, value in flat.items():
-            if not AMOUNT_KEY.search(key) or isinstance(value, bool):
-                continue
-            if isinstance(value, (int, float)):
-                amounts.append(float(value))
-            elif isinstance(value, str) and re.fullmatch(NUM, value.strip()):
-                amounts.append(number(value.strip()))
+        fields = structured_event(parsed)
+        t = fields["text"]
+        status, operation = read_status("\n".join(fields["status_texts"]) if fields["status_texts"] else t)
+        if fields["operation_texts"]:
+            operation = text_operation(" ".join(fields["operation_texts"]))
+        roles = amount_roles(t)
+        amounts = fields["amounts"] + [v for v, role in roles if role == "operation"]
+        other = fields["other_amounts"] + [v for v, role in roles if role == "other"]
     else:
-        raw = content if isinstance(content, str) else str(content)
-    t = norm(raw)
-    amounts += money(t)
-    if TOOL_FAILURE.search(t):
-        status = "failure"
-    elif TOOL_PENDING.search(t):
-        status = "pending"
-    elif TOOL_SUCCESS.search(t):
-        status = "success"
-    else:
-        status = "unknown"
-    operation = "movement" if TOOL_MOVEMENT.search(t) else "readonly" if TOOL_READONLY.search(t) else "unspecified"
-    return dict(status=status, operation=operation, amounts=amounts,
+        t = norm(content if isinstance(content, str) else str(content))
+        status, operation = read_status(t)
+        roles = amount_roles(t)
+        amounts = [v for v, role in roles if role == "operation"]
+        other = [v for v, role in roles if role == "other"]
+    if operation is None:
+        operation = text_operation(t)
+    return dict(status=status, operation=operation, amounts=amounts, other_amounts=other,
                 products=[p for p in products if norm(p) and norm(p) in t])
 
 
-def claim_clause(normalized, match):
-    """The clause (sentence, or dash/semicolon-delimited part) holding the matched phrase."""
+def claim_clause_span(normalized, match):
+    """(start, end) of the clause (sentence, or dash/semicolon-delimited part) holding the matched phrase."""
     start = max((m.end() for m in CLAUSE_BREAK.finditer(normalized[:match.start()])), default=0)
     after = CLAUSE_BREAK.search(normalized[match.end():])
-    end = match.end() + after.start() if after else len(normalized)
+    return start, match.end() + after.start() if after else len(normalized)
+
+
+def claim_clause(normalized, match):
+    start, end = claim_clause_span(normalized, match)
     return normalized[start:end].strip()
 
 
-def tool_confirms(event, claim):
-    """Does one PRECEDING tool event confirm this completed-action claim?
+def tool_confirms(event, claim, value=None):
+    """Does one PRECEDING tool event confirm this claim, or the claimed operation amount ``value``?
 
-    Requires a success status that is not a read-only lookup; where both sides
-    name MXN amounts at least one claimed amount must appear in the tool result,
-    and where both sides name context products they must share one. A success
-    whose operation is unspecified counts only when it is tied to the claim by a
-    matching amount; a bare "OK" is not evidence for a particular transfer.
+    The event must be a success that is not read-only, and where both sides name
+    context products they must share one. For a claimed amount: if the event names
+    operation amounts the claimed one must be among them; otherwise only a
+    money-movement success (not a bare "OK") confirms it. A claim without an
+    amount needs a money-movement success.
     """
     if event["status"] != "success" or event["operation"] == "readonly":
         return False
-    if event["amounts"] and claim["amounts"] and not any(contains(event["amounts"], v) for v in claim["amounts"]):
-        return False
     if event["products"] and claim["products"] and not set(map(norm, event["products"])) & set(map(norm, claim["products"])):
         return False
-    if event["operation"] == "movement":
-        return True
-    return bool(event["amounts"] and claim["amounts"])
+    if value is not None and event["amounts"]:
+        return contains(event["amounts"], value)
+    return event["operation"] == "movement"
 
 
 def unconfirmed_action_claims(f, patterns):
-    """One record per assistant turn that claims a completed action no earlier tool result confirms.
+    """One record per completed-action claim that no earlier tool result confirms.
 
-    Semantics of the ``no_tool_confirmation`` guard. For every assistant turn in
-    which a pattern matches, only ``role: tool`` messages that come BEFORE that
-    turn are considered, and at least one of them must be classified as a
-    successful money-movement result that agrees with the claim (see
-    ``tool_confirms``). Failed, rejected, pending/in-progress, read-only
-    (balance lookup) and later tool events do not confirm the claim, and neither
-    does a result whose text cannot be classified: a claim of a completed action
-    needs positive evidence, so an indeterminate tool result is treated as "not
-    confirming" (violation), never as unknown. This keeps the checker boolean and
-    the rule verifiable on train, where no conversation contains a tool message,
-    so train behaviour is identical to a plain phrase match.
+    Semantics of the ``no_tool_confirmation`` guard. Every match of every action
+    pattern in an assistant turn is a claim (overlapping matches, and matches in
+    one clause, are one claim); each is checked on its own clause against the
+    ``role: tool`` messages that come BEFORE that turn. The clause's operation
+    amounts (MXN amounts not introduced as a balance, fee, limit or available
+    amount, see amount_roles) must each be confirmed by some preceding event, so
+    "transferred 2 500 MXN to Ahorro Flexible and 700 MXN to Ahorro Fijo" needs
+    both amounts confirmed; a claim without an operation amount needs a preceding
+    money-movement success (see tool_confirms). Failed, rejected, negated,
+    pending/in-progress, read-only (balance, limit or history lookup) and later
+    tool events do not confirm a claim, and neither does a result whose text
+    cannot be classified: a claim of a completed action needs positive evidence,
+    so an indeterminate tool result is treated as "not confirming" (violation),
+    never as unknown. This keeps the checker boolean and the rule verifiable on
+    train, where no conversation contains a tool message, so train behaviour is
+    identical to a plain phrase match.
 
-    Known limits, deliberately accepted for free-text tool results: the claimed
-    amounts are those in the matched clause, so a single clause that mixes a
-    wrong transfer amount with a correct balance also present in the tool text
-    passes this check (balances are covered by turn_contradiction); any earlier
-    success is considered, not only the most recent exchange, so an amount-less
-    claim ("Hecho") after an earlier confirmed transfer is accepted; products are
-    matched as a set, so the direction of a transfer is not checked.
+    Known limits, deliberately accepted for free-text tool results: a movement
+    success that states no operation amount confirms any claimed amount; any
+    earlier success is considered, not only the most recent exchange, so an
+    amount-less claim ("Hecho") after an earlier confirmed transfer is accepted;
+    products are matched as a set, so the direction of a transfer is not checked;
+    the amount-role and negation cues are a RU/ES/EN vocabulary, not a parser.
     """
     products = [a.get("product", "") for a in f.context.get("accounts", []) + f.context.get("savings_rates", [])
                 if a.get("product")]
@@ -393,19 +542,28 @@ def unconfirmed_action_claims(f, patterns):
              for i, m in enumerate(f.conversation) if m.get("role") == "tool"]
     unconfirmed = []
     for turn in f.assistant_turns:
-        for pattern in patterns:
-            match = re.search(pattern, turn["normalized"])
-            if not match:
+        t = turn["normalized"]
+        preceding = [event for i, event in tools if i < turn["index"]]
+        seen, last_end = set(), -1
+        for match in sorted((m for pattern in patterns for m in re.finditer(pattern, t)), key=lambda m: m.start()):
+            span = claim_clause_span(t, match)
+            if match.start() < last_end or span in seen:
                 continue
-            clause = claim_clause(turn["normalized"], match)
-            claim = dict(amounts=money(clause), products=[p for p in products if norm(p) in clause])
-            confirming = [i for i, event in tools if i < turn["index"] and tool_confirms(event, claim)]
-            if not confirming:
+            last_end = match.end()
+            seen.add(span)
+            clause = t[span[0]:span[1]].strip()
+            claim = dict(amounts=[v for v, role in amount_roles(clause) if role == "operation"],
+                         products=[p for p in products if norm(p) in clause])
+            if claim["amounts"]:
+                missing = [v for v in claim["amounts"] if not any(tool_confirms(e, claim, v) for e in preceding)]
+            else:
+                missing = [] if any(tool_confirms(e, claim) for e in preceding) else [None]
+            if missing:
                 unconfirmed.append(dict(turn=turn["index"], match=match.group(), claim=clause,
                                         claimed_amounts=claim["amounts"],
+                                        unconfirmed_amounts=[v for v in missing if v is not None],
                                         tool_events=[dict(index=i, before_claim=i < turn["index"], **event)
                                                      for i, event in tools]))
-            break
     return unconfirmed
 
 
