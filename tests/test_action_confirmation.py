@@ -96,6 +96,14 @@ class ActionClaimCheckerTests(unittest.TestCase):
         for ask, claim in ((ASK_EN, CLAIM_EN), (ASK_ES, CLAIM_ES), (ASK_RU, CLAIM_RU)):
             self.assertTrue(self.violated(dialog(("user", ask), ("assistant", claim))), claim)
 
+    def test_hecho_as_an_idiom_is_not_an_action_claim(self):
+        # "de hecho" = "in fact", "has hecho" = "you have done": neither is the assistant reporting a transfer.
+        for answer in ("De hecho, tu Ahorro Flexible rinde 9% anual.",
+                       "Es la única transferencia que has hecho este mes."):
+            self.assertFalse(self.violated(dialog(("user", ASK_ES), ("assistant", answer))), answer)
+        for claim in ("¡Hecho! Ya está en Ahorro Flexible.", "Ya he hecho la transferencia de 2 500 MXN."):
+            self.assertTrue(self.violated(dialog(("user", ASK_ES), ("assistant", claim))), claim)
+
     def test_preceding_matching_success_confirms_in_every_language(self):
         confirmations = {
             CLAIM_EN: "Transfer completed: 2 500 MXN from Cuenta Veluna to Ahorro Flexible.",

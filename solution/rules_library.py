@@ -67,7 +67,7 @@ def instantiate(rows):
 
     topic = "savings"
     add(topic, "ACTION", "lexical", "lexical_predicate", "Do not assert a completed transfer without a confirming tool event.",
-        dict(guard="no_tool_confirmation", meaning="action claimed complete", patterns=[r"\bhecho\b", r"перевод (?:выполнен|сделан)", r"i (?:have )?transferred"]), fields=["accounts.*.balance"])
+        dict(guard="no_tool_confirmation", meaning="action claimed complete", patterns=[r"(?<!\bde )(?<!\bhas )\bhecho\b", r"перевод (?:выполнен|сделан)", r"i (?:have )?transferred"]), fields=["accounts.*.balance"])
     add(topic, "FIXED_LOCK", "lexical", "lexical_predicate", "Do not promise early withdrawal of a fixed-term deposit.",
         dict(meaning="early Fijo withdrawal promised", patterns=[r"sí, puede retirar su ahorro fijo", r"их можно будет вывести и из fijo", r"сможете вернуть деньги из fijo", r"да, можно\..{0,100}вывод средств из ahorro fijo", r"возможность вывести деньги раньше срока", r"you can withdraw it from your ahorro fijo at any time"]), flags=["has_fixed_product"])
     add(topic, "RATE", "selected_tariff", "rate_mismatch", "Quoted rates must match the subscription and product in context.", dict(absolute_tolerance=0.05))
