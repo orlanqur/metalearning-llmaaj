@@ -56,9 +56,39 @@ def numbers(text):
     return [number(m.group()) for m in re.finditer(NUM, text)]
 
 
+def money_spans(text):
+    """(start, end, value) of each MXN amount in already normalized text."""
+    return [(m.start(1), m.end(1), number(m.group(1)))
+            for m in re.finditer("(" + NUM + r")\s*(?:mxn|песо|pesos)\b", text)]
+
+
 def money(text):
-    text = norm(text)
-    return [number(m.group(1)) for m in re.finditer("(" + NUM + r")\s*(?:mxn|песо|pesos)\b", text)]
+    return [value for _, _, value in money_spans(norm(text))]
+
+
+# A sentence ends at . ! ? ; followed by whitespace or the end ("1,012.50" and "p.a." do not end one).
+SENTENCE_END = re.compile(r"[.!?;](?=\s|$)")
+# Words between a balance claim and its amount that make the amount hypothetical or about another operation.
+OPERATION_CUE = re.compile(r"перев[еоа]д|после|если|можете|будет|останет|платеж|долг|"
+                           r"transfer|after|\bif\b|would|could|payment|debt|"
+                           r"\bsi\b|despu[eé]s|podr|quedar|pago|deuda")
+
+
+def bound_amount(text, claim):
+    """The amount a claim asserts: the first amount at or after the claim, in the same sentence.
+
+    Returns (value, gap) where gap is the text between the claim and the amount,
+    or (None, None) if the sentence carries no amount. Later amounts belong to
+    other statements (another account, a hypothetical transfer, a payment).
+    """
+    for start, _, value in money_spans(text):
+        if start < claim.start():
+            continue
+        gap = text[claim.end():start] if start >= claim.end() else ""
+        if SENTENCE_END.search(gap):
+            return None, None
+        return value, gap
+    return None, None
 
 
 def close(actual, expected, absolute=1.0, relative=0.005):
@@ -211,8 +241,11 @@ class FactSheet:
         for turn in turns:
             if re.search(r"сейчас на вашем счете|now.{0,20}(?:balance|account)|saldo.{0,20}ahora", turn["normalized"]):
                 for product, balance in expected["balances"].items():
-                    if norm(product) in turn["normalized"]:
-                        poison["changed_balances"].extend(v for v in turn["money"] if not close(v, balance))
+                    # Only the amount bound to this product's mention can be its changed balance.
+                    for mention in re.finditer(re.escape(norm(product)), turn["normalized"]):
+                        value, gap = bound_amount(turn["normalized"], mention)
+                        if value is not None and not OPERATION_CUE.search(gap) and not close(value, balance):
+                            poison["changed_balances"].append(value)
         flags = dict(plus_subscription=plus, has_debt=debt > 0, has_hold=hold > 0,
                      has_locked=locked > 0, has_refunds=any(m["refunds"] > 0 for m in months),
                      has_fixed_product=any("fijo" in norm(a.get("product", "")) for a in accounts + c.get("savings_rates", [])),

@@ -8,7 +8,8 @@ from functools import wraps
 import fnmatch
 import re
 
-from .facts import NUM, contains, dates_in, money, month_in, norm, number, opening_exchange
+from .facts import (NUM, OPERATION_CUE, SENTENCE_END, bound_amount, contains, dates_in, money,
+                    month_in, norm, number, opening_exchange)
 
 
 def evidence(facts, reason, **details):
@@ -141,10 +142,85 @@ def wrong_period(f, p):
             return evidence(f, "Default spending window is not the last three complete months", expected_months=[m["month"] for m in f.last3])
 
 
+PERCENT = re.compile(r"(\d+(?:[.,]\d+)?)\s*%")
+# Vocabulary that makes a percentage a statement about a rate (RU / ES / EN).
+RATE_CUE = re.compile(r"ставк|годов|доходност|начисл|\bпод\s*$|"
+                      r"\btasa|\banual|\brind[ea]|rendimiento|inter[eé]s|\bgat\b|al año|\bpaga\b|"
+                      r"\brate|annual|\bp\.a\b|per year|a year|\bapy\b|\bapr\b|interest|yield|\bearn|\bpays?\b")
+# Other percentage metrics: a nearer one of these describes the number instead of a rate cue.
+OTHER_METRIC = re.compile(r"инфляц\w*|inflaci\w*|inflation(?: rate)?|налог\w*|impuest\w*|\btax(?:es)?\b|"
+                          r"комисси\w*|comisi[oó]n\w*|\bfees?\b|скидк\w*|descuento\w*|discount\w*|кешб[эе]к\w*|cashback")
+# "20% more", "на 2% выше", "un 2% más": a difference, not the rate itself.
+RELATIVE_AFTER = re.compile(r"\s*(?:more|less|higher|lower|extra|больше|меньше|выше|ниже|más|menos|mayor|menor)\b")
+# "20% of your income", "20% de tus ingresos", "20% от дохода", "20% дохода": a share, not a rate.
+SHARE_AFTER = re.compile(r"\s*(?:(?:of|de|del|de la|de los|de las|от|из)\s+"
+                         r"(?!(?:la |el |su |tu )?(?:inter|tasa|rendim|rate|annual|anual|ставк|годов|доходност))"
+                         r"|(?:вашего |вашей |ваших |своего |своей |своих )?"
+                         r"(?:доход(?!н)|зарплат|заработ|бюджет|сумм|расход|трат|сбережен|остатк|баланс|средств|денег))")
+# "save 20%", "move 20% to", "ahorra el 20%", "откладывайте около 20%": an allocation, not a rate.
+# Product nouns are excluded: "ahorro", "ahorros" and "savings" name accounts, not actions.
+SHARE_BEFORE = re.compile(r"(?:\bsave\b|set aside|put aside|\ballocate\b|\bmove\b|\bput\b|\btransfer\b|\binvest\b|"
+                          r"\bahorr(?!os?\b)\w*|\baparta\w*|\bdestina\w*|\bmuev\w*|\bpas[ae]\b|\btransfier\w*|\binviert\w*|"
+                          r"отклад\w*|направ\w*|копит\w*|перевед\w*|перевест\w*|полож\w*|влож\w*)\s+(?:[\w~≈]+\s+){0,2}$")
+
+
+def distance(pattern, before, after):
+    """Characters between the number and the nearest match of pattern on either side."""
+    return min([len(before) - m.end() for m in pattern.finditer(before)] +
+               [m.start() for m in pattern.finditer(after)], default=None)
+
+
+def rate_claims(f):
+    """Classify each percentage in the assistant turns: rate, share, relative, other, or unbound.
+
+    Each percentage is read inside its own segment: the sentence, cut at the
+    neighbouring percentages. It is a share when grammar says so ("20% of your income",
+    "save 20%", "откладывайте 20% дохода"), relative for a difference ("2% more"), and
+    otherwise is described by its nearest descriptor: rate vocabulary or a context
+    product name makes it a rate claim; a nearer inflation/tax/fee/discount/cashback word
+    makes it another metric. A percentage with no descriptor is unbound. Only rate
+    claims are compared with context rates, so the other kinds never make a confident bad.
+    Unknown is deliberately not returned: verify demotes any rule that answers unknown
+    on a single train row, which would switch the whole rate check off.
+    """
+    tokens = sorted({token for x in f.context.get("accounts", []) + f.context.get("savings_rates", [])
+                     for token in re.findall(r"\w{4,}", norm(x.get("product", "")))})
+    product = re.compile(r"\b(?:" + "|".join(map(re.escape, tokens)) + r")\b") if tokens else None
+    claims = []
+    for turn in f.assistant_turns:
+        t = turn["normalized"]
+        found = list(PERCENT.finditer(t))
+        for i, m in enumerate(found):
+            ends = [e.end() for e in SENTENCE_END.finditer(t, 0, m.start())]
+            start = max(ends[-1] if ends else 0, found[i-1].end() if i else 0)
+            stop = SENTENCE_END.search(t, m.end())
+            stop = min(stop.start() if stop else len(t), found[i+1].start() if i+1 < len(found) else len(t))
+            before, after = t[start:m.start()], t[m.end():stop]
+            # "откладывать под 12%" or "save at 9% a year" is still a rate.
+            near_rate = RATE_CUE.search(before[-12:]) or RATE_CUE.search(after[:16])
+            rate = [d for d in (distance(RATE_CUE, before, after),
+                                distance(product, before, after) if product else None) if d is not None]
+            other = distance(OTHER_METRIC, before, after)
+            if SHARE_AFTER.match(after) or SHARE_BEFORE.search(before) and not near_rate:
+                kind = "share"
+            elif RELATIVE_AFTER.match(after):
+                kind = "relative"
+            elif other is not None and (not rate or other <= min(rate)):
+                kind = "other"
+            elif rate:
+                kind = "rate"
+            else:
+                kind = "unbound"
+            claims.append(dict(turn=turn["index"], value=number(m.group(1)), kind=kind, start=m.start(1)))
+    return claims
+
+
 @checker
 def rate_mismatch(f, p):
+    """Compare only percentages that state a rate; shares and unbound numbers are not rate claims."""
     a = text(f)
-    claimed = [number(v) for v in re.findall(r"(\d+(?:[.,]\d+)?)\s*%", a)]
+    claims = rate_claims(f)
+    claimed = [c["value"] for c in claims if c["kind"] == "rate"]
     allowed = [r["rate"]*100 for r in f.rates if r["rate"] is not None]
     accounts = f.context.get("accounts", [])
     allowed += [x["annual_rate"]*100 for x in accounts if "annual_rate" in x]
@@ -155,7 +231,10 @@ def rate_mismatch(f, p):
     if product:
         valid = [r["rate"]*100 for r in f.rates if norm(r["product"]) == norm(product) and r["rate"] is not None]
         valid += [x["annual_rate"]*100 for x in accounts if norm(x.get("product", "")) == norm(product) and "annual_rate" in x]
-        mentions = re.findall(re.escape(norm(product)) + p["following_pattern"], a)
+        not_rates = {(c["turn"], c["start"]) for c in claims if c["kind"] != "rate"}
+        mentions = [m.group(1) for turn in f.assistant_turns
+                    for m in re.finditer(re.escape(norm(product)) + p["following_pattern"], turn["normalized"])
+                    if (turn["index"], m.start(1)) not in not_rates]
         if valid and any(not contains(valid, number(v), tolerance, 0) for v in mentions):
             return evidence(f, "Rate attributed to a product contradicts that product's context rate", product=product, expected=valid, observed=mentions)
         if p.get("exclusive_unless") and p["exclusive_unless"] not in a and valid and any(not contains(valid, v, tolerance, 0) for v in claimed):
@@ -232,9 +311,16 @@ def turn_contradiction(f, p):
 
     A wrong replacement can be caught even if the initial correct value was only
     in context. This includes the original judge's AMOUNT checks.
+
+    Only the amount the claim asserts is compared: the first amount at or after the
+    claim, in the same sentence. Other amounts in the message (a second account, a
+    payment, a suggested transfer) are not this claim. If the words between the claim
+    and its amount make it hypothetical ("после перевода", "if you transfer"), the
+    checker abstains for that claim rather than calling it a contradiction.
     """
     for turn in f.assistant_turns:
-        if not re.search(p["claim_pattern"], turn["normalized"]):
+        claims = list(re.finditer(p["claim_pattern"], turn["normalized"]))
+        if not claims:
             continue
         if p["kind"] == "account_balance":
             product = p["product"]
@@ -246,8 +332,13 @@ def turn_contradiction(f, p):
             valid = [m[k] for m in (scoped or f.months) for k in ("purchases", "net_purchases")]
         else:
             valid = [v for key, v in f.known_fields.items() if fnmatch.fnmatchcase(key, p["field"]) and isinstance(v, (float, int))]
-        if valid and any(not contains(valid, v) for v in turn["money"]):
-            return evidence(f, "Claimed amount differs from the unchanged context", turn=turn["index"], expected_any=valid, observed=turn["money"])
+        for claim in claims:
+            value, gap = bound_amount(turn["normalized"], claim)
+            if value is None or OPERATION_CUE.search(gap):
+                continue
+            if valid and not contains(valid, value):
+                return evidence(f, "Claimed amount differs from the unchanged context", turn=turn["index"],
+                                claim=claim.group(), expected_any=valid, observed=value)
 
 
 @checker
