@@ -2,6 +2,13 @@
 
 Plata track · Hacktoberfest Hack Day Barcelona 2026
 
+> **Post-hackathon development; excluded from the submitted competition version.**
+> This branch starts from `56a79fa` of `orlanqur/plata-clean-work` (the submitted
+> branch, left unchanged) and fixes three correctness defects found by a review after
+> the hackathon, plus one more found while fixing them. Public-test predictions are
+> unchanged. Details:
+> [docs/POST-HACKATHON.md](docs/POST-HACKATHON.md).
+
 ## What it is
 
 A two-stage judge that learns topic-specific evaluation rules from expert-labeled
