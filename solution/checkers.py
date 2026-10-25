@@ -6,9 +6,10 @@ checks use an explicit runtime; without it they remain not_checked.
 
 from functools import wraps
 import fnmatch
+import json
 import re
 
-from .facts import (NUM, OPERATION_CUE, SENTENCE_END, bound_amount, contains, dates_in, money,
+from .facts import (NUM, OPERATION_CUE, SENTENCE_END, bound_amount, contains, dates_in, flatten, money,
                     month_in, norm, number, opening_exchange)
 
 
@@ -250,6 +251,164 @@ def date_mismatch(f, p):
         return evidence(f, "Asserted date is absent from context", unexpected_dates=sorted(wrong, key=str), expected_dates=f.dates)
 
 
+# Tool-result vocabulary (RU/ES/EN, matched on facts.norm text). A failure cue wins over a
+# pending cue, which wins over a success cue, so negations such as "not completed",
+# "no se pudo completar" or "не выполнен" never read as success.
+TOOL_FAILURE = re.compile(
+    r"\b(?:fail\w*|reject\w*|declin\w*|denied|den[ie]gad\w*|error\w*|cancel\w*|abort\w*|revers\w*|refus\w*|"
+    r"insufficient|exceeded|unsuccessful|unable|timed out|timeout|"
+    r"(?:not|wasn.t|could not|couldn.t|didn.t|did not|cannot|can.t)\s+(?:be\s+)?"
+    r"(?:complet\w*|success\w*|process\w*|execut\w*|sen[dt]|transfer\w*|mov\w*|made|go through)|"
+    r"fall[oó]|fallid\w*|rechazad\w*|declinad\w*|insuficiente\w*|cancelad\w*|anulad\w*|revertid\w*|"
+    r"no (?:se )?(?:pudo|pudieron|complet\w*|realiz\w*|proces\w*|ejecut\w*|envi\w*|transfir\w*)|no fue posible|"
+    r"отклонен\w*|ошибк\w*|отказ\w*|отменен\w*|сбой|недостаточно|превышен\w*|"
+    r"не (?:удалось|прош\w*|выполнен\w*|проведен\w*|завершен\w*|исполнен\w*|отправлен\w*|переведен\w*))\b")
+TOOL_PENDING = re.compile(
+    r"\b(?:pending|processing|in progress|queued|scheduled|awaiting|initiated|submitted|under review|"
+    r"(?:is being|being|will be|to be)\s+(?:process\w*|complet\w*|execut\w*|sent|transferred|moved|review\w*)|"
+    r"pendiente\w*|en proceso|procesando|en curso|programad\w*|en espera|iniciad\w*|en revisi[oó]n|"
+    r"ser[aá] (?:procesad|realizad|completad|enviad|transferid)\w*|se (?:realizar|procesar|completar|enviar|transferir)[aá]n?|"
+    r"est[aá] siendo procesad\w*|"
+    r"в обработке|обрабатыва\w*|в процессе|ожида\w*|запланирован\w*|принят\w*|инициирован\w*|"
+    r"будет (?:выполнен\w*|переведен\w*|отправлен\w*|обработан\w*|проведен\w*))\b")
+TOOL_SUCCESS = re.compile(
+    r"\b(?:success\w*|succeeded|complet(?:ed|e)|done|ok|okay|confirmed|executed|processed|approved|posted|"
+    r"transferred|sent|moved|deposited|credited|debited|"
+    r"[eé]xito|exitos[oa]\w*|completad[oa]s?|realizad[oa]s?|efectuad[oa]s?|ejecutad[oa]s?|procesad[oa]s?|"
+    r"confirmad[oa]s?|aprobad[oa]s?|transferid[oa]s?|enviad[oa]s?|movid[oa]s?|depositad[oa]s?|abonad[oa]s?|"
+    r"acreditad[oa]s?|list[oa]|hecho|correcto|"
+    r"успешн\w*|выполнен\w*|завершен\w*|подтвержден\w*|проведен\w*|исполнен\w*|переведен\w*|отправлен\w*|"
+    r"зачислен\w*|списан\w*|готово)\b")
+TOOL_MOVEMENT = re.compile(
+    r"\b(?:transfer\w*|remit\w*|wire\w*|sen[dt]|sending|mov(?:e|ed|ing)|deposit\w*|withdraw\w*|pa(?:y|id|yment\w*)|top[- ]?up|"
+    r"transferen\w*|transferid\w*|transfir\w*|env[ií]\w*|mov(?:er|id)\w*|traspas\w*|dep[oó]sit\w*|retir\w*|pag[oa]\w*|abon\w*|"
+    r"перевод\w*|переведен\w*|перевест\w*|перечисл\w*|отправ\w*|зачисл\w*|пополн\w*|списан\w*|снят\w*|платеж\w*|оплат\w*)\b")
+TOOL_READONLY = re.compile(
+    r"\b(?:balance\w*|lookup|look-up|inquiry|query|statement|history|rate\w*|limit\w*|details?|info\w*|"
+    r"saldo\w*|consulta\w*|estado de cuenta|historial|movimientos|tasa\w*|l[ií]mite\w*|detalle\w*|"
+    r"баланс\w*|остат\w*|запрос\w*|проверк\w*|выписк\w*|истори\w*|ставк\w*|лимит\w*|сведени\w*|информац\w*)\b")
+AMOUNT_KEY = re.compile(r"amount|sum|total|monto|importe|cantidad|сумм", re.I)
+CLAUSE_BREAK = re.compile(r"[.!?;](?:\s|$)|\n|\s[—–-]\s")
+
+
+def classify_tool_event(content, products=()):
+    """Best-effort reading of one tool result (free text, or JSON when it parses).
+
+    Returns ``status`` (success | failure | pending | unknown), ``operation``
+    (movement | readonly | unspecified), the MXN ``amounts`` it names (JSON
+    amount-like fields included) and the context ``products`` it mentions.
+    Nothing here is required to exist: a bare string is classified on its words.
+    """
+    parsed, amounts = None, []
+    if isinstance(content, (dict, list)):
+        parsed = content
+    elif isinstance(content, str):
+        try:
+            parsed = json.loads(content)
+        except ValueError:
+            parsed = None
+    if isinstance(parsed, (dict, list)):
+        flat = flatten(parsed)
+        # Absent fields must not read as cues: {"error": null} or {"failed": false} says nothing.
+        raw = "\n".join(key if isinstance(value, bool) else f"{key}: {value}" for key, value in flat.items()
+                        if value not in (None, "", False))
+        for key, value in flat.items():
+            if not AMOUNT_KEY.search(key) or isinstance(value, bool):
+                continue
+            if isinstance(value, (int, float)):
+                amounts.append(float(value))
+            elif isinstance(value, str) and re.fullmatch(NUM, value.strip()):
+                amounts.append(number(value.strip()))
+    else:
+        raw = content if isinstance(content, str) else str(content)
+    t = norm(raw)
+    amounts += money(t)
+    if TOOL_FAILURE.search(t):
+        status = "failure"
+    elif TOOL_PENDING.search(t):
+        status = "pending"
+    elif TOOL_SUCCESS.search(t):
+        status = "success"
+    else:
+        status = "unknown"
+    operation = "movement" if TOOL_MOVEMENT.search(t) else "readonly" if TOOL_READONLY.search(t) else "unspecified"
+    return dict(status=status, operation=operation, amounts=amounts,
+                products=[p for p in products if norm(p) and norm(p) in t])
+
+
+def claim_clause(normalized, match):
+    """The clause (sentence, or dash/semicolon-delimited part) holding the matched phrase."""
+    start = max((m.end() for m in CLAUSE_BREAK.finditer(normalized[:match.start()])), default=0)
+    after = CLAUSE_BREAK.search(normalized[match.end():])
+    end = match.end() + after.start() if after else len(normalized)
+    return normalized[start:end].strip()
+
+
+def tool_confirms(event, claim):
+    """Does one PRECEDING tool event confirm this completed-action claim?
+
+    Requires a success status that is not a read-only lookup; where both sides
+    name MXN amounts at least one claimed amount must appear in the tool result,
+    and where both sides name context products they must share one. A success
+    whose operation is unspecified counts only when it is tied to the claim by a
+    matching amount; a bare "OK" is not evidence for a particular transfer.
+    """
+    if event["status"] != "success" or event["operation"] == "readonly":
+        return False
+    if event["amounts"] and claim["amounts"] and not any(contains(event["amounts"], v) for v in claim["amounts"]):
+        return False
+    if event["products"] and claim["products"] and not set(map(norm, event["products"])) & set(map(norm, claim["products"])):
+        return False
+    if event["operation"] == "movement":
+        return True
+    return bool(event["amounts"] and claim["amounts"])
+
+
+def unconfirmed_action_claims(f, patterns):
+    """One record per assistant turn that claims a completed action no earlier tool result confirms.
+
+    Semantics of the ``no_tool_confirmation`` guard. For every assistant turn in
+    which a pattern matches, only ``role: tool`` messages that come BEFORE that
+    turn are considered, and at least one of them must be classified as a
+    successful money-movement result that agrees with the claim (see
+    ``tool_confirms``). Failed, rejected, pending/in-progress, read-only
+    (balance lookup) and later tool events do not confirm the claim, and neither
+    does a result whose text cannot be classified: a claim of a completed action
+    needs positive evidence, so an indeterminate tool result is treated as "not
+    confirming" (violation), never as unknown. This keeps the checker boolean and
+    the rule verifiable on train, where no conversation contains a tool message,
+    so train behaviour is identical to a plain phrase match.
+
+    Known limits, deliberately accepted for free-text tool results: the claimed
+    amounts are those in the matched clause, so a single clause that mixes a
+    wrong transfer amount with a correct balance also present in the tool text
+    passes this check (balances are covered by turn_contradiction); any earlier
+    success is considered, not only the most recent exchange, so an amount-less
+    claim ("Hecho") after an earlier confirmed transfer is accepted; products are
+    matched as a set, so the direction of a transfer is not checked.
+    """
+    products = [a.get("product", "") for a in f.context.get("accounts", []) + f.context.get("savings_rates", [])
+                if a.get("product")]
+    tools = [(i, classify_tool_event(m.get("content", ""), products))
+             for i, m in enumerate(f.conversation) if m.get("role") == "tool"]
+    unconfirmed = []
+    for turn in f.assistant_turns:
+        for pattern in patterns:
+            match = re.search(pattern, turn["normalized"])
+            if not match:
+                continue
+            clause = claim_clause(turn["normalized"], match)
+            claim = dict(amounts=money(clause), products=[p for p in products if norm(p) in clause])
+            confirming = [i for i, event in tools if i < turn["index"] and tool_confirms(event, claim)]
+            if not confirming:
+                unconfirmed.append(dict(turn=turn["index"], match=match.group(), claim=clause,
+                                        claimed_amounts=claim["amounts"],
+                                        tool_events=[dict(index=i, before_claim=i < turn["index"], **event)
+                                                     for i, event in tools]))
+            break
+    return unconfirmed
+
+
 @checker
 def lexical_predicate(f, p):
     """Narrow inherited phrase match, with a separate context applicability gate."""
@@ -258,10 +417,15 @@ def lexical_predicate(f, p):
         return None
     if p.get("guard") == "minimum_below_full" and not (cs.get("minimum_payment", float("inf")) < cs.get("no_interest_payment", 0)):
         return None
-    if p.get("guard") == "no_tool_confirmation" and any(m["role"] == "tool" for m in f.conversation):
-        return None
     user = "\n".join(norm(m["content"]) for m in f.conversation if m["role"] == "user")
     if p.get("user_pattern") and not re.search(p["user_pattern"], user):
+        return None
+    if p.get("guard") == "no_tool_confirmation":
+        # Per-claim check: a tool message anywhere in the conversation is not a confirmation.
+        unconfirmed = unconfirmed_action_claims(f, p["patterns"])
+        if unconfirmed:
+            return evidence(f, "Completed-action claim has no preceding confirming tool result",
+                            match=unconfirmed[0]["match"], predicate=p["meaning"], claims=unconfirmed)
         return None
     for pattern in p["patterns"]:
         match = re.search(pattern, text(f))
